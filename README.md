@@ -1,7 +1,9 @@
 <div align="center">
 
   <h1>🪟 Windows-Use</h1>
-
+  <a href="https://pepy.tech/project/windows-use">
+    <img src="https://static.pepy.tech/badge/windows-use" alt="PyPI Downloads">
+  </a>
   <a href="https://github.com/CursorTouch/windows-use/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
   </a>
