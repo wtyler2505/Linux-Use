@@ -8,6 +8,8 @@ from windows_use.agent.registry.service import Registry
 from windows_use.agent.prompt.service import Prompt
 from langchain_core.tools import BaseTool
 from windows_use.desktop import Desktop
+from rich.markdown import Markdown
+from rich.console import Console
 from termcolor import colored
 import logging
 
@@ -105,4 +107,9 @@ class Agent:
             if self.agent_state.consecutive_failures >= 3:
                 logger.warning("Consecutive failures exceeded limit, stopping execution.")
                 return AgentResult(is_done=False, content=None, error="Consecutive failures exceeded limit.")
-            self.agent_step.increment_step()        
+            self.agent_step.increment_step()
+
+    def print_response(self,query: str):
+        console=Console()
+        response=self.invoke(query)
+        console.print(Markdown(response.content))   

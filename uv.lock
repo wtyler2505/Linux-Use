@@ -1633,7 +1633,7 @@ wheels = [
 
 [[package]]
 name = "windows-use"
-version = "0.1.31"
+version = "0.1.4"
 source = { editable = "." }
 dependencies = [
     { name = "fuzzywuzzy" },
@@ -1646,6 +1646,7 @@ dependencies = [
     { name = "pydantic" },
     { name = "python-levenshtein" },
     { name = "requests" },
+    { name = "rich" },
     { name = "setuptools" },
     { name = "termcolor" },
     { name = "twine" },
@@ -1664,6 +1665,7 @@ requires-dist = [
     { name = "pydantic", specifier = ">=2.11.7" },
     { name = "python-levenshtein", specifier = ">=0.27.1" },
     { name = "requests", specifier = ">=2.32.4" },
+    { name = "rich", specifier = ">=14.0.0" },
     { name = "setuptools", specifier = ">=80.9.0" },
     { name = "termcolor", specifier = ">=3.1.0" },
     { name = "twine", specifier = ">=6.1.0" },
