@@ -14,7 +14,7 @@ class AgentState(BaseModel):
     def is_done(self):
         return self.agent_data is not None and self.agent_data.action.name == 'Done Tool'
 
-    def initialize_state(self, messages: list[BaseMessage]):
+    def init_state(self, messages: list[BaseMessage]):
         self.consecutive_failures = 0
         self.result = ""
         self.messages = messages

@@ -6,6 +6,7 @@ from langchain_core.language_models.chat_models import BaseChatModel
 from windows_use.agent.registry.views import ToolResult
 from windows_use.agent.registry.service import Registry
 from windows_use.agent.prompt.service import Prompt
+from live_inspect.watch_cursor import WatchCursor
 from langchain_core.tools import BaseTool
 from windows_use.desktop import Desktop
 from rich.markdown import Markdown
@@ -48,6 +49,7 @@ class Agent:
         self.instructions=instructions
         self.desktop = Desktop()
         self.agent_state = AgentState()
+        self.watch_cursor = WatchCursor()
         self.agent_step = AgentStep(max_steps=max_steps)
         self.use_vision=use_vision
         self.llm = llm
@@ -95,22 +97,30 @@ class Agent:
         system_message=SystemMessage(content=Prompt.system_prompt(instructions=self.instructions,tools_prompt=tools_prompt,max_steps=max_steps))
         human_message=image_message(prompt=prompt,image=desktop_state.screenshot) if self.use_vision and desktop_state.screenshot else HumanMessage(content=prompt)
         messages=[system_message,HumanMessage(content=f'<user_query>{query}</user_query>'),human_message]
-        self.agent_state.initialize_state(messages=messages)
-        while True:
-            if self.agent_step.is_last_step():
-                logger.info("Reached maximum number of steps, stopping execution.")
-                return AgentResult(is_done=False, content=None, error="Maximum steps reached.")
-            self.reason()
-            if self.agent_state.is_done():
-                self.answer()
-                return AgentResult(is_done=True, content=self.agent_state.result, error=None)
-            self.action()
-            if self.agent_state.consecutive_failures >= 3:
-                logger.warning("Consecutive failures exceeded limit, stopping execution.")
-                return AgentResult(is_done=False, content=None, error="Consecutive failures exceeded limit.")
-            self.agent_step.increment_step()
+        self.agent_state.init_state(messages=messages)
+        try:
+            self.watch_cursor.start()
+            while True:
+                if self.agent_step.is_last_step():
+                    self.watch_cursor.stop()
+                    logger.info("Reached maximum number of steps, stopping execution.")
+                    return AgentResult(is_done=False, content=None, error="Maximum steps reached.")
+                self.reason()
+                if self.agent_state.is_done():
+                    self.answer()
+                    self.watch_cursor.stop()
+                    return AgentResult(is_done=True, content=self.agent_state.result, error=None)
+                self.action()
+                if self.agent_state.consecutive_failures >= 3:
+                    logger.warning("Consecutive failures exceeded limit, stopping execution.")
+                    return AgentResult(is_done=False, content=None, error="Consecutive failures exceeded limit.")
+                self.agent_step.increment_step()
+        except Exception as error:
+            return AgentResult(is_done=False, content=None, error=str(error))
+        finally:
+            self.watch_cursor.stop()
 
     def print_response(self,query: str):
         console=Console()
         response=self.invoke(query)
-        console.print(Markdown(response.content))   
+        console.print(Markdown(response.content or response.error))   

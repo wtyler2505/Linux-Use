@@ -125,7 +125,6 @@ class Desktop:
         except Exception as ex:
             print(f"Error: {ex}")
             apps = []
-        print(apps)
         return apps
     
     def screenshot_in_bytes(self,screenshot:PILImage)->bytes:
