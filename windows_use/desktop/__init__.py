@@ -1,4 +1,4 @@
-from uiautomation import GetScreenSize, Control, GetRootControl, ControlType, GetFocusedControl
+from uiautomation import GetScreenSize, Control, GetRootControl, ControlType, GetFocusedControl, SetWindowTopmost
 from windows_use.desktop.views import DesktopState,App,Size
 from windows_use.desktop.config import EXCLUDED_APPS
 from PIL.Image import Image as PILImage
@@ -79,6 +79,18 @@ class Desktop:
             response,status=self.execute_command(f'Start-Process "shell:AppsFolder\\{appid}"')
         return response,status
     
+    def switch_app(self,name:str):
+        apps={app.name:app for app in self.desktop_state.apps}
+        matched_app:tuple[str,float]=process.extractOne(name,list(apps.keys()))
+        if matched_app is None:
+            return (f'Application {name.title()} not found.',1)
+        app_name,_=matched_app
+        app=apps.get(app_name)
+        if SetWindowTopmost(app.handle,isTopmost=True):
+            return (f'{app_name.title()} switched to foreground.',0)
+        else:
+            return (f'Failed to switch to {app_name.title()}.',1)
+    
     def get_app_size(self,control:Control):
         window=control.BoundingRectangle
         if window.isempty():
@@ -109,10 +121,11 @@ class Desktop:
                 if element.ControlType in [ControlType.WindowControl, ControlType.PaneControl]:
                     status = self.get_app_status(element)
                     size=self.get_app_size(element)
-                    apps.append(App(name=element.Name, depth=depth, status=status,size=size))
+                    apps.append(App(name=element.Name, depth=depth, status=status,size=size,handle=element.NativeWindowHandle))
         except Exception as ex:
             print(f"Error: {ex}")
             apps = []
+        print(apps)
         return apps
     
     def screenshot_in_bytes(self,screenshot:PILImage)->bytes:

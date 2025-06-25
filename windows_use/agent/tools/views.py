@@ -45,6 +45,9 @@ class Move(SharedBaseModel):
 class Shortcut(SharedBaseModel):
     shortcut:list[str]=Field(...,description="The shortcut to execute by pressing the keys.",examples=[['ctrl','a'],['alt','f4']])
 
+class Switch(SharedBaseModel):
+    name:str=Field(...,description="The name of the application to switch to foreground.",examples=['Google Chrome'])
+
 class Key(SharedBaseModel):
     key:str=Field(...,description="The key to press.",examples=['enter'])
 

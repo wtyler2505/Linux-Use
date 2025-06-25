@@ -1,6 +1,7 @@
 from windows_use.tree.views import TreeState
-from dataclasses import dataclass
 from typing import Literal,Optional
+from dataclasses import dataclass
+
 
 @dataclass
 class App:
@@ -8,9 +9,10 @@ class App:
     depth:int
     status:Literal['Maximized','Minimized','Normal']
     size:'Size'
+    handle: int
 
     def to_string(self):
-        return f'Name: {self.name}|Depth: {self.depth}|Status: {self.status}|Size: {self.size.to_string()}'
+        return f'Name: {self.name}|Depth: {self.depth}|Status: {self.status}|Size: {self.size.to_string()} Handle: {self.handle}'
 
 @dataclass
 class Size:

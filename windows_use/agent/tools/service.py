@@ -1,4 +1,4 @@
-from windows_use.agent.tools.views import Click, Type, Launch, Scroll, Drag, Move, Shortcut, Key, Wait, Scrape,Done, Clipboard, Shell
+from windows_use.agent.tools.views import Click, Type, Launch, Scroll, Drag, Move, Shortcut, Key, Wait, Scrape,Done, Clipboard, Shell, Switch
 from windows_use.desktop import Desktop
 from humancursor import SystemCursor
 from markdownify import markdownify
@@ -45,6 +45,15 @@ def clipboard_tool(mode: Literal['copy', 'paste'], text: str = None,desktop:Desk
         return f'Clipboard Content: "{clipboard_content}"'
     else:
         raise ValueError('Invalid mode. Use "copy" or "paste".')
+    
+@tool('Switch Tool',args_schema=Switch)
+def switch_tool(name: str,desktop:Desktop=None) -> str:
+    'Switch to a specific application window (e.g., "notepad", "calculator", "chrome", etc.) and bring to foreground.'
+    _,status=desktop.switch_app(name)
+    if status!=0:
+        return f'Failed to switch to {name.title()} window.'
+    else:
+        return f'Switched to {name.title()} window.'
 
 @tool('Click Tool',args_schema=Click)
 def click_tool(loc:tuple[int,int],button:Literal['left','right','middle']='left',clicks:int=1,desktop:Desktop=None)->str:

@@ -1,4 +1,4 @@
-from windows_use.agent.tools.service import click_tool, type_tool, launch_tool, shell_tool, clipboard_tool, done_tool, shortcut_tool, scroll_tool, drag_tool, move_tool, key_tool, wait_tool, scrape_tool 
+from windows_use.agent.tools.service import click_tool, type_tool, launch_tool, shell_tool, clipboard_tool, done_tool, shortcut_tool, scroll_tool, drag_tool, move_tool, key_tool, wait_tool, scrape_tool, switch_tool
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from windows_use.agent.views import AgentState, AgentStep, AgentResult
 from windows_use.agent.utils import extract_agent_data, image_message
@@ -43,7 +43,7 @@ class Agent:
         self.registry = Registry([
             click_tool,type_tool, launch_tool, shell_tool, clipboard_tool,
             done_tool, shortcut_tool, scroll_tool, drag_tool, move_tool,
-            key_tool, wait_tool, scrape_tool
+            key_tool, wait_tool, scrape_tool, switch_tool
         ] + additional_tools)
         self.instructions=instructions
         self.desktop = Desktop()
