@@ -20,6 +20,7 @@ def done_tool(answer:str,desktop:Desktop=None):
 def launch_tool(name: str,desktop:Desktop=None) -> str:
     'Launch an application present in start menu (e.g., "notepad", "calculator", "chrome")'
     _,status=desktop.launch_app(name)
+    pg.sleep(1.25)
     if status!=0:
         return f'Failed to launch {name.title()}.'
     else:
