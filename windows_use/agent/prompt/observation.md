@@ -1,29 +1,31 @@
 ```xml
-<Observation>
-Execution Step: ({steps}/{max_steps})
+<input>
+    <agent_state>
+        Current step: {steps}
 
-Action Response: {observation}
+        Max. Steps: {max_steps}
 
-[Start of Desktop State]
+        Action Response: {observation}
+    <agent_state>
+    <desktop_state>
+        [Begin of App Info]
+        Foreground App: {active_app}
 
-Cursor Location: {cursor_location}
+        Background Apps:
+        {apps}
+        [End of App Info]
+        [Begin of Screen]
+        List of Interactive Elements:
+        {interactive_elements}
 
-Foreground Application: {active_app}
+        List of Scrollable Elements:
+        {scrollable_elements}
 
-Opened Applications:
-{apps}
-
-List of Interactive Elements:
-{interactive_elements}
-
-List of Scrollable Elements:
-{scrollable_elements}
-
-List of Informative Elements:
-{informative_elements}
-
-[End of Desktop State]
+        List of Informative Elements:
+        {informative_elements}
+        [End of Screen]
+    <desktop_state>
 
 Note: Use the Done Tool if the task is completely over else continue solving.
-</Observation>
+</input>
 ```

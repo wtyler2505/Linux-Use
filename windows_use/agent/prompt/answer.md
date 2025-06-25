@@ -1,9 +1,8 @@
 ```xml
-<Option>
-    <Evaluate>{evaluate}</Evaluate>
-    <Memory>{memory}</Memory>
-    <Thought>{thought}</Thought>
-    <Final-Answer>{final_answer}</Final-Answer>
-    <Route>Answer</Route>
-</Option>
+<output>
+    <evaluate>{evaluate}</evaluate>
+    <memory>{memory}</memory>
+    <thought>{thought}</thought>
+    <final_answer>{final_answer}</final_answer>
+</output>
 ```

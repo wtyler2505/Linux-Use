@@ -11,6 +11,7 @@ from windows_use.desktop import Desktop
 from rich.markdown import Markdown
 from rich.console import Console
 from termcolor import colored
+from textwrap import shorten
 import logging
 
 logger = logging.getLogger(__name__)
@@ -68,7 +69,7 @@ class Agent:
         logger.info(colored(f"🔧: Action: {name}({', '.join(f'{k}={v}' for k, v in params.items())})",color='blue',attrs=['bold']))
         tool_result = self.registry.execute(tool_name=name, desktop=self.desktop, **params)
         observation=tool_result.content if tool_result.is_success else tool_result.error
-        logger.info(colored(f"🔭: Observation: {observation}",color='green',attrs=['bold']))
+        logger.info(colored(f"🔭: Observation: {shorten(observation,500,placeholder='...')}",color='green',attrs=['bold']))
         desktop_state = self.desktop.get_state(use_vision=self.use_vision)
         prompt=Prompt.observation_prompt(agent_step=self.agent_step, tool_result=tool_result, desktop_state=desktop_state)
         human_message=image_message(prompt=prompt,image=desktop_state.screenshot) if self.use_vision and desktop_state.screenshot else HumanMessage(content=prompt)
@@ -93,7 +94,7 @@ class Agent:
         prompt=Prompt.observation_prompt(agent_step=self.agent_step, tool_result=ToolResult(is_success=True, content="No Action"), desktop_state=desktop_state)
         system_message=SystemMessage(content=Prompt.system_prompt(instructions=self.instructions,tools_prompt=tools_prompt,max_steps=max_steps))
         human_message=image_message(prompt=prompt,image=desktop_state.screenshot) if self.use_vision and desktop_state.screenshot else HumanMessage(content=prompt)
-        messages=[system_message,HumanMessage(content=f'Task: {query}'),human_message]
+        messages=[system_message,HumanMessage(content=f'<user_query>{query}</user_query>'),human_message]
         self.agent_state.initialize_state(messages=messages)
         while True:
             if self.agent_step.is_last_step():

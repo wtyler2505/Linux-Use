@@ -19,6 +19,7 @@ class Prompt:
             'current_datetime': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             'instructions': '\n'.join(instructions),
             'tools_prompt': tools_prompt,
+            'download_directory': Path.home().joinpath('Downloads').as_posix(),
             'os':platform.system(),
             'home_dir':Path.home().as_posix(),
             'user':getuser(),
@@ -41,7 +42,7 @@ class Prompt:
     def previous_observation_prompt(observation: str)-> str:
         template=PromptTemplate.from_template(dedent('''
         ```xml
-        <Observation>{observation}</Observation>
+        <output>{observation}</output>
         ```
         '''))
         return template.format(**{'observation': observation})
