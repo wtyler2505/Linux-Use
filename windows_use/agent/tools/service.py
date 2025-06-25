@@ -60,7 +60,7 @@ def click_tool(loc:tuple[int,int],button:Literal['left','right','middle']='left'
 
 @tool('Type Tool',args_schema=Type)
 def type_tool(loc:tuple[int,int],text:str,clear:str='false',caret_position:Literal['start','idle','end']='idle',desktop:Desktop=None):
-    'Type text into input fields, text areas, or focused elements. Set clear=True to replace existing text, False to append. Click on target element coordinates first.'
+    'Type text into input fields, text areas, or focused elements. Set clear=True to replace existing text, False to append. Click on target element coordinates first and start typing.'
     x,y=loc
     cursor.click_on(loc)
     control=desktop.get_element_under_cursor()
