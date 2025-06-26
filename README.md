@@ -84,6 +84,13 @@ Enter your query: <YOUR TASK>
 
 <https://github.com/user-attachments/assets/47bdd166-1261-4155-8890-1b2189c0a3fd>
 
+## 🪴Grounding
+
+![Image](https://github.com/user-attachments/assets/7e65166f-574c-45ed-91e1-ff5fda34c9be)
+![Image](https://github.com/user-attachments/assets/f7e4cea0-635d-4a6c-b13a-cea4637563d2)
+![Image](https://github.com/user-attachments/assets/71d74d2f-ed56-473c-a166-415a37924861)
+![Image](https://github.com/user-attachments/assets/115a944c-4f5d-41a9-bb35-c1caad0b51f6)
+
 ## Vision
 
 Talk to your computer. Watch it get things done.
