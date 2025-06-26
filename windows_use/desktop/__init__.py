@@ -23,7 +23,7 @@ class Desktop:
         tree_state=tree.get_state()
         active_app,apps=(apps[0],apps[1:]) if len(apps)>0 else (None,[])
         if use_vision:
-            annotated_screenshot=tree.annotate(tree_state.interactive_nodes)
+            annotated_screenshot=tree.annotated_screenshot(tree_state.interactive_nodes,scale=0.5)
             screenshot=self.screenshot_in_bytes(annotated_screenshot)
         else:
             screenshot=None
@@ -134,7 +134,7 @@ class Desktop:
         data_uri = f"data:image/png;base64,{img_base64}"
         return data_uri
 
-    def get_screenshot(self,scale:float=0.4)->Image:
+    def get_screenshot(self,scale:float=0.7)->Image:
         screenshot=pyautogui.screenshot()
         size=(screenshot.width*scale, screenshot.height*scale)
         screenshot.thumbnail(size=size, resample=Image.Resampling.LANCZOS)

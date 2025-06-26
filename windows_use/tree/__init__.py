@@ -105,7 +105,7 @@ class Tree:
                     name=node.Name.strip() or "''",
                     control_type=node.LocalizedControlType.title(),
                     shortcut=node.AcceleratorKey or "''",
-                    bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom),
+                    bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom,width=box.width(),height=box.height()),
                     center=center,
                     app_name=app_name
                 ))
@@ -117,12 +117,14 @@ class Tree:
             elif is_element_scrollable(node):
                 scroll_pattern=node.GetScrollPattern()
                 box = node.BoundingRectangle
+                # Get the center
                 x,y=box.xcenter(),box.ycenter()
                 center = Center(x=x,y=y)
                 scrollable_nodes.append(ScrollElementNode(
                     name=node.Name.strip() or node.LocalizedControlType.capitalize() or "''",
                     app_name=app_name,
                     control_type=node.LocalizedControlType.title(),
+                    bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom,width=box.width(),height=box.height()),
                     center=center,
                     horizontal_scrollable=scroll_pattern.HorizontallyScrollable,
                     vertical_scrollable=scroll_pattern.VerticallyScrollable
@@ -137,49 +139,57 @@ class Tree:
     def get_random_color(self):
         return "#{:06x}".format(random.randint(0, 0xFFFFFF))
 
-    def annotate(self,nodes:list[TreeElementNode])->Image:
-        screenshot=self.desktop.get_screenshot()
-        # Include padding to the screenshot
-        padding=20
-        width=screenshot.width+(2*padding)
-        height=screenshot.height+(2*padding)
-        padded_screenshot=Image.new("RGB", (width, height), color=(255, 255, 255))
-        padded_screenshot.paste(screenshot, (padding,padding))
-        # Create a layout above the screenshot to place bounding boxes.
-        draw=ImageDraw.Draw(padded_screenshot)
-        font_size=12
+    def annotated_screenshot(self, nodes: list[TreeElementNode],scale:float=0.7) -> Image.Image:
+        screenshot = self.desktop.get_screenshot(scale=scale)
+        sleep(0.25)
+        # Add padding
+        padding = 20
+        width = screenshot.width + (2 * padding)
+        height = screenshot.height + (2 * padding)
+        padded_screenshot = Image.new("RGB", (width, height), color=(255, 255, 255))
+        padded_screenshot.paste(screenshot, (padding, padding))
+
+        draw = ImageDraw.Draw(padded_screenshot)
+        font_size = 12
         try:
-            font=ImageFont.truetype('arial.ttf',font_size)
+            font = ImageFont.truetype('arial.ttf', font_size)
         except:
-            font=ImageFont.load_default()
-        for label,node in enumerate(nodes):
-            box=node.bounding_box
-            color=self.get_random_color()
-            # Adjust bounding box to fit padded image
+            font = ImageFont.load_default()
+
+        def get_random_color():
+            return "#{:06x}".format(random.randint(0, 0xFFFFFF))
+
+        def draw_annotation(label, node: TreeElementNode):
+            box = node.bounding_box
+            color = get_random_color()
+
+            # Scale and pad the bounding box
             adjusted_box = (
-                box.left + padding, box.top + padding,  # Adjust top-left corner
-                box.right + padding, box.bottom + padding  # Adjust bottom-right corner
+                int(box.left * scale) + padding,
+                int(box.top * scale) + padding,
+                int(box.right * scale) + padding,
+                int(box.bottom * scale) + padding
             )
-            # Draw bounding box around the element in the screenshot
-            draw.rectangle(adjusted_box,outline=color,width=2)
-            
-            # Get the size of the label
-            label_width=draw.textlength(str(label),font=font,font_size=font_size)
-            label_height=font_size
-            left,top,right,bottom=adjusted_box
-            # Position the label above the bounding box and towards the right
-            label_x1 = right - label_width  # Align the right side of the label with the right edge of the box
-            label_y1 = top - label_height - 4  # Place the label just above the top of the bounding box, with some padding
 
-            # Draw the label background rectangle
+            # Draw bounding box
+            draw.rectangle(adjusted_box, outline=color, width=2)
+
+            # Label dimensions
+            label_width = draw.textlength(str(label), font=font)
+            label_height = font_size
+            left, top, right, bottom = adjusted_box
+
+            # Label position above bounding box
+            label_x1 = right - label_width
+            label_y1 = top - label_height - 4
             label_x2 = label_x1 + label_width
-            label_y2 = label_y1 + label_height + 4  # Add some padding
+            label_y2 = label_y1 + label_height + 4
 
-            # Draw the label background rectangle
+            # Draw label background and text
             draw.rectangle([(label_x1, label_y1), (label_x2, label_y2)], fill=color)
+            draw.text((label_x1 + 2, label_y1 + 2), str(label), fill=(255, 255, 255), font=font)
 
-            # Draw the label text
-            text_x = label_x1 + 2  # Padding for text inside the rectangle
-            text_y = label_y1 + 2
-            draw.text((text_x, text_y), str(label), fill=(255, 255, 255), font=font)
+        # Draw annotations in parallel
+        with ThreadPoolExecutor() as executor:
+            executor.map(draw_annotation, range(len(nodes)), nodes)
         return padded_screenshot

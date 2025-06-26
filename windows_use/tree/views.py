@@ -7,14 +7,14 @@ class TreeState:
     scrollable_nodes:list['ScrollElementNode']=field(default_factory=[])
 
     def interactive_elements_to_string(self)->str:
-        return '\n'.join([f'Label: {index} App Name: {node.app_name} ControlType: {f'{node.control_type} Control'} Name: {node.name} Shortcut: {node.shortcut} Cordinates: {node.center.to_string()}' for index,node in enumerate(self.interactive_nodes)])
+        return '\n'.join([f'Label: {index} App Name: {node.app_name} ControlType: {f'{node.control_type} Control'} Name: {node.name} Shortcut: {node.shortcut} Bounding Box: {node.bounding_box.xyxy_to_string()} Cordinates: {node.center.to_string()}' for index,node in enumerate(self.interactive_nodes)])
     
     def informative_elements_to_string(self)->str:
         return '\n'.join([f'App Name: {node.app_name} Name: {node.name}' for node in self.informative_nodes])
     
     def scrollable_elements_to_string(self)->str:
         n=len(self.interactive_nodes)
-        return '\n'.join([f'Label: {n+index} App Name: {node.app_name} ControlType: {f'{node.control_type} Control'} Name: {node.name} Cordinates: {node.center.to_string()} Horizontal Scrollable: {node.horizontal_scrollable} Vertical Scrollable: {node.vertical_scrollable}' for index,node in enumerate(self.scrollable_nodes)])
+        return '\n'.join([f'Label: {n+index} App Name: {node.app_name} ControlType: {f'{node.control_type} Control'} Name: {node.name} Bounding Box: {node.bounding_box.xyxy_to_string()} Cordinates: {node.center.to_string()} Horizontal Scrollable: {node.horizontal_scrollable} Vertical Scrollable: {node.vertical_scrollable}' for index,node in enumerate(self.scrollable_nodes)])
     
 @dataclass
 class BoundingBox:
@@ -22,9 +22,18 @@ class BoundingBox:
     top:int
     right:int
     bottom:int
+    width:int
+    height:int
 
-    def to_string(self):
-        return f'({self.left},{self.top},{self.right},{self.bottom})'
+    def xywh_to_string(self):
+        return f'({self.left},{self.top},{self.width},{self.height})'
+    
+    def xyxy_to_string(self):
+        x1,y1,x2,y2=self.convert_xywh_to_xyxy()
+        return f'({x1},{y1},{x2},{y2})'
+    
+    def convert_xywh_to_xyxy(self)->tuple[int,int,int,int]:
+        return self.left,self.top,self.left+self.width,self.top+self.height
 
 @dataclass
 class Center:
@@ -53,6 +62,7 @@ class ScrollElementNode:
     name:str
     control_type:str
     app_name:str
+    bounding_box:BoundingBox
     center:Center
     horizontal_scrollable:bool
     vertical_scrollable:bool

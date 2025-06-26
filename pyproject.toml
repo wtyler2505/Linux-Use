@@ -1,6 +1,6 @@
 [project]
 name = "windows-use"
-version = "0.1.4"
+version = "0.2.0"
 description = "An AI Agent that interacts with Windows OS at GUI level."
 readme = "README.md"
 authors = [
