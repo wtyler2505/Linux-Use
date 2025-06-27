@@ -2,21 +2,33 @@
 name = "windows-use"
 version = "0.2.0"
 description = "An AI Agent that interacts with Windows OS at GUI level."
-readme = "README.md"
 authors = [
     { name = "Jeomon George", email = "jeogeoalukka@gmail.com" }
 ]
+readme = "README.md"
 license = 'MIT'
 license-files = ["LICENSE"]
 urls = { homepage = "https://github.com/CursorTouch" }
 keywords = ["windows", "agent", "ai", "desktop","ai agent","automation"]
 requires-python = ">=3.13"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: User Interfaces",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3.13",
+]
+
 dependencies = [
     "fuzzywuzzy>=0.18.0",
     "humancursor>=1.1.5",
     "langchain>=0.3.25",
     "langchain-community>=0.3.25",
     "langchain-google-genai>=2.1.5",
+    "langchain-groq>=0.3.4",
+    "langchain-ollama>=0.3.3",
     "live-inspect==0.1.1",
     "markdownify>=1.1.0",
     "pillow>=11.2.1",
@@ -31,13 +43,15 @@ dependencies = [
     "uiautomation>=2.0.28",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.4.1",
+    "ruff>=0.12.1",
+]
+
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.setuptools]
+[tool.hatch.build]
 packages = ["windows_use"]
-include-package-data = true
-
-[tool.setuptools.package-data]
-"windows_use.agent.prompts" = ["*.md"]

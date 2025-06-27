@@ -44,7 +44,7 @@ class Agent:
         self.registry = Registry([
             click_tool,type_tool, launch_tool, shell_tool, clipboard_tool,
             done_tool, shortcut_tool, scroll_tool, drag_tool, move_tool,
-            key_tool, wait_tool, scrape_tool
+            key_tool, wait_tool, scrape_tool, switch_tool
         ] + additional_tools)
         self.instructions=instructions
         self.desktop = Desktop()

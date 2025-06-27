@@ -1,6 +1,6 @@
-# Contributing to Windows-MCP
+# Contributing to Windows-Use
 
-Thank you for your interest in contributing to MCP-Use! This document provides guidelines and instructions for contributing to this project.
+Thank you for your interest in contributing to Windows-Use! This document provides guidelines and instructions for contributing to this project.
 
 ## Table of Contents
 
@@ -26,31 +26,26 @@ Thank you for your interest in contributing to MCP-Use! This document provides g
 
 ### Development Environment
 
-Windows MCP requires:
-- Python 3.11 or later
+Windows-Use requires:
+- Python 3.13 or later
 
 ### Installation from Source
 
 1. Fork the repository on GitHub.
 2. Clone your fork locally:
-
-```bash
-git clone https://github.com/Jeomon/Windows-MCP.git
-cd Windows-MCP
-```
-
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/windows-use.git
+   cd windows-use
+   ```
 3. Install the package in development mode:
-
-```bash
-pip install -e ".[dev,search]"
-```
-
+   ```bash
+   pip install -e ".[dev,search]"
+   ```
 4. Set up pre-commit hooks:
-
-```bash
-pip install pre-commit
-pre-commit install
-```
+   ```bash
+   pip install pre-commit
+   pre-commit install
+   ```
 
 ## Development Workflow
 
@@ -63,11 +58,11 @@ pre-commit install
 ### Commit Messages
 
 For now no commit style is enforced, try to keep your commit messages informational.
-
 ### Code Style
 
-Key style guidelines:
+We use [Ruff](https://github.com/astral-sh/ruff) for code formatting and linting. The configuration is in `ruff.toml`.
 
+Key style guidelines:
 - Line length: 100 characters
 - Use double quotes for strings
 - Follow PEP 8 naming conventions
@@ -78,7 +73,7 @@ Key style guidelines:
 We use pre-commit hooks to ensure code quality before committing. The configuration is in `.pre-commit-config.yaml`.
 
 The hooks will:
-
+- Format code using Ruff
 - Run linting checks
 - Check for trailing whitespace and fix it
 - Ensure files end with a newline
@@ -121,24 +116,23 @@ pytest tests/
 
 - Update docstrings for new or modified functions, classes, and methods
 - Use Google-style docstrings:
+  ```python
+  def function_name(param1: type, param2: type) -> return_type:
+      """Short description.
 
-```python
-def function_name(param1: type, param2: type) -> return_type:
-    """Short description.
       Longer description if needed.
 
-     Args:
-        param1: Description of param1
-        param2: Description of param2
+      Args:
+          param1: Description of param1
+          param2: Description of param2
 
-    Returns:
-        Description of return value
+      Returns:
+          Description of return value
 
-    Raises:
-        ExceptionType: When and why this exception is raised
-    """
-```
-
+      Raises:
+          ExceptionType: When and why this exception is raised
+      """
+  ```
 - Update README.md for user-facing changes
 
 ## Getting Help
@@ -149,4 +143,4 @@ If you need help with your contribution:
 - Reach out to the maintainers
 - Check existing code for examples
 
-Thank you for contributing to Windows-MCP!
+Thank you for contributing to Windows-Use!

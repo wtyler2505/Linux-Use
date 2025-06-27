@@ -33,7 +33,9 @@ class BoundingBox:
         return f'({x1},{y1},{x2},{y2})'
     
     def convert_xywh_to_xyxy(self)->tuple[int,int,int,int]:
-        return self.left,self.top,self.left+self.width,self.top+self.height
+        x1,y1=self.left,self.top
+        x2,y2=self.left+self.width,self.top+self.height
+        return x1,y1,x2,y2
 
 @dataclass
 class Center:
