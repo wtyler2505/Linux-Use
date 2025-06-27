@@ -10,6 +10,8 @@ class Registry:
 
     def tool_prompt(self, tool_name: str) -> str:
         tool = self.tools_registry.get(tool_name)
+        if tool is None:
+            return f"Tool '{tool_name}' not found."
         return dedent(f"""
         Tool Name: {tool.name}
         Description: {tool.description}

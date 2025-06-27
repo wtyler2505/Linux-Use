@@ -22,6 +22,7 @@ classifiers = [
 ]
 
 dependencies = [
+    "coverage>=7.9.1",
     "fuzzywuzzy>=0.18.0",
     "humancursor>=1.1.5",
     "langchain>=0.3.25",
@@ -34,6 +35,7 @@ dependencies = [
     "pillow>=11.2.1",
     "pyautogui>=0.9.54",
     "pydantic>=2.11.7",
+    "pytest-cov>=6.2.1",
     "python-levenshtein>=0.27.1",
     "requests>=2.32.4",
     "rich>=14.0.0",

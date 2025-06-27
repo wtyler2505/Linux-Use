@@ -2,9 +2,9 @@ from dataclasses import dataclass,field
 
 @dataclass
 class TreeState:
-    interactive_nodes:list['TreeElementNode']=field(default_factory=[])
-    informative_nodes:list['TextElementNode']=field(default_factory=[])
-    scrollable_nodes:list['ScrollElementNode']=field(default_factory=[])
+    interactive_nodes:list['TreeElementNode']=field(default_factory=list)
+    informative_nodes:list['TextElementNode']=field(default_factory=list)
+    scrollable_nodes:list['ScrollElementNode']=field(default_factory=list)
 
     def interactive_elements_to_string(self)->str:
         return '\n'.join([f'Label: {index} App Name: {node.app_name} ControlType: {f'{node.control_type} Control'} Name: {node.name} Shortcut: {node.shortcut} Bounding Box: {node.bounding_box.xyxy_to_string()} Cordinates: {node.center.to_string()}' for index,node in enumerate(self.interactive_nodes)])
