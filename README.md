@@ -8,7 +8,7 @@
     <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
   </a>
   <img src="https://img.shields.io/badge/python-3.12%2B-blue" alt="Python">
-  <img src="https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-blue" alt="Platform">
+  <img src="https://img.shields.io/badge/platform-Windows%207–11-blue" alt="Platform: Windows 7 to 11">
   <br>
 
   <a href="https://x.com/CursorTouch">
@@ -30,7 +30,7 @@
 
 - Python 3.12 or higher
 - [UV](https://github.com/astral-sh/uv) (or `pip`)
-- Windows 10 or 11
+- Windows 7 or 8 or 10 or 11
 
 ### **Installation Steps**
 
