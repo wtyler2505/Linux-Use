@@ -25,6 +25,9 @@
         {informative_elements}
         [End of Screen]
     <desktop_state>
+    <user_query>
+        {query}
+    </user_query>
 
 Note: Use the Done Tool if the task is completely over else continue solving.
 </input>

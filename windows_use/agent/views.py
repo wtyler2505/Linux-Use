@@ -10,11 +10,13 @@ class AgentState(BaseModel):
     agent_data: 'AgentData' = None
     messages: list[BaseMessage] =  Field(default_factory=list)
     previous_observation: str = None
+    query:str=None
 
     def is_done(self):
         return self.agent_data is not None and self.agent_data.action.name == 'Done Tool'
 
-    def init_state(self, messages: list[BaseMessage]):
+    def init_state(self,query: str, messages: list[BaseMessage]):
+        self.query=query
         self.consecutive_failures = 0
         self.result = ""
         self.messages = messages

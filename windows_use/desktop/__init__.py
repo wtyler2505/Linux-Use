@@ -134,7 +134,7 @@ class Desktop:
         data_uri = f"data:image/png;base64,{img_base64}"
         return data_uri
 
-    def get_screenshot(self,scale:float=0.7)->Image:
+    def get_screenshot(self,scale:float=0.7)->Image.Image:
         screenshot=pyautogui.screenshot()
         size=(screenshot.width*scale, screenshot.height*scale)
         screenshot.thumbnail(size=size, resample=Image.Resampling.LANCZOS)

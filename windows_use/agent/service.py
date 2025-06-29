@@ -73,7 +73,7 @@ class Agent:
         observation=tool_result.content if tool_result.is_success else tool_result.error
         logger.info(colored(f"🔭: Observation: {shorten(observation,500,placeholder='...')}",color='green',attrs=['bold']))
         desktop_state = self.desktop.get_state(use_vision=self.use_vision)
-        prompt=Prompt.observation_prompt(agent_step=self.agent_step, tool_result=tool_result, desktop_state=desktop_state)
+        prompt=Prompt.observation_prompt(query=self.agent_state.query,agent_step=self.agent_step, tool_result=tool_result, desktop_state=desktop_state)
         human_message=image_message(prompt=prompt,image=desktop_state.screenshot) if self.use_vision and desktop_state.screenshot else HumanMessage(content=prompt)
         self.agent_state.update_state(agent_data=None,observation=observation,messages=[ai_message, human_message])
 
@@ -93,11 +93,11 @@ class Agent:
         max_steps = self.agent_step.max_steps
         tools_prompt = self.registry.get_tools_prompt()
         desktop_state = self.desktop.get_state(use_vision=self.use_vision)
-        prompt=Prompt.observation_prompt(agent_step=self.agent_step, tool_result=ToolResult(is_success=True, content="No Action"), desktop_state=desktop_state)
+        prompt=Prompt.observation_prompt(query=query,agent_step=self.agent_step, tool_result=ToolResult(is_success=True, content="No Action"), desktop_state=desktop_state)
         system_message=SystemMessage(content=Prompt.system_prompt(instructions=self.instructions,tools_prompt=tools_prompt,max_steps=max_steps))
         human_message=image_message(prompt=prompt,image=desktop_state.screenshot) if self.use_vision and desktop_state.screenshot else HumanMessage(content=prompt)
-        messages=[system_message,HumanMessage(content=f'<user_query>{query}</user_query>'),human_message]
-        self.agent_state.init_state(messages=messages)
+        messages=[system_message,human_message]
+        self.agent_state.init_state(query=query,messages=messages)
         try:
             self.watch_cursor.start()
             while True:

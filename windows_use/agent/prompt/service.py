@@ -48,7 +48,7 @@ class Prompt:
         return template.format(**{'observation': observation})
          
     @staticmethod
-    def observation_prompt(agent_step: AgentStep, tool_result:ToolResult,desktop_state: DesktopState) -> str:
+    def observation_prompt(query:str,agent_step: AgentStep, tool_result:ToolResult,desktop_state: DesktopState) -> str:
         cursor_position = pg.position()
         tree_state = desktop_state.tree_state
         template = PromptTemplate.from_file(files('windows_use.agent.prompt').joinpath('observation.md'))
@@ -62,6 +62,7 @@ class Prompt:
             'interactive_elements': tree_state.interactive_elements_to_string() or 'No interactive elements found',
             'informative_elements': tree_state.informative_elements_to_string() or 'No informative elements found',
             'scrollable_elements': tree_state.scrollable_elements_to_string() or 'No scrollable elements found',
+            'query':query
         })
     
     @staticmethod
