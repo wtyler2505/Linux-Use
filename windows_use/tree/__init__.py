@@ -1,5 +1,5 @@
 from windows_use.tree.views import TreeElementNode, TextElementNode, ScrollElementNode, Center, BoundingBox, TreeState
-from windows_use.tree.config import INTERACTIVE_CONTROL_TYPE_NAMES,INFORMATIVE_CONTROL_TYPE_NAMES
+from windows_use.tree.config import INTERACTIVE_CONTROL_TYPE_NAMES,INFORMATIVE_CONTROL_TYPE_NAMES, DEFAULT_ACTIONS
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from uiautomation import GetRootControl,Control,ImageControl
 from windows_use.desktop.config import AVOIDED_APPS
@@ -49,14 +49,6 @@ class Tree:
         interactive_nodes, informative_nodes, scrollable_nodes = [], [], []
         app_name=node.Name.strip()
         app_name='Desktop' if app_name=='Program Manager' else app_name
-        def is_element_interactive(node:Control):
-            try:
-                if node.ControlTypeName in INTERACTIVE_CONTROL_TYPE_NAMES:
-                    if is_element_visible(node) and is_element_enabled(node) and not is_element_image(node):
-                        return True
-            except Exception:
-                return False
-            return False
         
         def is_element_visible(node:Control,threshold:int=0):
             box=node.BoundingRectangle
@@ -73,6 +65,13 @@ class Tree:
                 return node.IsEnabled
             except Exception:
                 return False
+            
+        def is_default_action(node:Control):
+            legacy_pattern=node.GetLegacyIAccessiblePattern()
+            default_action=legacy_pattern.DefaultAction
+            if default_action in DEFAULT_ACTIONS:
+                return True
+            return False
         
         def is_element_image(node:Control):
             if isinstance(node,ImageControl):
@@ -95,6 +94,18 @@ class Tree:
                 return scroll_pattern.VerticallyScrollable or scroll_pattern.HorizontallyScrollable
             except Exception:
                 return False
+            
+        def is_element_interactive(node:Control):
+            try:
+                if node.ControlTypeName in INTERACTIVE_CONTROL_TYPE_NAMES:
+                    if is_element_visible(node) and is_element_enabled(node) and not is_element_image(node):
+                        return True
+                elif node.ControlTypeName=='GroupControl':
+                    if is_element_visible(node) and is_element_enabled(node) and is_default_action(node):
+                        return True
+            except Exception:
+                return False
+            return False
             
         def tree_traversal(node: Control):
             if is_element_interactive(node):

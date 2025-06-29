@@ -6,6 +6,10 @@ INTERACTIVE_CONTROL_TYPE_NAMES=set([
     'ImageControl','SpinnerControl','ScrollBarControl'
 ])
 
-INFORMATIVE_CONTROL_TYPE_NAMES=[
+DEFAULT_ACTIONS=set([
+    'Click','Press','Jump','Check','Uncheck','Double Click'
+])
+
+INFORMATIVE_CONTROL_TYPE_NAMES=set([
     'TextControl','ImageControl'
-]
+])
