@@ -151,7 +151,7 @@ class Tree:
                     interactive_nodes.append(TreeElementNode(
                         name=first_child.Name.strip() or "''",
                         control_type="link",
-                        shortcut=node.AcceleratorKey or "''",
+                        shortcut=first_child.AcceleratorKey or "''",
                         bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom,width=box.width(),height=box.height()),
                         center=center,
                         app_name=app_name

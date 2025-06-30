@@ -58,7 +58,7 @@ def switch_tool(name: str,desktop:Desktop=None) -> str:
 
 @tool('Click Tool',args_schema=Click)
 def click_tool(loc:tuple[int,int],button:Literal['left','right','middle']='left',clicks:int=1,desktop:Desktop=None)->str:
-    'Click on UI elements at specific coordinates. Supports left/right/middle mouse buttons and single/double/triple clicks. Use coordinates from State-Tool output.'
+    'Click on UI elements at specific coordinates. Supports left/right/middle mouse buttons and single/double/triple clicks.'
     x,y=loc
     cursor.move_to(loc)
     control=desktop.get_element_under_cursor()
