@@ -7,6 +7,7 @@ class AgentState(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid4()))
     consecutive_failures: int = 0
     result: str = ''
+    error: str = ''
     agent_data: 'AgentData' = None
     messages: list[BaseMessage] =  Field(default_factory=list)
     previous_observation: str = None

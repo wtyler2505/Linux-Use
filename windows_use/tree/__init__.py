@@ -95,13 +95,21 @@ class Tree:
             except Exception:
                 return False
             
-        def is_child_hyperlink(node:Control):
-            if node.ControlTypeName=='ListItemControl':
-                children=node.GetChildren()
-                if len(children)==0:
+        def element_has_child_element(node:Control,control_type:str,child_control_type:str):
+            if node.ControlTypeName==control_type:
+                first_child=node.GetFirstChildControl()
+                if first_child is None:
                     return False
-                first_child=children[0]
-                return first_child.ControlTypeName=='HyperlinkControl'
+                return first_child.ControlTypeName==child_control_type
+            
+        def group_has_name(node:Control):
+            try:
+                if node.ControlTypeName=='GroupControl':
+                    if not str(node.Name).strip():
+                        return True
+                    return False
+            except Exception:
+                return False
             
         def is_element_interactive(node:Control):
             try:
@@ -128,8 +136,26 @@ class Tree:
                     center=center,
                     app_name=app_name
                 ))
-                if is_child_hyperlink(node):
+                if group_has_name(node):
                     interactive_nodes.pop()
+                elif element_has_child_element(node,'ListItem','Hyperlink'):
+                    interactive_nodes.pop()
+                elif element_has_child_element(node,'Hyperlink','Text'):
+                    interactive_nodes.pop()
+                    first_child=node.GetFirstChildControl()
+                    if first_child:
+                        first_child=first_child.GetFirstChildControl()
+                    box = first_child.BoundingRectangle
+                    x,y=box.xcenter(),box.ycenter()
+                    center = Center(x=x,y=y)
+                    interactive_nodes.append(TreeElementNode(
+                        name=first_child.Name.strip() or "''",
+                        control_type="link",
+                        shortcut=node.AcceleratorKey or "''",
+                        bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom,width=box.width(),height=box.height()),
+                        center=center,
+                        app_name=app_name
+                    ))
             elif is_element_text(node):
                 informative_nodes.append(TextElementNode(
                     name=node.Name.strip() or "''",

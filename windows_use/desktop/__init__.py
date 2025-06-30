@@ -1,4 +1,4 @@
-from uiautomation import GetScreenSize, Control, GetRootControl, ControlType, GetFocusedControl, SetWindowTopmost
+from uiautomation import GetScreenSize, Control, GetRootControl, ControlType, ControlFromCursor, SetWindowTopmost
 from windows_use.desktop.views import DesktopState,App,Size
 from windows_use.desktop.config import EXCLUDED_APPS
 from PIL.Image import Image as PILImage
@@ -48,7 +48,7 @@ class Desktop:
         return "Normal"
     
     def get_element_under_cursor(self)->Control:
-        return GetFocusedControl()
+        return ControlFromCursor()
     
     def get_apps_from_start_menu(self)->dict[str,str]:
         command='Get-StartApps | ConvertTo-Csv -NoTypeInformation'

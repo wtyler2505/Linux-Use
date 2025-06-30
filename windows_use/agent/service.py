@@ -110,11 +110,12 @@ class Agent:
                 elif self.agent_state.consecutive_failures==self.consecutive_failures:
                     self.watch_cursor.stop()
                     logger.info("Consecutive failures exceeded limit, stopping execution.")
-                    return AgentResult(is_done=False, content=None, error="Consecutive failures exceeded limit.")
+                    return AgentResult(is_done=False, content=None, error=self.agent_state.error)
                 try:
                     self.reason()
-                except Exception:
+                except Exception as err:
                     self.agent_state.consecutive_failures += 1
+                    self.agent_state.error = str(err)
                     continue
                 if self.agent_state.is_done():
                     self.answer()
