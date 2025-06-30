@@ -57,7 +57,7 @@ class Tree:
             width=box.width()
             height=box.height()
             area=width*height
-            is_offscreen=not node.IsOffscreen
+            is_offscreen=not node.IsOffscreen or node.ControlTypeName in ['EditControl']
             return area > threshold and is_offscreen
     
         def is_element_enabled(node:Control):
