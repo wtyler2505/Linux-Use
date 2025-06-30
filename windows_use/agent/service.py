@@ -32,13 +32,14 @@ class Agent:
         instructions (list[str], optional): Instructions for the agent. Defaults to [].
         additional_tools (list[BaseTool], optional): Additional tools for the agent. Defaults to [].
         llm (BaseChatModel): Language model for the agent. Defaults to None.
+        consecutive_failures (int, optional): Maximum number of consecutive failures for the agent. Defaults to 3.
         max_steps (int, optional): Maximum number of steps for the agent. Defaults to 100.
         use_vision (bool, optional): Whether to use vision for the agent. Defaults to False.
     
     Returns:
         Agent
     '''
-    def __init__(self,instructions:list[str]=[],additional_tools:list[BaseTool]=[], llm: BaseChatModel=None,max_steps:int=100,use_vision:bool=False):
+    def __init__(self,instructions:list[str]=[],additional_tools:list[BaseTool]=[], llm: BaseChatModel=None,consecutive_failures:int=3,max_steps:int=100,use_vision:bool=False):
         self.name='Windows Use'
         self.description='An agent that can interact with GUI elements on Windows' 
         self.registry = Registry([
@@ -47,6 +48,7 @@ class Agent:
             key_tool, wait_tool, scrape_tool, switch_tool
         ] + additional_tools)
         self.instructions=instructions
+        self.consecutive_failures=consecutive_failures
         self.desktop = Desktop()
         self.agent_state = AgentState()
         self.watch_cursor = WatchCursor()
@@ -105,16 +107,22 @@ class Agent:
                     self.watch_cursor.stop()
                     logger.info("Reached maximum number of steps, stopping execution.")
                     return AgentResult(is_done=False, content=None, error="Maximum steps reached.")
-                self.reason()
+                elif self.agent_state.consecutive_failures==self.consecutive_failures:
+                    self.watch_cursor.stop()
+                    logger.info("Consecutive failures exceeded limit, stopping execution.")
+                    return AgentResult(is_done=False, content=None, error="Consecutive failures exceeded limit.")
+                try:
+                    self.reason()
+                except Exception:
+                    self.agent_state.consecutive_failures += 1
+                    continue
                 if self.agent_state.is_done():
                     self.answer()
                     self.watch_cursor.stop()
                     return AgentResult(is_done=True, content=self.agent_state.result, error=None)
-                self.action()
-                if self.agent_state.consecutive_failures >= 3:
-                    logger.warning("Consecutive failures exceeded limit, stopping execution.")
-                    return AgentResult(is_done=False, content=None, error="Consecutive failures exceeded limit.")
-                self.agent_step.increment_step()
+                else:
+                    self.action()
+                    self.agent_step.increment_step()
         except Exception as error:
             return AgentResult(is_done=False, content=None, error=str(error))
         finally:

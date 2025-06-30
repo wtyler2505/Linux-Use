@@ -95,6 +95,14 @@ class Tree:
             except Exception:
                 return False
             
+        def is_child_hyperlink(node:Control):
+            if node.ControlTypeName=='ListItemControl':
+                children=node.GetChildren()
+                if len(children)==0:
+                    return False
+                first_child=children[0]
+                return first_child.ControlTypeName=='HyperlinkControl'
+            
         def is_element_interactive(node:Control):
             try:
                 if node.ControlTypeName in INTERACTIVE_CONTROL_TYPE_NAMES:
@@ -120,6 +128,8 @@ class Tree:
                     center=center,
                     app_name=app_name
                 ))
+                if is_child_hyperlink(node):
+                    interactive_nodes.pop()
             elif is_element_text(node):
                 informative_nodes.append(TextElementNode(
                     name=node.Name.strip() or "''",

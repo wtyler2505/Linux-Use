@@ -65,6 +65,7 @@ def click_tool(loc:tuple[int,int],button:Literal['left','right','middle']='left'
     pg.mouseDown()
     pg.click(button=button,clicks=clicks)
     pg.mouseUp()
+    pg.sleep(1.0)
     num_clicks={1:'Single',2:'Double',3:'Triple'}
     return f'{num_clicks.get(clicks)} {button} Clicked on {control.Name} Element with ControlType {control.ControlTypeName} at ({x},{y}).'
 

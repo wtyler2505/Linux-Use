@@ -111,7 +111,7 @@ class Desktop:
         
     def get_apps(self) -> list[App]:
         try:
-            sleep(0.75)
+            sleep(1.00)
             desktop = GetRootControl()  # Get the desktop control
             elements = desktop.GetChildren()
             apps = []
