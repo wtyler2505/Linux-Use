@@ -58,7 +58,7 @@ class Tree:
             width=box.width()
             height=box.height()
             area=width*height
-            is_offscreen=not node.IsOffscreen or node.ControlTypeName in ['EditControl']
+            is_offscreen=(not node.IsOffscreen) or node.ControlTypeName in ['EditControl']
             return area > threshold and is_offscreen
     
         def is_element_enabled(node:Control):
@@ -97,11 +97,11 @@ class Tree:
                 return False
             
         def element_has_child_element(node:Control,control_type:str,child_control_type:str):
-            if node.ControlTypeName==control_type:
+            if node.LocalizedControlType==control_type:
                 first_child=node.GetFirstChildControl()
                 if first_child is None:
                     return False
-                return first_child.ControlTypeName==child_control_type
+                return first_child.LocalizedControlType==child_control_type
             
         def group_has_name(node:Control):
             try:
@@ -123,6 +123,24 @@ class Tree:
             except Exception:
                 return False
             return False
+        
+        def dom_correction(node:Control):
+            if group_has_name(node) or element_has_child_element(node,'list item','link') or element_has_child_element(node,'item','link'):
+                interactive_nodes.pop()
+            elif element_has_child_element(node,'link','heading'):
+                interactive_nodes.pop()
+                node=node.GetFirstChildControl()
+                x,y=random_point_within_bounding_box(node=node)
+                box = node.BoundingRectangle
+                center = Center(x=x,y=y)
+                interactive_nodes.append(TreeElementNode(
+                    name=node.Name.strip() or "''",
+                    control_type="link",
+                    shortcut=node.AcceleratorKey or "''",
+                    bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom,width=box.width(),height=box.height()),
+                    center=center,
+                    app_name=app_name
+                ))
             
         def tree_traversal(node: Control):
             if is_element_interactive(node):
@@ -137,26 +155,7 @@ class Tree:
                     center=center,
                     app_name=app_name
                 ))
-                if group_has_name(node):
-                    interactive_nodes.pop()
-                elif element_has_child_element(node,'ListItem','Hyperlink'):
-                    interactive_nodes.pop()
-                elif element_has_child_element(node,'Hyperlink','Text'):
-                    interactive_nodes.pop()
-                    first_child=node.GetFirstChildControl()
-                    if first_child:
-                        first_child=first_child.GetFirstChildControl()
-                    box = first_child.BoundingRectangle
-                    x,y=random_point_within_bounding_box(node=first_child)
-                    center = Center(x=x,y=y)
-                    interactive_nodes.append(TreeElementNode(
-                        name=first_child.Name.strip() or "''",
-                        control_type="link",
-                        shortcut=first_child.AcceleratorKey or "''",
-                        bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom,width=box.width(),height=box.height()),
-                        center=center,
-                        app_name=app_name
-                    ))
+                dom_correction(node)
             elif is_element_text(node):
                 informative_nodes.append(TextElementNode(
                     name=node.Name.strip() or "''",
@@ -241,3 +240,9 @@ class Tree:
         with ThreadPoolExecutor() as executor:
             executor.map(draw_annotation, range(len(nodes)), nodes)
         return padded_screenshot
+    
+    def get_annotated_image_data(self)->tuple[Image.Image,list[TreeElementNode]]:
+        node=GetRootControl()
+        nodes,_,_=self.get_appwise_nodes(node=node)
+        screenshot=self.annotated_screenshot(nodes=nodes,scale=1.0)
+        return screenshot,nodes
