@@ -176,7 +176,6 @@ class Tree:
                     horizontal_scrollable=scroll_pattern.HorizontallyScrollable,
                     vertical_scrollable=scroll_pattern.VerticallyScrollable
                 ))
-                
             # Recursively check all children
             for child in node.GetChildren():
                 tree_traversal(child)
