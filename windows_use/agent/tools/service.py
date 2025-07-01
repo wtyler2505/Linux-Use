@@ -4,12 +4,14 @@ from humancursor import SystemCursor
 from markdownify import markdownify
 from langchain.tools import tool
 from typing import Literal
-import uiautomation as ua
+import uiautomation as uia
 import pyperclip as pc
 import pyautogui as pg
 import requests
 
 cursor=SystemCursor()
+pg.FAILSAFE=False
+pg.PAUSE=1.0
 
 @tool('Done Tool',args_schema=Done)
 def done_tool(answer:str,desktop:Desktop=None):
@@ -96,9 +98,9 @@ def scroll_tool(loc:tuple[int,int]=None,type:Literal['horizontal','vertical']='v
         case 'vertical':
             match direction:
                 case 'up':
-                    ua.WheelUp(wheel_times)
+                    uia.WheelUp(wheel_times)
                 case 'down':
-                    ua.WheelDown(wheel_times)
+                    uia.WheelDown(wheel_times)
                 case _:
                     return 'Invalid direction. Use "up" or "down".'
         case 'horizontal':
@@ -106,13 +108,13 @@ def scroll_tool(loc:tuple[int,int]=None,type:Literal['horizontal','vertical']='v
                 case 'left':
                     pg.keyDown('Shift')
                     pg.sleep(0.05)
-                    ua.WheelUp(wheel_times)
+                    uia.WheelUp(wheel_times)
                     pg.sleep(0.05)
                     pg.keyUp('Shift')
                 case 'right':
                     pg.keyDown('Shift')
                     pg.sleep(0.05)
-                    ua.WheelDown(wheel_times)
+                    uia.WheelDown(wheel_times)
                     pg.sleep(0.05)
                     pg.keyUp('Shift')
                 case _:

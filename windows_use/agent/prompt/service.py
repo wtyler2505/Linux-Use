@@ -12,7 +12,7 @@ import platform
 
 class Prompt:
     @staticmethod
-    def system_prompt(tools_prompt:str,max_steps:int,instructions: list[str]=[]) -> str:
+    def system_prompt(browser: str,tools_prompt:str,max_steps:int,instructions: list[str]=[]) -> str:
         width, height = pg.size()
         template =PromptTemplate.from_file(files('windows_use.agent.prompt').joinpath('system.md'))
         return template.format(**{
@@ -21,6 +21,7 @@ class Prompt:
             'tools_prompt': tools_prompt,
             'download_directory': Path.home().joinpath('Downloads').as_posix(),
             'os':platform.system(),
+            'browser':browser,
             'home_dir':Path.home().as_posix(),
             'user':getuser(),
             'resolution':f'{width}x{height}',

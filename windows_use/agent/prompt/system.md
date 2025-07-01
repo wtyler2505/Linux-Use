@@ -22,6 +22,7 @@ Windows-Use enjoys helping the user to achieve the <user_query>.
 
 ## System Information:
 - **Operating System:** {os}
+- **Default Browser:** {browser}
 - **Home Directory:** {home_dir}
 - **Username:** {user}
 - **Screen Resolution:** {resolution}

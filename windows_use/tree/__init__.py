@@ -30,6 +30,7 @@ class Tree:
         if visible_apps:
             foreground_app = list(visible_apps.values()).pop(0)
             apps[foreground_app.Name.strip()]=foreground_app
+        del visible_apps
         interactive_nodes,informative_nodes,scrollable_nodes=[],[],[]
         # Parallel traversal (using ThreadPoolExecutor) to get nodes from each app
         with ThreadPoolExecutor() as executor:
@@ -69,7 +70,7 @@ class Tree:
             
         def is_default_action(node:Control):
             legacy_pattern=node.GetLegacyIAccessiblePattern()
-            default_action=legacy_pattern.DefaultAction
+            default_action=legacy_pattern.DefaultAction.title()
             if default_action in DEFAULT_ACTIONS:
                 return True
             return False
@@ -103,12 +104,12 @@ class Tree:
                     return False
                 return first_child.LocalizedControlType==child_control_type
             
-        def group_has_name(node:Control):
+        def group_has_no_name(node:Control):
             try:
-                if node.ControlTypeName=='GroupControl':
-                    if not str(node.Name).strip():
+                if node.LocalizedControlType=='group':
+                    if not node.Name.strip():
                         return True
-                    return False
+                return False
             except Exception:
                 return False
             
@@ -125,7 +126,7 @@ class Tree:
             return False
         
         def dom_correction(node:Control):
-            if group_has_name(node) or element_has_child_element(node,'list item','link') or element_has_child_element(node,'item','link'):
+            if group_has_no_name(node) or element_has_child_element(node,'list item','link') or element_has_child_element(node,'item','link'):
                 interactive_nodes.pop()
             elif element_has_child_element(node,'link','heading'):
                 interactive_nodes.pop()

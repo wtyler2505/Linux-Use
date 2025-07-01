@@ -13,6 +13,7 @@ from rich.markdown import Markdown
 from rich.console import Console
 from termcolor import colored
 from textwrap import shorten
+from typing import Literal
 import logging
 
 logger = logging.getLogger(__name__)
@@ -30,6 +31,7 @@ class Agent:
 
     Args:
         instructions (list[str], optional): Instructions for the agent. Defaults to [].
+        browser (Literal['edge', 'chrome', 'firefox'], optional): Browser the agent should use (Make sure this browser is installed). Defaults to 'edge'.
         additional_tools (list[BaseTool], optional): Additional tools for the agent. Defaults to [].
         llm (BaseChatModel): Language model for the agent. Defaults to None.
         consecutive_failures (int, optional): Maximum number of consecutive failures for the agent. Defaults to 3.
@@ -39,7 +41,7 @@ class Agent:
     Returns:
         Agent
     '''
-    def __init__(self,instructions:list[str]=[],additional_tools:list[BaseTool]=[], llm: BaseChatModel=None,consecutive_failures:int=3,max_steps:int=100,use_vision:bool=False):
+    def __init__(self,instructions:list[str]=[],additional_tools:list[BaseTool]=[],browser:Literal['edge','chrome','firefox']='edge', llm: BaseChatModel=None,consecutive_failures:int=3,max_steps:int=100,use_vision:bool=False):
         self.name='Windows Use'
         self.description='An agent that can interact with GUI elements on Windows' 
         self.registry = Registry([
@@ -48,6 +50,7 @@ class Agent:
             key_tool, wait_tool, scrape_tool, switch_tool
         ] + additional_tools)
         self.instructions=instructions
+        self.browser=browser
         self.consecutive_failures=consecutive_failures
         self.desktop = Desktop()
         self.agent_state = AgentState()
@@ -96,7 +99,7 @@ class Agent:
         tools_prompt = self.registry.get_tools_prompt()
         desktop_state = self.desktop.get_state(use_vision=self.use_vision)
         prompt=Prompt.observation_prompt(query=query,agent_step=self.agent_step, tool_result=ToolResult(is_success=True, content="No Action"), desktop_state=desktop_state)
-        system_message=SystemMessage(content=Prompt.system_prompt(instructions=self.instructions,tools_prompt=tools_prompt,max_steps=max_steps))
+        system_message=SystemMessage(content=Prompt.system_prompt(browser=self.browser,instructions=self.instructions,tools_prompt=tools_prompt,max_steps=max_steps))
         human_message=image_message(prompt=prompt,image=desktop_state.screenshot) if self.use_vision and desktop_state.screenshot else HumanMessage(content=prompt)
         messages=[system_message,human_message]
         self.agent_state.init_state(query=query,messages=messages)
