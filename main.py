@@ -7,9 +7,9 @@ import os
 load_dotenv()
 
 def main():
-    # llm=ChatGoogleGenerativeAI(model='gemini-2.0-flash')
-    llm=ChatGroq(model='meta-llama/llama-4-scout-17b-16e-instruct',api_key=os.getenv("GROQ_API_KEY"))
-    agent = Agent(llm=llm,browser='chrome',use_vision=False)
+    llm=ChatGoogleGenerativeAI(model='gemini-2.0-flash-lite')
+    # llm=ChatGroq(model='meta-llama/llama-4-scout-17b-16e-instruct',api_key=os.getenv("GROQ_API_KEY"))
+    agent = Agent(llm=llm,browser='chrome',use_vision=True)
     query=input("Enter your query: ")
     agent.print_response(query)
 

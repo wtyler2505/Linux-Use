@@ -1,6 +1,5 @@
 from windows_use.tree.views import TreeElementNode, TextElementNode, ScrollElementNode, Center, BoundingBox, TreeState
 from windows_use.tree.config import INTERACTIVE_CONTROL_TYPE_NAMES,INFORMATIVE_CONTROL_TYPE_NAMES, DEFAULT_ACTIONS
-from windows_use.tree.utils import random_point_within_bounding_box
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from uiautomation import GetRootControl,Control,ImageControl
 from windows_use.desktop.config import AVOIDED_APPS
@@ -131,8 +130,8 @@ class Tree:
             elif element_has_child_element(node,'link','heading'):
                 interactive_nodes.pop()
                 node=node.GetFirstChildControl()
-                x,y=random_point_within_bounding_box(node=node)
                 box = node.BoundingRectangle
+                x,y=box.xcenter(),box.ycenter()
                 center = Center(x=x,y=y)
                 interactive_nodes.append(TreeElementNode(
                     name=node.Name.strip() or "''",
@@ -146,7 +145,7 @@ class Tree:
         def tree_traversal(node: Control):
             if is_element_interactive(node):
                 box = node.BoundingRectangle
-                x,y=random_point_within_bounding_box(node=node)
+                x,y=box.xcenter(),box.ycenter()
                 center = Center(x=x,y=y)
                 interactive_nodes.append(TreeElementNode(
                     name=node.Name.strip() or "''",
