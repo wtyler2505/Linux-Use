@@ -1,5 +1,6 @@
 from windows_use.tree.views import TreeElementNode, TextElementNode, ScrollElementNode, Center, BoundingBox, TreeState
 from windows_use.tree.config import INTERACTIVE_CONTROL_TYPE_NAMES,INFORMATIVE_CONTROL_TYPE_NAMES, DEFAULT_ACTIONS
+from windows_use.tree.utils import random_point_within_bounding_box
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from uiautomation import GetRootControl,Control,ImageControl
 from windows_use.desktop.config import AVOIDED_APPS
@@ -16,7 +17,7 @@ class Tree:
         self.desktop=desktop
 
     def get_state(self)->TreeState:
-        sleep(0.15)
+        sleep(0.5)
         # Get the root control of the desktop
         root=GetRootControl()
         interactive_nodes,informative_nodes,scrollable_nodes=self.get_appwise_nodes(node=root)
@@ -52,6 +53,7 @@ class Tree:
         app_name='Desktop' if app_name=='Program Manager' else app_name
         
         def is_element_visible(node:Control,threshold:int=0):
+            is_control=node.IsControlElement
             box=node.BoundingRectangle
             if box.isempty():
                 return False
@@ -59,7 +61,7 @@ class Tree:
             height=box.height()
             area=width*height
             is_offscreen=(not node.IsOffscreen) or node.ControlTypeName in ['EditControl']
-            return area > threshold and is_offscreen
+            return area > threshold and is_offscreen and is_control
     
         def is_element_enabled(node:Control):
             try:
@@ -145,7 +147,7 @@ class Tree:
         def tree_traversal(node: Control):
             if is_element_interactive(node):
                 box = node.BoundingRectangle
-                x,y=box.xcenter(),box.ycenter()
+                x,y=random_point_within_bounding_box(node=node,scale_factor=0.8)
                 center = Center(x=x,y=y)
                 interactive_nodes.append(TreeElementNode(
                     name=node.Name.strip() or "''",

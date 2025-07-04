@@ -91,7 +91,7 @@ def type_tool(loc:tuple[int,int],text:str,clear:str='false',caret_position:Liter
 
 @tool('Scroll Tool',args_schema=Scroll)
 def scroll_tool(loc:tuple[int,int]=None,type:Literal['horizontal','vertical']='vertical',direction:Literal['up','down','left','right']='down',wheel_times:int=1,desktop:Desktop=None)->str:
-    'Scroll at specific coordinates or current mouse position. Use wheel_times to control scroll amount (1 wheel = ~3-5 lines). Essential for navigating lists, web pages, and long content.'
+    'Move cursor to a specific location or current location, start scrolling in the specified direction. Use wheel_times to control scroll amount (1 wheel = ~3-5 lines). Essential for navigating lists, web pages, and long content.'
     if loc:
         cursor.move_to(loc)
     match type:

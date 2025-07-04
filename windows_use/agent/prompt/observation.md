@@ -8,6 +8,7 @@
         Action Response: {observation}
     <agent_state>
     <desktop_state>
+        Cursor Location: {cursor_location}
         [Begin of App Info]
         Foreground App: {active_app}
 

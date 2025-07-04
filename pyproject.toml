@@ -30,6 +30,7 @@ dependencies = [
     "langchain-google-genai>=2.1.5",
     "langchain-groq>=0.3.4",
     "langchain-ollama>=0.3.3",
+    "langchain-openai>=0.3.27",
     "live-inspect==0.1.1",
     "markdownify>=1.1.0",
     "pillow>=11.2.1",

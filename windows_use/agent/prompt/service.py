@@ -50,7 +50,7 @@ class Prompt:
          
     @staticmethod
     def observation_prompt(query:str,agent_step: AgentStep, tool_result:ToolResult,desktop_state: DesktopState) -> str:
-        cursor_position = pg.position()
+        cursor_location = pg.position()
         tree_state = desktop_state.tree_state
         template = PromptTemplate.from_file(files('windows_use.agent.prompt').joinpath('observation.md'))
         return template.format(**{
@@ -58,7 +58,7 @@ class Prompt:
             'max_steps': agent_step.max_steps,
             'observation': tool_result.content if tool_result.is_success else tool_result.error,
             'active_app': desktop_state.active_app_to_string(),
-            'cursor_location': f'{cursor_position.x},{cursor_position.y}',
+            'cursor_location': f'({cursor_location.x},{cursor_location.y})',
             'apps': desktop_state.apps_to_string(),
             'interactive_elements': tree_state.interactive_elements_to_string() or 'No interactive elements found',
             'informative_elements': tree_state.informative_elements_to_string() or 'No informative elements found',

@@ -47,6 +47,10 @@ class Desktop:
             return "Maximized"
         return "Normal"
     
+    def get_cursor_location(self)->tuple[int,int]:
+        position=pyautogui.position()
+        return (position.x,position.y)
+    
     def get_element_under_cursor(self)->Control:
         return ControlFromCursor()
     
