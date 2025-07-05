@@ -78,7 +78,9 @@ class Tree:
         
         def is_element_image(node:Control):
             if isinstance(node,ImageControl):
-                if not node.Name.strip() or node.LocalizedControlType=='graphic':
+                if node.Name:
+                    return False
+                if node.LocalizedControlType=='graphic':
                     return True
             return False
         
@@ -95,6 +97,12 @@ class Tree:
             try:
                 scroll_pattern=node.GetScrollPattern()
                 return scroll_pattern.VerticallyScrollable or scroll_pattern.HorizontallyScrollable
+            except Exception:
+                return False
+            
+        def is_keyboard_focusable(node:Control):
+            try:
+                return node.IsKeyboardFocusable
             except Exception:
                 return False
             
@@ -120,24 +128,49 @@ class Tree:
                     if is_element_visible(node) and is_element_enabled(node) and not is_element_image(node):
                         return True
                 elif node.ControlTypeName=='GroupControl':
-                    if is_element_visible(node) and is_element_enabled(node) and is_default_action(node):
+                    if is_element_visible(node) and is_element_enabled(node) and (is_default_action(node) or is_keyboard_focusable(node)):
                         return True
             except Exception:
                 return False
             return False
         
         def dom_correction(node:Control):
-            if group_has_no_name(node) or element_has_child_element(node,'list item','link') or element_has_child_element(node,'item','link'):
+            if element_has_child_element(node,'list item','link') or element_has_child_element(node,'item','link'):
                 interactive_nodes.pop()
+                return None
+            elif group_has_no_name(node):
+                interactive_nodes.pop()
+                if is_keyboard_focusable(node):
+                    child=node
+                    try:
+                        while child.GetFirstChildControl() is not None:
+                            child=child.GetFirstChildControl()
+                    except Exception:
+                        return None
+                    if child.ControlTypeName!='TextControl':
+                        return None
+                    control_type='edit'
+                    box = node.BoundingRectangle
+                    x,y=box.xcenter(),box.ycenter()
+                    center = Center(x=x,y=y)
+                    interactive_nodes.append(TreeElementNode(
+                        name=child.Name.strip() or "''",
+                        control_type=control_type,
+                        shortcut=node.AcceleratorKey or "''",
+                        bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom,width=box.width(),height=box.height()),
+                        center=center,
+                        app_name=app_name
+                    ))
             elif element_has_child_element(node,'link','heading'):
                 interactive_nodes.pop()
                 node=node.GetFirstChildControl()
+                control_type='link'
                 box = node.BoundingRectangle
                 x,y=box.xcenter(),box.ycenter()
                 center = Center(x=x,y=y)
                 interactive_nodes.append(TreeElementNode(
                     name=node.Name.strip() or "''",
-                    control_type="link",
+                    control_type=control_type,
                     shortcut=node.AcceleratorKey or "''",
                     bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom,width=box.width(),height=box.height()),
                     center=center,

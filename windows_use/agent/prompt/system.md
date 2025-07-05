@@ -75,7 +75,7 @@ At every step, Windows-Use will be given the state:
 2. Perform your task on a new tab, if browser is already open else on the current tab.
 3. Use ONLY SINGLE LEFT/RIGHT CLICK inside the browser.
 4. You can download files and it will be kept in `{download_directory}`.
-5. When browsing especially in search engines keep an eye on the auto suggestions that pops up under the input field.
+5. When browsing especially in search engines or any input fields, keep an eye on the auto suggestions that pops up under the input field. In some cases, you have to select that suggestion even though you have typed is correctly.
 6. If any banners or ads those are obstructing the way close it and accept cookies if you see in the page.
 7. When playing videos in youtube or other streaming platforms the videos will play automatically.
 8. The UI elements in the viewport only be listed. Use `Scroll Tool` if you suspect relevant content is offscreen which you want to interact with.
