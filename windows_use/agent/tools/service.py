@@ -37,18 +37,15 @@ def shell_tool(command: str,desktop:Desktop=None) -> str:
 @tool('Clipboard Tool',args_schema=Clipboard)
 def clipboard_tool(mode: Literal['copy', 'paste'], text: str = None,desktop:Desktop=None)->str:
     'Copy text to clipboard or retrieve current clipboard content. Use "copy" mode with text parameter to copy, "paste" mode to retrieve.'
+    # Validation is now handled by the Pydantic model, so the function logic is simpler.
     if mode == 'copy':
-        if text:
-            pc.copy(text)  # Copy text to system clipboard
-            return f'Copied "{text}" to clipboard'
-        else:
-            raise ValueError("No text provided to copy")
-    elif mode == 'paste':
-        clipboard_content = pc.paste()  # Get text from system clipboard
-        return f'Clipboard Content: "{clipboard_content}"'
+        pc.copy(text)
+        return f'Copied "{text}" to clipboard'
+    # This must be 'paste' since the model validates the mode.
     else:
-        raise ValueError('Invalid mode. Use "copy" or "paste".')
-    
+        clipboard_content = pc.paste()
+        return f'Clipboard Content: "{clipboard_content}"'
+
 @tool('Switch Tool',args_schema=Switch)
 def switch_tool(name: str,desktop:Desktop=None) -> str:
     'Switch to a specific application window (e.g., "notepad", "calculator", "chrome", etc.) and bring to foreground.'
