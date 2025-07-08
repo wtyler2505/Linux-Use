@@ -1,5 +1,5 @@
-from pydantic import BaseModel,Field
-from typing import Literal
+from pydantic import BaseModel,Field, model_validator
+from typing import Literal, Optional
 
 class SharedBaseModel(BaseModel):
     class Config:
@@ -9,13 +9,22 @@ class Done(SharedBaseModel):
     answer:str = Field(...,description="the detailed final answer to the user query in proper markdown format",examples=["The task is completed successfully."])
 
 class Clipboard(SharedBaseModel):
-    mode:Literal['copy','paste'] = Field(...,description="the mode of the clipboard",examples=['Copy'])
-    text:str = Field(...,description="the text to copy to clipboard",examples=["hello world"])
+    mode:Literal['copy','paste'] = Field(...,description="the mode of the clipboard",examples=['copy'])
+    text:Optional[str] = Field(default=None, description="the text to copy to clipboard",examples=["hello world"])
+
+    @model_validator(mode='after')
+    def validate_logic(self):
+        if self.mode == 'copy' and self.text is None:
+            raise ValueError("The 'text' field must be provided for 'copy' mode.")
+        if self.mode == 'paste' and self.text is not None:
+            raise ValueError("The 'text' field must not be provided for 'paste' mode.")
+        return self
 
 class Click(SharedBaseModel):
     loc:tuple[int,int]=Field(...,description="The coordinate within the bounding box of the element to click on.",examples=[(0,0)])
     button:Literal['left','right','middle']=Field(description='The button to click on the element.',default='left',examples=['left'])
-    clicks:Literal[0,1,2]=Field(description="The number of times to click on the element. (0 for hover, 1 for single click, 2 for double click)",default=2,examples=[0])
+    # Allow 3 for triple-clicks
+    clicks:Literal[0,1,2,3]=Field(description="The number of times to click on the element. (0 for hover, 1 for single, 2 for double, 3 for triple click)",default=1,examples=[1])
 
 class Shell(SharedBaseModel):
     command:str=Field(...,description="The PowerShell command to execute.",examples=['Get-Process'])
@@ -32,8 +41,8 @@ class Launch(SharedBaseModel):
 class Scroll(SharedBaseModel):
     loc:tuple[int,int]|None=Field(description="The coordinate within the bounding box of the element to scroll on. If None, the screen will be scrolled.",default=None,examples=[(0,0)])
     type:Literal['horizontal','vertical']=Field(description="The type of scroll.",default='vertical',examples=['vertical'])
-    direction:Literal['up','down','left','right']=Field(description="The direction of the scroll.",default=['down'],examples=['down'])
-    wheel_times:int=Field(description="The number of times to scroll.",default=1,examples=[1,2,5])
+    direction:Literal['up','down','left','right']=Field(description="The direction of the scroll.",default='down',examples=['down'])
+    wheel_times:int=Field(description="The number of times to scroll.",default=1,examples=[1,2,5], ge=0)
 
 class Drag(SharedBaseModel):
     from_loc:tuple[int,int]=Field(...,description="The from coordinates of the drag.",examples=[(0,0)])
@@ -52,7 +61,7 @@ class Key(SharedBaseModel):
     key:str=Field(...,description="The key to press.",examples=['enter'])
 
 class Wait(SharedBaseModel):
-    duration:int=Field(...,description="The duration to wait in seconds.",examples=[5])
+    duration:int=Field(...,description="The duration to wait in seconds.",examples=[5], ge=0)
 
 class Scrape(SharedBaseModel):
     url:str=Field(...,description="The url of the webpage to scrape.",examples=['https://google.com'])
