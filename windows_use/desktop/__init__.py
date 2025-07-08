@@ -2,9 +2,9 @@ from uiautomation import GetScreenSize, Control, GetRootControl, ControlType, Co
 from windows_use.desktop.views import DesktopState,App,Size
 from windows_use.desktop.config import EXCLUDED_APPS
 from PIL.Image import Image as PILImage
-from windows_use.tree import Tree
 from fuzzywuzzy import process
 from time import sleep
+from typing import TYPE_CHECKING
 from io import BytesIO
 from PIL import Image
 import subprocess
@@ -13,11 +13,17 @@ import base64
 import csv
 import io
 
+# Keep this for type-hinting to avoid circular import errors in type checkers
+if TYPE_CHECKING:
+    from windows_use.tree import Tree
+
 class Desktop:
     def __init__(self):
         self.desktop_state=None
-        
+
     def get_state(self,use_vision:bool=False)->DesktopState:
+        # --- FIX: Local import to avoid circular dependency at module level ---
+        from windows_use.tree import Tree
         tree=Tree(self)
         apps=self.get_apps()
         tree_state=tree.get_state()
@@ -29,12 +35,12 @@ class Desktop:
             screenshot=None
         self.desktop_state=DesktopState(apps=apps,active_app=active_app,screenshot=screenshot,tree_state=tree_state)
         return self.desktop_state
-    
+
     def get_taskbar(self)->Control:
         root=GetRootControl()
         taskbar=root.GetFirstChildControl()
         return taskbar
-    
+
     def get_app_status(self,control:Control)->str:
         taskbar=self.get_taskbar()
         taskbar_height=taskbar.BoundingRectangle.height()
@@ -46,45 +52,49 @@ class Desktop:
         if window_width >= screen_width and window_height >= screen_height - taskbar_height:
             return "Maximized"
         return "Normal"
-    
+
     def get_cursor_location(self)->tuple[int,int]:
         position=pyautogui.position()
         return (position.x,position.y)
-    
+
     def get_element_under_cursor(self)->Control:
         return ControlFromCursor()
-    
+
     def get_apps_from_start_menu(self)->dict[str,str]:
         command='Get-StartApps | ConvertTo-Csv -NoTypeInformation'
         apps_info,_=self.execute_command(command)
         reader=csv.DictReader(io.StringIO(apps_info))
         return {row.get('Name').lower():row.get('AppID') for row in reader}
-    
+
     def execute_command(self,command:str)->tuple[str,int]:
         try:
-            result = subprocess.run(['powershell', '-Command']+command.split(), 
+            result = subprocess.run(['powershell', '-Command']+command.split(),
             capture_output=True, check=True)
             return (result.stdout.decode('latin1'),result.returncode)
         except subprocess.CalledProcessError as e:
             return (e.stdout.decode('latin1'),e.returncode)
-        
+
     def launch_app(self,name:str):
         apps_map=self.get_apps_from_start_menu()
-        matched_app=process.extractOne(name,apps_map.keys())
+        matched_app=process.extractOne(name, list(apps_map.keys()))
         if matched_app is None:
             return (f'Application {name.title()} not found in start menu.',1)
         app_name,_=matched_app
         appid=apps_map.get(app_name)
         if appid is None:
-            return (f'Application {name.title()} not found in start menu.',1)
+            return (f'Application {app_name.title()} not found in start menu.',1)
         if name.endswith('.exe'):
             response,status=self.execute_command(f'Start-Process "{appid}"')
         else:
             response,status=self.execute_command(f'Start-Process "shell:AppsFolder\\{appid}"')
         return response,status
-    
+
     def switch_app(self,name:str):
-        apps={app.name:app for app in self.desktop_state.apps}
+        # Ensure desktop state is available
+        if self.desktop_state is None:
+            self.get_state()
+            
+        apps={app.name:app for app in [self.desktop_state.active_app] + self.desktop_state.apps if app}
         matched_app:tuple[str,float]=process.extractOne(name,list(apps.keys()))
         if matched_app is None:
             return (f'Application {name.title()} not found.',1)
@@ -94,25 +104,25 @@ class Desktop:
             return (f'{app_name.title()} switched to foreground.',0)
         else:
             return (f'Failed to switch to {app_name.title()}.',1)
-    
+
     def get_app_size(self,control:Control):
         window=control.BoundingRectangle
         if window.isempty():
             return Size(width=0,height=0)
         return Size(width=window.width(),height=window.height())
-    
+
     def is_app_visible(self,app)->bool:
         is_minimized=self.get_app_status(app)!='Minimized'
         size=self.get_app_size(app)
         area=size.width*size.height
         is_overlay=self.is_overlay_app(app)
         return not is_overlay and is_minimized and area>10
-    
+
     def is_overlay_app(self,element:Control) -> bool:
         no_children = len(element.GetChildren()) == 0
         is_name = "Overlay" in element.Name.strip()
         return no_children or is_name
-        
+
     def get_apps(self) -> list[App]:
         try:
             sleep(1.00)
@@ -130,7 +140,7 @@ class Desktop:
             print(f"Error: {ex}")
             apps = []
         return apps
-    
+
     def screenshot_in_bytes(self,screenshot:PILImage)->bytes:
         buffer=BytesIO()
         screenshot.save(buffer,format='PNG')
@@ -140,6 +150,6 @@ class Desktop:
 
     def get_screenshot(self,scale:float=0.7)->Image.Image:
         screenshot=pyautogui.screenshot()
-        size=(screenshot.width*scale, screenshot.height*scale)
+        size=(int(screenshot.width*scale), int(screenshot.height*scale))
         screenshot.thumbnail(size=size, resample=Image.Resampling.LANCZOS)
         return screenshot
