@@ -12,6 +12,7 @@ class Registry:
         tool = self.tools_registry.get(tool_name)
         if tool is None:
             return f"Tool '{tool_name}' not found."
+
         return dedent(f"""
         Tool Name: {tool.name}
         Description: {tool.description}
@@ -26,12 +27,17 @@ class Registry:
             function=tool.run
         ) for tool in self.tools}
     
+    # In windows_use/agent/registry/service.py
+
     def get_tools_prompt(self) -> str:
-        tools_prompt = [self.tool_prompt(tool.name) for tool in self.tools]
-        return dedent(f"""
-        Available Tools:
-        {'\n\n'.join(tools_prompt)}
-        """)
+        tools_prompt_list = [self.tool_prompt(tool.name) for tool in self.tools]
+        
+        # --- THIS IS THE FIX ---
+        # Construct the final string with simple concatenation to avoid indentation issues.
+        header = "Available Tools:"
+        body = "\n\n".join(tools_prompt_list).strip()
+        
+        return f"{header}\n\n{body}"
     
     def execute(self, tool_name: str, desktop: Desktop, **kwargs) -> ToolResult:
         tool = self.tools_registry.get(tool_name)
