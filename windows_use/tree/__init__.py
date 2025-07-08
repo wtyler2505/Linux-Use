@@ -18,21 +18,27 @@ class Tree:
 
     def get_state(self)->TreeState:
         sleep(0.5)
-        # Get the root control of the desktop
         root=GetRootControl()
         interactive_nodes,informative_nodes,scrollable_nodes=self.get_appwise_nodes(node=root)
         return TreeState(interactive_nodes=interactive_nodes,informative_nodes=informative_nodes,scrollable_nodes=scrollable_nodes)
-    
-    def get_appwise_nodes(self,node:Control) -> tuple[list[TreeElementNode],list[TextElementNode]]:
+
+    def get_appwise_nodes(self,node:Control) -> tuple[list[TreeElementNode],list[TextElementNode],list[ScrollElementNode]]:
         all_apps=node.GetChildren()
         visible_apps = {app.Name: app for app in all_apps if self.desktop.is_app_visible(app) and app.Name not in AVOIDED_APPS}
-        apps={'Taskbar':visible_apps.pop('Taskbar'),'Program Manager':visible_apps.pop('Program Manager')}
+
+        apps = {}
+        if 'Taskbar' in visible_apps:
+            apps['Taskbar'] = visible_apps.pop('Taskbar')
+
+        if 'Program Manager' in visible_apps:
+            apps['Program Manager'] = visible_apps.pop('Program Manager')
+
         if visible_apps:
-            foreground_app = list(visible_apps.values()).pop(0)
-            apps[foreground_app.Name.strip()]=foreground_app
-        del visible_apps
+            foreground_app_name = next(iter(visible_apps))
+            foreground_app = visible_apps[foreground_app_name]
+            apps[foreground_app.Name.strip()] = foreground_app
+
         interactive_nodes,informative_nodes,scrollable_nodes=[],[],[]
-        # Parallel traversal (using ThreadPoolExecutor) to get nodes from each app
         with ThreadPoolExecutor() as executor:
             future_to_node = {executor.submit(self.get_nodes, app): app for app in apps.values()}
             for future in as_completed(future_to_node):
@@ -51,7 +57,7 @@ class Tree:
         interactive_nodes, informative_nodes, scrollable_nodes = [], [], []
         app_name=node.Name.strip()
         app_name='Desktop' if app_name=='Program Manager' else app_name
-        
+
         def is_element_visible(node:Control,threshold:int=0):
             is_control=node.IsControlElement
             box=node.BoundingRectangle
@@ -62,28 +68,28 @@ class Tree:
             area=width*height
             is_offscreen=(not node.IsOffscreen) or node.ControlTypeName in ['EditControl']
             return area > threshold and is_offscreen and is_control
-    
+
         def is_element_enabled(node:Control):
             try:
                 return node.IsEnabled
             except Exception:
                 return False
-            
+
         def is_default_action(node:Control):
             legacy_pattern=node.GetLegacyIAccessiblePattern()
             default_action=legacy_pattern.DefaultAction.title()
             if default_action in DEFAULT_ACTIONS:
                 return True
             return False
-        
+
         def is_element_image(node:Control):
-            if isinstance(node,ImageControl):
+            if node.ControlTypeName == 'ImageControl':
                 if node.Name:
                     return False
-                if node.LocalizedControlType=='graphic':
+                if node.LocalizedControlType == 'graphic':
                     return True
             return False
-        
+
         def is_element_text(node:Control):
             try:
                 if node.ControlTypeName in INFORMATIVE_CONTROL_TYPE_NAMES:
@@ -92,27 +98,27 @@ class Tree:
             except Exception:
                 return False
             return False
-        
+
         def is_element_scrollable(node:Control):
             try:
                 scroll_pattern=node.GetScrollPattern()
                 return scroll_pattern.VerticallyScrollable or scroll_pattern.HorizontallyScrollable
             except Exception:
                 return False
-            
+
         def is_keyboard_focusable(node:Control):
             try:
                 return node.IsKeyboardFocusable
             except Exception:
                 return False
-            
+
         def element_has_child_element(node:Control,control_type:str,child_control_type:str):
             if node.LocalizedControlType==control_type:
                 first_child=node.GetFirstChildControl()
                 if first_child is None:
                     return False
                 return first_child.LocalizedControlType==child_control_type
-            
+
         def group_has_no_name(node:Control):
             try:
                 if node.LocalizedControlType=='group':
@@ -121,11 +127,19 @@ class Tree:
                 return False
             except Exception:
                 return False
-            
+
         def is_element_interactive(node:Control):
             try:
+                # Explicitly handle ImageControl first
+                if node.ControlTypeName == 'ImageControl':
+                    # An ImageControl is only interactive if it's visible, enabled, AND has a name.
+                    # A nameless one is considered decorative.
+                    return is_element_visible(node) and is_element_enabled(node) and bool(node.Name.strip())
+
                 if node.ControlTypeName in INTERACTIVE_CONTROL_TYPE_NAMES:
-                    if is_element_visible(node) and is_element_enabled(node) and not is_element_image(node):
+                    # For all other interactive types, the original logic is fine.
+                    # `is_element_image` is no longer needed here.
+                    if is_element_visible(node) and is_element_enabled(node):
                         return True
                 elif node.ControlTypeName=='GroupControl':
                     if is_element_visible(node) and is_element_enabled(node) and (is_default_action(node) or is_keyboard_focusable(node)):
@@ -133,7 +147,7 @@ class Tree:
             except Exception:
                 return False
             return False
-        
+
         def dom_correction(node:Control):
             if element_has_child_element(node,'list item','link') or element_has_child_element(node,'item','link'):
                 interactive_nodes.pop()
@@ -157,7 +171,7 @@ class Tree:
                         name=child.Name.strip() or "''",
                         control_type=control_type,
                         shortcut=node.AcceleratorKey or "''",
-                        bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom,width=box.width(),height=box.height()),
+                        bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom),
                         center=center,
                         app_name=app_name
                     ))
@@ -172,11 +186,11 @@ class Tree:
                     name=node.Name.strip() or "''",
                     control_type=control_type,
                     shortcut=node.AcceleratorKey or "''",
-                    bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom,width=box.width(),height=box.height()),
+                    bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom),
                     center=center,
                     app_name=app_name
                 ))
-            
+
         def tree_traversal(node: Control):
             if is_element_interactive(node):
                 box = node.BoundingRectangle
@@ -186,7 +200,7 @@ class Tree:
                     name=node.Name.strip() or "''",
                     control_type=node.LocalizedControlType.title(),
                     shortcut=node.AcceleratorKey or "''",
-                    bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom,width=box.width(),height=box.height()),
+                    bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom),
                     center=center,
                     app_name=app_name
                 ))
@@ -199,31 +213,28 @@ class Tree:
             elif is_element_scrollable(node):
                 scroll_pattern=node.GetScrollPattern()
                 box = node.BoundingRectangle
-                # Get the center
                 x,y=box.xcenter(),box.ycenter()
                 center = Center(x=x,y=y)
                 scrollable_nodes.append(ScrollElementNode(
                     name=node.Name.strip() or node.LocalizedControlType.capitalize() or "''",
                     app_name=app_name,
                     control_type=node.LocalizedControlType.title(),
-                    bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom,width=box.width(),height=box.height()),
+                    bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom),
                     center=center,
                     horizontal_scrollable=scroll_pattern.HorizontallyScrollable,
                     vertical_scrollable=scroll_pattern.VerticallyScrollable
                 ))
-            # Recursively check all children
             for child in node.GetChildren():
                 tree_traversal(child)
         tree_traversal(node)
         return (interactive_nodes,informative_nodes,scrollable_nodes)
-    
+
     def get_random_color(self):
         return "#{:06x}".format(random.randint(0, 0xFFFFFF))
 
     def annotated_screenshot(self, nodes: list[TreeElementNode],scale:float=0.7) -> Image.Image:
         screenshot = self.desktop.get_screenshot(scale=scale)
         sleep(0.25)
-        # Add padding
         padding = 20
         width = screenshot.width + (2 * padding)
         height = screenshot.height + (2 * padding)
@@ -243,38 +254,27 @@ class Tree:
         def draw_annotation(label, node: TreeElementNode):
             box = node.bounding_box
             color = get_random_color()
-
-            # Scale and pad the bounding box
             adjusted_box = (
                 int(box.left * scale) + padding,
                 int(box.top * scale) + padding,
                 int(box.right * scale) + padding,
                 int(box.bottom * scale) + padding
             )
-
-            # Draw bounding box
             draw.rectangle(adjusted_box, outline=color, width=2)
-
-            # Label dimensions
             label_width = draw.textlength(str(label), font=font)
             label_height = font_size
             left, top, right, bottom = adjusted_box
-
-            # Label position above bounding box
             label_x1 = right - label_width
             label_y1 = top - label_height - 4
             label_x2 = label_x1 + label_width
             label_y2 = label_y1 + label_height + 4
-
-            # Draw label background and text
             draw.rectangle([(label_x1, label_y1), (label_x2, label_y2)], fill=color)
             draw.text((label_x1 + 2, label_y1 + 2), str(label), fill=(255, 255, 255), font=font)
 
-        # Draw annotations in parallel
         with ThreadPoolExecutor() as executor:
             executor.map(draw_annotation, range(len(nodes)), nodes)
         return padded_screenshot
-    
+
     def get_annotated_image_data(self)->tuple[Image.Image,list[TreeElementNode]]:
         node=GetRootControl()
         nodes,_,_=self.get_appwise_nodes(node=node)
