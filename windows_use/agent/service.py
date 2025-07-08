@@ -37,13 +37,13 @@ class Agent:
         consecutive_failures (int, optional): Maximum number of consecutive failures for the agent. Defaults to 3.
         max_steps (int, optional): Maximum number of steps for the agent. Defaults to 100.
         use_vision (bool, optional): Whether to use vision for the agent. Defaults to False.
-    
+
     Returns:
         Agent
     '''
     def __init__(self,instructions:list[str]=[],additional_tools:list[BaseTool]=[],browser:Literal['edge','chrome','firefox']='edge', llm: BaseChatModel=None,consecutive_failures:int=3,max_steps:int=100,use_vision:bool=False):
         self.name='Windows Use'
-        self.description='An agent that can interact with GUI elements on Windows' 
+        self.description='An agent that can interact with GUI elements on Windows'
         self.registry = Registry([
             click_tool,type_tool, launch_tool, shell_tool, clipboard_tool,
             done_tool, shortcut_tool, scroll_tool, drag_tool, move_tool,
@@ -95,15 +95,18 @@ class Agent:
         self.agent_state.update_state(agent_data=None,observation=None,result=tool_result.content,messages=[ai_message])
 
     def invoke(self,query: str):
-        max_steps = self.agent_step.max_steps
-        tools_prompt = self.registry.get_tools_prompt()
-        desktop_state = self.desktop.get_state(use_vision=self.use_vision)
-        prompt=Prompt.observation_prompt(query=query,agent_step=self.agent_step, tool_result=ToolResult(is_success=True, content="No Action"), desktop_state=desktop_state)
-        system_message=SystemMessage(content=Prompt.system_prompt(browser=self.browser,instructions=self.instructions,tools_prompt=tools_prompt,max_steps=max_steps))
-        human_message=image_message(prompt=prompt,image=desktop_state.screenshot) if self.use_vision and desktop_state.screenshot else HumanMessage(content=prompt)
-        messages=[system_message,human_message]
-        self.agent_state.init_state(query=query,messages=messages)
         try:
+            # --- FIX: Moved setup inside the try block ---
+            max_steps = self.agent_step.max_steps
+            tools_prompt = self.registry.get_tools_prompt()
+            desktop_state = self.desktop.get_state(use_vision=self.use_vision)
+            prompt=Prompt.observation_prompt(query=query,agent_step=self.agent_step, tool_result=ToolResult(is_success=True, content="No Action"), desktop_state=desktop_state)
+            system_message=SystemMessage(content=Prompt.system_prompt(browser=self.browser,instructions=self.instructions,tools_prompt=tools_prompt,max_steps=max_steps))
+            human_message=image_message(prompt=prompt,image=desktop_state.screenshot) if self.use_vision and desktop_state.screenshot else HumanMessage(content=prompt)
+            messages=[system_message,human_message]
+            self.agent_state.init_state(query=query,messages=messages)
+            # --- End of moved block ---
+
             self.watch_cursor.start()
             while True:
                 if self.agent_step.is_last_step():
@@ -135,4 +138,4 @@ class Agent:
     def print_response(self,query: str):
         console=Console()
         response=self.invoke(query)
-        console.print(Markdown(response.content or response.error))   
+        console.print(Markdown(response.content or response.error))
