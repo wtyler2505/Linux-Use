@@ -1,15 +1,23 @@
-INTERACTIVE_CONTROL_TYPE_NAMES=set([
-    'ButtonControl','ListItemControl','MenuItemControl','DocumentControl',
-    'EditControl','CheckBoxControl', 'RadioButtonControl','ComboBoxControl',
-    'HyperlinkControl','SplitButtonControl','TabItemControl',
-    'TreeItemControl','DataItemControl','HeaderItemControl','TextBoxControl',
-    'ImageControl','SpinnerControl','ScrollBarControl'
-])
+from typing import Set
 
-DEFAULT_ACTIONS=set([
-    'Click','Press','Jump','Check','Uncheck','Double Click'
-])
+# Control types that the agent can directly interact with
+INTERACTIVE_CONTROL_TYPE_NAMES: Set[str] = {
+    'ButtonControl', 'CheckBoxControl', 'ComboBoxControl', 'CustomControl', 
+    'DataItemControl', 'EditControl', 'GroupControl', 'HyperlinkControl', 'ImageControl', 
+    'ListItemControl', 'MenuControl', 'MenuBarControl', 'MenuItemControl', 
+    'PaneControl', 'RadioButtonControl', 'ScrollBarControl', 'SliderControl', 
+    'SpinnerControl', 'SplitButtonControl', 'TabItemControl', 'TableControl', 
+    'ThumbControl', 'TitleBarControl', 'ToolBarControl', 'TreeItemControl', 
+    'WindowControl'
+}
 
-INFORMATIVE_CONTROL_TYPE_NAMES=set([
-    'TextControl','ImageControl'
-])
+# Control types that provide information but are not typically interactive
+INFORMATIVE_CONTROL_TYPE_NAMES: Set[str] = {
+    'HeaderControl', 'HeaderItemControl', 'IndicatorControl', 'ProgressBarControl',
+    'SeparatorControl', 'StatusBarControl', 'TextControl', 'ToolTipControl'
+}
+
+# Default actions for legacy patterns that indicate interactiveness
+DEFAULT_ACTIONS: Set[str] = {
+    'Press', 'Click', 'Open', 'Expand', 'Collapse', 'Toggle'
+}
