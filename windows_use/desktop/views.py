@@ -29,6 +29,11 @@ class DesktopState:
     screenshot:bytes|None
     tree_state:TreeState
 
+    def __post_init__(self):
+        # Ensure tree_state is always an instance of TreeState
+        if not isinstance(self.tree_state, TreeState):
+            raise TypeError("tree_state must be an instance of TreeState")
+
     def active_app_to_string(self):
         if self.active_app is None:
             return 'No active app'
