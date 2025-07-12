@@ -12,3 +12,4 @@ wheels/
 .venv
 .env
 notebook.ipynb
+__pycache__
