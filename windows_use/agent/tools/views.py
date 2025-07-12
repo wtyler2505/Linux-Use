@@ -25,6 +25,7 @@ class Type(SharedBaseModel):
     text:str=Field(...,description="The text to type on the element.",examples=['hello world'])
     clear:Literal['true','false']=Field(description="To clear the text field before typing.",default='false',examples=['true'])
     caret_position:Literal['start','idle','end']=Field(description="The position of the caret.",default='idle',examples=['start','idle','end'])
+    press_enter:Literal['true','false']=Field(description="To press enter after typing.",default='false',examples=['true'])
 
 class Launch(SharedBaseModel):
     name:str=Field(...,description="The name of the application to launch.",examples=['Google Chrome'])

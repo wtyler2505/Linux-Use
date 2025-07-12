@@ -72,7 +72,7 @@ def click_tool(loc:tuple[int,int],button:Literal['left','right','middle']='left'
     return f'{num_clicks.get(clicks)} {button} Clicked on {control.Name} Element with ControlType {control.ControlTypeName} at ({x},{y}).'
 
 @tool('Type Tool',args_schema=Type)
-def type_tool(loc:tuple[int,int],text:str,clear:str='false',caret_position:Literal['start','idle','end']='idle',desktop:Desktop=None):
+def type_tool(loc:tuple[int,int],text:str,clear:Literal['true','false']='false',caret_position:Literal['start','idle','end']='idle',press_enter:Literal['true','false']='false',desktop:Desktop=None):
     'Type text into input fields, text areas, or focused elements. Set clear=True to replace existing text, False to append. Click on target element coordinates first and start typing.'
     x,y=loc
     cursor.click_on(loc)
@@ -87,6 +87,8 @@ def type_tool(loc:tuple[int,int],text:str,clear:str='false',caret_position:Liter
         pg.hotkey('ctrl','a')
         pg.press('backspace')
     pg.typewrite(text,interval=0.1)
+    if press_enter=='true':
+        pg.press('enter')
     return f'Typed {text} on {control.Name} Element with ControlType {control.ControlTypeName} at ({x},{y}).'
 
 @tool('Scroll Tool',args_schema=Scroll)
