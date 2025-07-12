@@ -28,10 +28,7 @@ class Registry:
     
     def get_tools_prompt(self) -> str:
         tools_prompt = [self.tool_prompt(tool.name) for tool in self.tools]
-        return dedent(f"""
-        Available Tools:
-        {'\n\n'.join(tools_prompt)}
-        """)
+        return '\n\n'.join(tools_prompt)
     
     def execute(self, tool_name: str, desktop: Desktop, **kwargs) -> ToolResult:
         tool = self.tools_registry.get(tool_name)

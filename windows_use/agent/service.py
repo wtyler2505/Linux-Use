@@ -126,6 +126,7 @@ class Agent:
                     return AgentResult(is_done=True, content=self.agent_state.result, error=None)
                 else:
                     self.action()
+                    self.agent_state.consecutive_failures = 0
                     self.agent_step.increment_step()
         except Exception as error:
             return AgentResult(is_done=False, content=None, error=str(error))
