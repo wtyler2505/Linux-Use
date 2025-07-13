@@ -100,7 +100,7 @@ class Tree:
             
         def is_keyboard_focusable(node:Control):
             try:
-                if node.ControlTypeName in set(['EditControl','ButtonControl','CheckBoxControl','RadioButtonControl']):
+                if node.ControlTypeName in set(['EditControl','ButtonControl','CheckBoxControl','RadioButtonControl','TabItemControl']):
                     return True
                 return node.IsKeyboardFocusable
             except Exception:
@@ -127,7 +127,7 @@ class Tree:
                 if node.ControlTypeName in INTERACTIVE_CONTROL_TYPE_NAMES:
                     if is_element_visible(node) and is_element_enabled(node) and not is_element_image(node) and is_keyboard_focusable(node):
                         return True
-                elif node.ControlTypeName=='GroupControl':
+                elif node.ControlTypeName=='GroupControl' and node.FrameworkId=='Chrome':
                     if is_element_visible(node) and is_element_enabled(node) and (is_default_action(node) or is_keyboard_focusable(node)):
                         return True
             except Exception:
@@ -149,7 +149,7 @@ class Tree:
                         return None
                     if child.ControlTypeName!='TextControl':
                         return None
-                    control_type='edit'
+                    control_type='Edit'
                     box = node.BoundingRectangle
                     x,y=box.xcenter(),box.ycenter()
                     center = Center(x=x,y=y)
@@ -190,7 +190,8 @@ class Tree:
                     center=center,
                     app_name=app_name
                 ))
-                dom_correction(node)
+                if node.FrameworkId=='Chrome':
+                    dom_correction(node)
             elif is_element_text(node):
                 informative_nodes.append(TextElementNode(
                     name=node.Name.strip() or "''",
