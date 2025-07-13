@@ -78,9 +78,7 @@ class Tree:
         
         def is_element_image(node:Control):
             if isinstance(node,ImageControl):
-                if node.Name:
-                    return False
-                if node.LocalizedControlType=='graphic':
+                if node.LocalizedControlType=='graphic' or not node.IsKeyboardFocusable:
                     return True
             return False
         
