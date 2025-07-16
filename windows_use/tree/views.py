@@ -53,6 +53,7 @@ class TreeElementNode:
     bounding_box:BoundingBox
     center:Center
     app_name:str
+    app_window:tuple[int,int]
 
 @dataclass
 class TextElementNode:
