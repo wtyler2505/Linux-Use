@@ -1,9 +1,10 @@
 from uiautomation import GetScreenSize, Control, GetRootControl, ControlType, ControlFromCursor, SetWindowTopmost
+from windows_use.desktop.config import EXCLUDED_APPS, BROWSER_NAMES
 from windows_use.desktop.views import DesktopState,App,Size
-from windows_use.desktop.config import EXCLUDED_APPS
 from PIL.Image import Image as PILImage
 from windows_use.tree import Tree
 from fuzzywuzzy import process
+from psutil import Process
 from time import sleep
 from io import BytesIO
 from PIL import Image
@@ -67,6 +68,10 @@ class Desktop:
             return (result.stdout.decode('latin1'),result.returncode)
         except subprocess.CalledProcessError as e:
             return (e.stdout.decode('latin1'),e.returncode)
+        
+    def is_app_browser(self,node:Control):
+        process=Process(node.ProcessId)
+        return process.name() in BROWSER_NAMES
         
     def launch_app(self,name:str):
         apps_map=self.get_apps_from_start_menu()

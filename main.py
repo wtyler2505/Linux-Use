@@ -1,8 +1,6 @@
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_groq import ChatGroq
 from windows_use.agent import Agent
 from dotenv import load_dotenv
-import os
 
 load_dotenv()
 

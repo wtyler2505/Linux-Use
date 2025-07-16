@@ -1,8 +1,8 @@
 from windows_use.tree.views import TreeElementNode, TextElementNode, ScrollElementNode, Center, BoundingBox, TreeState
 from windows_use.tree.config import INTERACTIVE_CONTROL_TYPE_NAMES,INFORMATIVE_CONTROL_TYPE_NAMES, DEFAULT_ACTIONS
+from uiautomation import GetRootControl,Control,ImageControl,ScrollPattern
 from windows_use.tree.utils import random_point_within_bounding_box
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from uiautomation import GetRootControl,Control,ImageControl
 from windows_use.desktop.config import AVOIDED_APPS
 from PIL import Image, ImageFont, ImageDraw
 from typing import TYPE_CHECKING
@@ -34,7 +34,7 @@ class Tree:
         interactive_nodes,informative_nodes,scrollable_nodes=[],[],[]
         # Parallel traversal (using ThreadPoolExecutor) to get nodes from each app
         with ThreadPoolExecutor() as executor:
-            future_to_node = {executor.submit(self.get_nodes, app): app for app in apps.values()}
+            future_to_node = {executor.submit(self.get_nodes, app,self.desktop.is_app_browser(app)): app for app in apps.values()}
             for future in as_completed(future_to_node):
                 try:
                     result = future.result()
@@ -47,7 +47,7 @@ class Tree:
                     print(f"Error processing node {future_to_node[future].Name}: {e}")
         return interactive_nodes,informative_nodes,scrollable_nodes
 
-    def get_nodes(self, node: Control) -> tuple[list[TreeElementNode],list[TextElementNode],list[ScrollElementNode]]:
+    def get_nodes(self, node: Control, is_browser=False) -> tuple[list[TreeElementNode],list[TextElementNode],list[ScrollElementNode]]:
         interactive_nodes, informative_nodes, scrollable_nodes = [], [], []
         app_name=node.Name.strip()
         app_name='Desktop' if app_name=='Program Manager' else app_name
@@ -93,7 +93,7 @@ class Tree:
         
         def is_element_scrollable(node:Control):
             try:
-                scroll_pattern=node.GetScrollPattern()
+                scroll_pattern:ScrollPattern=node.GetScrollPattern()
                 return scroll_pattern.VerticallyScrollable or scroll_pattern.HorizontallyScrollable
             except Exception:
                 return False
@@ -115,7 +115,7 @@ class Tree:
             
         def group_has_no_name(node:Control):
             try:
-                if node.LocalizedControlType=='group':
+                if node.ControlTypeName=='GroupControl':
                     if not node.Name.strip():
                         return True
                 return False
@@ -127,7 +127,7 @@ class Tree:
                 if node.ControlTypeName in INTERACTIVE_CONTROL_TYPE_NAMES:
                     if is_element_visible(node) and is_element_enabled(node) and not is_element_image(node) and is_keyboard_focusable(node):
                         return True
-                elif node.ControlTypeName=='GroupControl' and node.FrameworkId=='Chrome':
+                elif node.ControlTypeName=='GroupControl' and is_browser:
                     if is_element_visible(node) and is_element_enabled(node) and (is_default_action(node) or is_keyboard_focusable(node)):
                         return True
             except Exception:
@@ -190,7 +190,7 @@ class Tree:
                     center=center,
                     app_name=app_name
                 ))
-                if node.FrameworkId=='Chrome':
+                if is_browser:
                     dom_correction(node)
             elif is_element_text(node):
                 informative_nodes.append(TextElementNode(
@@ -198,7 +198,7 @@ class Tree:
                     app_name=app_name
                 ))
             elif is_element_scrollable(node):
-                scroll_pattern=node.GetScrollPattern()
+                scroll_pattern:ScrollPattern=node.GetScrollPattern()
                 box = node.BoundingRectangle
                 # Get the center
                 x,y=box.xcenter(),box.ycenter()

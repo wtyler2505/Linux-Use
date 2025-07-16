@@ -34,6 +34,7 @@ dependencies = [
     "live-inspect==0.1.1",
     "markdownify>=1.1.0",
     "pillow>=11.2.1",
+    "psutil>=7.0.0",
     "pyautogui>=0.9.54",
     "pydantic>=2.11.7",
     "pytest-cov>=6.2.1",
