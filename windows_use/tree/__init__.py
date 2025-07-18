@@ -35,7 +35,7 @@ class Tree:
         interactive_nodes,informative_nodes,scrollable_nodes=[],[],[]
         # Parallel traversal (using ThreadPoolExecutor) to get nodes from each app
         with ThreadPoolExecutor() as executor:
-            future_to_node = {executor.submit(self.get_nodes, app): app for app in apps.values() if app}
+            future_to_node = {executor.submit(self.get_nodes,app,self.desktop.is_app_browser(app)): app for app in apps.values() if app}
             for future in as_completed(future_to_node):
                 try:
                     result = future.result()

@@ -67,7 +67,9 @@ At every step, Windows-Use will be given the state:
 8. If a captcha appears, attempt solving it if possible or else use fallback strategies.
 9. If the window size of an app is less than 50% of screen size than maximize it. (ALWAYS prefer to keep apps in MAXIMIZE)
 10. The scrolling depends on the location of the cursor, so mention the location where to scroll.
-11. The apps that you use like browser, vscode , ..etc contains the information about the user like they are already logged into the platform.
+11. You can't switch to an app if it is minimized; in that case click on the minimized app.
+12. The apps that you use like browser, vscode , ..etc contains the information about the user like they are already logged into the platform.
+
 </desktop_rules>
 
 <browsing_rules>
