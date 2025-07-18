@@ -3,7 +3,7 @@ from windows_use.tree.config import INTERACTIVE_CONTROL_TYPE_NAMES,INFORMATIVE_C
 from uiautomation import GetRootControl,Control,ImageControl,ScrollPattern
 from windows_use.tree.utils import random_point_within_bounding_box
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from windows_use.desktop.config import AVOIDED_APPS,EXCLUDED_APPS
+from windows_use.desktop.config import AVOIDED_APPS
 from PIL import Image, ImageFont, ImageDraw
 from typing import TYPE_CHECKING
 from time import sleep
@@ -25,12 +25,12 @@ class Tree:
     
     def get_appwise_nodes(self,node:Control) -> tuple[list[TreeElementNode],list[TextElementNode]]:
         all_apps=node.GetChildren()
-        visible_apps = {app.Name: app for app in all_apps if self.desktop.is_app_visible(app) and app.Name not in AVOIDED_APPS}
-        apps={'Taskbar':visible_apps.pop('Taskbar',None),'Program Manager':visible_apps.pop('Program Manager',None)}
+        visible_apps = {app.ClassName: app for app in all_apps if self.desktop.is_app_visible(app) and app.Name not in AVOIDED_APPS}
+        apps={'Taskbar':visible_apps.pop("Shell_TrayWnd",None),'Program Manager':visible_apps.pop("Progman",None)}
         if visible_apps:
             foreground_app=next(iter(visible_apps.values()))
             if foreground_app:
-                apps[foreground_app.Name.strip()]=foreground_app
+                apps[foreground_app.ClassName.strip()]=foreground_app
         del visible_apps
         interactive_nodes,informative_nodes,scrollable_nodes=[],[],[]
         # Parallel traversal (using ThreadPoolExecutor) to get nodes from each app
@@ -51,8 +51,7 @@ class Tree:
     def get_nodes(self, node: Control, is_browser=False) -> tuple[list[TreeElementNode],list[TextElementNode],list[ScrollElementNode]]:
         interactive_nodes, informative_nodes, scrollable_nodes = [], [], []
         app_name=node.Name.strip()
-        app_name='Desktop' if app_name=='Program Manager' else app_name
-        window_box=node.BoundingRectangle
+        app_name='Desktop' if node.ClassName=='Progman' else app_name
         
         def is_element_visible(node:Control,threshold:int=0):
             is_control=node.IsControlElement
@@ -161,8 +160,7 @@ class Tree:
                         shortcut=node.AcceleratorKey or "''",
                         bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom,width=box.width(),height=box.height()),
                         center=center,
-                        app_name=app_name,
-                        app_window=BoundingBox(left=window_box.left,top=window_box.top,right=window_box.right,bottom=window_box.bottom,width=window_box.width(),height=window_box.height())
+                        app_name=app_name
                     ))
             elif element_has_child_element(node,'link','heading'):
                 interactive_nodes.pop()
@@ -177,14 +175,13 @@ class Tree:
                     shortcut=node.AcceleratorKey or "''",
                     bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom,width=box.width(),height=box.height()),
                     center=center,
-                    app_name=app_name,
-                    app_window=BoundingBox(left=window_box.left,top=window_box.top,right=window_box.right,bottom=window_box.bottom,width=window_box.width(),height=window_box.height())
+                    app_name=app_name
                 ))
             
         def tree_traversal(node: Control):
             if is_element_interactive(node):
                 box = node.BoundingRectangle
-                x,y=random_point_within_bounding_box(node=node,window_size=(window_box.width(),window_box.height()),scale_factor=0.8)
+                x,y=random_point_within_bounding_box(node=node,scale_factor=0.8)
                 center = Center(x=x,y=y)
                 interactive_nodes.append(TreeElementNode(
                     name=node.Name.strip() or "''",
@@ -192,8 +189,7 @@ class Tree:
                     shortcut=node.AcceleratorKey or "''",
                     bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom,width=box.width(),height=box.height()),
                     center=center,
-                    app_name=app_name,
-                    app_window=BoundingBox(left=window_box.left,top=window_box.top,right=window_box.right,bottom=window_box.bottom,width=window_box.width(),height=window_box.height())
+                    app_name=app_name
                 ))
                 if is_browser:
                     dom_correction(node)
@@ -206,7 +202,7 @@ class Tree:
                 scroll_pattern:ScrollPattern=node.GetScrollPattern()
                 box = node.BoundingRectangle
                 # Get the center
-                x,y=box.xcenter(),box.ycenter()
+                x,y=random_point_within_bounding_box(node=node,scale_factor=0.8)
                 center = Center(x=x,y=y)
                 scrollable_nodes.append(ScrollElementNode(
                     name=node.Name.strip() or node.LocalizedControlType.capitalize() or "''",
@@ -248,28 +244,15 @@ class Tree:
 
         def draw_annotation(label, node: TreeElementNode):
             box = node.bounding_box
-            app_box = node.app_window
             color = get_random_color()
 
             # Scale and pad the bounding box also clip the bounding box
-            if node.app_name not in EXCLUDED_APPS:
-                clipped_left = max(box.left, app_box.left)
-                clipped_top = max(box.top, app_box.top)
-                clipped_right = min(box.right, app_box.right)
-                clipped_bottom = min(box.bottom, app_box.bottom)
-                adjusted_box = (
-                    int(clipped_left * scale) + padding,
-                    int(clipped_top * scale) + padding,
-                    int(clipped_right * scale) + padding,
-                    int(clipped_bottom * scale) + padding
-                )
-            else:
-                adjusted_box = (
-                    int(box.left * scale) + padding,
-                    int(box.top * scale) + padding,
-                    int(box.right * scale) + padding,
-                    int(box.bottom * scale) + padding
-                )
+            adjusted_box = (
+                int(box.left * scale) + padding,
+                int(box.top * scale) + padding,
+                int(box.right * scale) + padding,
+                int(box.bottom * scale) + padding
+            )
             # Draw bounding box
             draw.rectangle(adjusted_box, outline=color, width=2)
 
