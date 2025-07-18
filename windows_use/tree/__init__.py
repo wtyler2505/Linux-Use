@@ -26,15 +26,16 @@ class Tree:
     def get_appwise_nodes(self,node:Control) -> tuple[list[TreeElementNode],list[TextElementNode]]:
         all_apps=node.GetChildren()
         visible_apps = {app.Name: app for app in all_apps if self.desktop.is_app_visible(app) and app.Name not in AVOIDED_APPS}
-        apps={'Taskbar':visible_apps.pop('Taskbar'),'Program Manager':visible_apps.pop('Program Manager')}
+        apps={'Taskbar':visible_apps.pop('Taskbar',None),'Program Manager':visible_apps.pop('Program Manager',None)}
         if visible_apps:
-            foreground_app = list(visible_apps.values()).pop(0)
-            apps[foreground_app.Name.strip()]=foreground_app
+            foreground_app=next(iter(visible_apps.values()))
+            if foreground_app:
+                apps[foreground_app.Name.strip()]=foreground_app
         del visible_apps
         interactive_nodes,informative_nodes,scrollable_nodes=[],[],[]
         # Parallel traversal (using ThreadPoolExecutor) to get nodes from each app
         with ThreadPoolExecutor() as executor:
-            future_to_node = {executor.submit(self.get_nodes, app,self.desktop.is_app_browser(app)): app for app in apps.values()}
+            future_to_node = {executor.submit(self.get_nodes, app): app for app in apps.values() if app}
             for future in as_completed(future_to_node):
                 try:
                     result = future.result()
