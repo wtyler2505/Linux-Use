@@ -131,6 +131,9 @@ class Tree:
                 elif node.ControlTypeName=='GroupControl' and is_browser:
                     if is_element_visible(node) and is_element_enabled(node) and (is_default_action(node) or is_keyboard_focusable(node)):
                         return True
+                elif node.ControlTypeName=='GroupControl' and not is_browser:
+                    if is_element_visible(node) and is_element_enabled(node) and is_default_action(node):
+                        return True
             except Exception:
                 return False
             return False

@@ -1,4 +1,4 @@
-from uiautomation import GetScreenSize, Control, GetRootControl, ControlType, ControlFromCursor, SetWindowTopmost
+from uiautomation import Control, GetRootControl, IsIconic, IsZoomed, IsWindowVisible, ControlType, ControlFromCursor, SetWindowTopmost, IsTopLevelWindow, ShowWindow
 from windows_use.desktop.config import EXCLUDED_APPS, BROWSER_NAMES
 from windows_use.desktop.views import DesktopState,App,Size
 from PIL.Image import Image as PILImage
@@ -31,22 +31,22 @@ class Desktop:
         self.desktop_state=DesktopState(apps=apps,active_app=active_app,screenshot=screenshot,tree_state=tree_state)
         return self.desktop_state
     
-    def get_taskbar(self)->Control:
-        root=GetRootControl()
-        taskbar=root.GetFirstChildControl()
-        return taskbar
+    def get_window_element_from_element(self,element:Control)->Control|None:
+        while element is not None:
+            if IsTopLevelWindow(element.NativeWindowHandle):
+                return element
+            element = element.GetParentControl()
+        return None
     
     def get_app_status(self,control:Control)->str:
-        taskbar=self.get_taskbar()
-        taskbar_height=taskbar.BoundingRectangle.height()
-        window = control.BoundingRectangle
-        screen_width, screen_height = GetScreenSize()
-        window_width,window_height=window.width(),window.height()
-        if window.isempty():
-            return "Minimized"
-        if window_width >= screen_width and window_height >= screen_height - taskbar_height:
-            return "Maximized"
-        return "Normal"
+        if IsIconic(control.NativeWindowHandle):
+            return 'Minimized'
+        elif IsZoomed(control.NativeWindowHandle):
+            return 'Maximized'
+        elif IsWindowVisible(control.NativeWindowHandle):
+            return 'Normal'
+        else:
+            return 'Hidden'
     
     def get_cursor_location(self)->tuple[int,int]:
         position=pyautogui.position()
@@ -95,7 +95,10 @@ class Desktop:
             return (f'Application {name.title()} not found.',1)
         app_name,_=matched_app
         app=apps.get(app_name)
-        if SetWindowTopmost(app.handle,isTopmost=True):
+        if IsIconic(app.handle):
+            ShowWindow(app.handle, cmdShow=9)
+            return (f'{app_name.title()} restored from minimized state.',0)
+        elif SetWindowTopmost(app.handle,isTopmost=True):
             return (f'{app_name.title()} switched to foreground.',0)
         else:
             return (f'Failed to switch to {app_name.title()}.',1)
