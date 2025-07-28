@@ -184,7 +184,7 @@ class Tree:
         def tree_traversal(node: Control):
             if is_element_interactive(node):
                 box = node.BoundingRectangle
-                x,y=random_point_within_bounding_box(node=node,scale_factor=0.8)
+                x,y=random_point_within_bounding_box(node=node,scale_factor=0.5)
                 center = Center(x=x,y=y)
                 interactive_nodes.append(TreeElementNode(
                     name=node.Name.strip() or "''",
