@@ -212,6 +212,8 @@ class Tree:
                 ))
             # Recursively check all children
             for child in node.GetChildren():
+                if child.IsOffscreen and child.ControlTypeName!= 'EditControl' and child.ClassName!="Popup":
+                    continue
                 tree_traversal(child)
         tree_traversal(node)
         return (interactive_nodes,informative_nodes,scrollable_nodes)
