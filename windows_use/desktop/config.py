@@ -7,5 +7,5 @@ AVOIDED_APPS:Set[str]=set([
 ])
 
 EXCLUDED_APPS:Set[str]=set([
-    'Program Manager','Taskbar'
+    'Progman','Shell_TrayWnd','Microsoft.UI.Content.PopupWindowSiteBridge'
 ]).union(AVOIDED_APPS)
