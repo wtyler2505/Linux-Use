@@ -3,7 +3,7 @@ from windows_use.tree.config import INTERACTIVE_CONTROL_TYPE_NAMES,INFORMATIVE_C
 from uiautomation import GetRootControl,Control,ImageControl,ScrollPattern
 from windows_use.tree.utils import random_point_within_bounding_box
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from windows_use.desktop.config import AVOIDED_APPS
+from windows_use.desktop.config import AVOIDED_APPS, EXCLUDED_APPS
 from PIL import Image, ImageFont, ImageDraw
 from typing import TYPE_CHECKING
 from time import sleep
@@ -24,12 +24,21 @@ class Tree:
         return TreeState(interactive_nodes=interactive_nodes,informative_nodes=informative_nodes,scrollable_nodes=scrollable_nodes)
     
     def get_appwise_nodes(self,node:Control) -> tuple[list[TreeElementNode],list[TextElementNode]]:
-        all_apps=node.GetChildren()
-        visible_apps = [app for app in all_apps if self.desktop.is_app_visible(app) and app.Name not in AVOIDED_APPS]
+        apps:list[Control]=[]
+        found_foreground_app=False
+
+        for app in node.GetChildren():
+            if app.ClassName in EXCLUDED_APPS:
+                apps.append(app)
+            elif app.ClassName not in AVOIDED_APPS and self.desktop.is_app_visible(app):
+                if not found_foreground_app:
+                    apps.append(app)
+                    found_foreground_app=True
+
         interactive_nodes,informative_nodes,scrollable_nodes=[],[],[]
         # Parallel traversal (using ThreadPoolExecutor) to get nodes from each app
         with ThreadPoolExecutor() as executor:
-            future_to_node = {executor.submit(self.get_nodes,app,self.desktop.is_app_browser(app)): app for app in visible_apps}
+            future_to_node = {executor.submit(self.get_nodes, app,self.desktop.is_app_browser(app)): app for app in apps}
             for future in as_completed(future_to_node):
                 try:
                     result = future.result()
@@ -120,14 +129,14 @@ class Tree:
         def is_element_interactive(node:Control):
             try:
                 if node.ControlTypeName in INTERACTIVE_CONTROL_TYPE_NAMES:
-                    if is_element_visible(node) and is_element_enabled(node) and not is_element_image(node) and is_keyboard_focusable(node):
+                    if is_element_visible and is_element_enabled(node) and not is_element_image(node) or is_keyboard_focusable(node):
                         return True
                 elif node.ControlTypeName=='GroupControl' and is_browser:
-                    if is_element_visible(node) and is_element_enabled(node) and (is_default_action(node) or is_keyboard_focusable(node)):
+                    if is_element_visible and is_element_enabled(node) and (is_default_action(node) or is_keyboard_focusable(node)):
                         return True
-                elif node.ControlTypeName=='GroupControl' and not is_browser:
-                    if is_element_visible(node) and is_element_enabled(node) and is_default_action(node):
-                        return True
+                # elif node.ControlTypeName=='GroupControl' and not is_browser:
+                #     if is_element_visible and is_element_enabled(node) and is_default_action(node):
+                #         return True
             except Exception:
                 return False
             return False
@@ -176,9 +185,13 @@ class Tree:
                 ))
             
         def tree_traversal(node: Control):
+            # Checks to skip the nodes that are not interactive
+            if node.IsOffscreen and node.ControlTypeName!= 'EditControl' and node.ClassName!="Popup":
+                return None
+            
             if is_element_interactive(node):
                 box = node.BoundingRectangle
-                x,y=random_point_within_bounding_box(node=node,scale_factor=0.5)
+                x,y=random_point_within_bounding_box(node=node,scale_factor=0.8)
                 center = Center(x=x,y=y)
                 interactive_nodes.append(TreeElementNode(
                     name=node.Name.strip() or "''",
@@ -212,9 +225,8 @@ class Tree:
                 ))
             # Recursively check all children
             for child in node.GetChildren():
-                if child.IsOffscreen and child.ControlTypeName!= 'EditControl' and child.ClassName!="Popup":
-                    continue
                 tree_traversal(child)
+
         tree_traversal(node)
         return (interactive_nodes,informative_nodes,scrollable_nodes)
     
