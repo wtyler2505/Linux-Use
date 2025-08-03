@@ -96,31 +96,9 @@ Enter your query: <YOUR TASK>
 
 Talk to your computer. Watch it get things done.
 
-## Roadmap
+## Star History
 
-### 🤖 Agent Intelligence
-
-* [ ] **Integrate memory** : allow the agent to remember past interactions made by the user.
-* [ ] **Optimize token usage** : implement strategies like Ally Tree compression and prompt engineering to reduce overhead.
-* [ ] **Simulate advanced human-like input** : enable accurate and naturalistic mouse & keyboard interactions across apps.
-* [ ] **Support for local LLMs** : local models with near-parity performance to cloud-based APIs (e.g., Mistral, LLaMA, etc.).
-* [ ] **Improve reasoning and planning** : enhance the agent's ability to break down and sequence complex tasks.
-
-### 🌳 Ally Tree Optimization
-
-* [ ] **Improve UI element detection** : automatically identify and prioritize essential, interactive components on screen.
-* [ ] **Compress Ally Tree intelligently** : reduce complexity by pruning irrelevant branches.
-* [ ] **Context-aware prioritization** : rank UI elements based on relevance to the task at hand.
-
-### 💡 User Experience
-
-* [ ] **Reduce latency** : optimize to improve response time between GUI interaction.
-* [ ] **Polish command interface** : make it easier to write, speak, or type commands through a simplified UX layer.
-* [ ] **Better error handling & recovery** : ensure graceful handling of edge cases and unclear instructions.
-
-### 🧪 Evaluation
-
-* [ ] **LLM evaluation benchmarks** — track performance across different models and benchmarks.
+[![Star History Chart](https://api.star-history.com/svg?repos=CursorTouch/Windows-Use&type=Date)](https://www.star-history.com/#CursorTouch/Windows-Use&Date)
 
 ## ⚠️ Caution
 
