@@ -119,6 +119,7 @@ class Agent:
                 except Exception as err:
                     self.agent_state.consecutive_failures += 1
                     self.agent_state.error = str(err)
+                    logger.error(f"Error: {self.agent_state.error}")
                     continue
                 if self.agent_state.is_done():
                     self.answer()

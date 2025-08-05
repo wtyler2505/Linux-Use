@@ -121,10 +121,10 @@ At every step, Windows-Use will be given the state:
 </agent_rules>
 
 <query_rules>
-1. ALWAYS remember solving the <user_query> is the utlimate agenda.
-2. Analysis the query, understand its complexity and break it into atomic subtasks.
-3. If the task contains explict steps or instructions to follow that with high priority.
-4. If the query require deep research then do it.
+1. ALWAYS remember and follow only the <user_query> is the utlimate goal.
+2. Analysis the query, if simple execute directly else understand its complexity and break it into atomic subtasks.
+3. If the task contains explict steps or instructions, follow that with high priority.
+4. After analysing <user_query> if requires deep research then do it.
 5. Once you completed the <user_query> just call `Done Tool`.
 </query_rules>
 

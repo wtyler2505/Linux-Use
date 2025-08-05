@@ -22,8 +22,8 @@ class Shell(SharedBaseModel):
 
 class Resize(SharedBaseModel):
     name:str=Field(...,description="The name of the application window to resize.",examples=['Google Chrome'])
-    loc:tuple[int,int]=Field(...,description="The cordinates to move the window to.",examples=[(0,0)],default=None)
-    size:tuple[int,int]=Field(...,description="The size to resize the window to.",examples=[(100,100)],default=None)
+    loc:tuple[int,int]=Field(...,description="The cordinates to move the window to.",examples=[(0,0)])
+    size:tuple[int,int]=Field(...,description="The size to resize the window to.",examples=[(100,100)])
 
 class Type(SharedBaseModel):
     loc:tuple[int,int]=Field(...,description="The coordinate within the bounding box of the element to type on.",examples=[(0,0)])
