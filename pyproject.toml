@@ -22,7 +22,6 @@ classifiers = [
 ]
 
 dependencies = [
-    "coverage>=7.9.1",
     "fuzzywuzzy>=0.18.0",
     "humancursor>=1.1.5",
     "ipykernel>=6.29.5",
@@ -38,12 +37,8 @@ dependencies = [
     "psutil>=7.0.0",
     "pyautogui>=0.9.54",
     "pydantic>=2.11.7",
-    "pytest-cov>=6.2.1",
     "python-levenshtein>=0.27.1",
-    "pyuac>=0.0.3",
-    "requests>=2.32.4",
     "rich>=14.0.0",
-    "setuptools>=80.9.0",
     "termcolor>=3.1.0",
     "twine>=6.1.0",
     "uiautomation>=2.0.28",
