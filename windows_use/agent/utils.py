@@ -49,6 +49,6 @@ def image_message(prompt,image)->HumanMessage:
         },
         {
             "type": "image_url", 
-            "image_url": image
+            "image_url": {"url": image}
         },
     ])
