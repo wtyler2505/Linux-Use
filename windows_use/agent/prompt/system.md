@@ -148,4 +148,4 @@ ALWAYS respond exclusively in the following XML format:
 </output>
 ```
 
-Begin!!!
+Your response should only be verbatim in the format. Any other response format will be rejected.
