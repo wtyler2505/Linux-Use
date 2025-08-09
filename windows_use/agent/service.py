@@ -65,6 +65,7 @@ class Agent:
     def reason(self,state:AgentState):
         messages=state['messages']
         message=self.llm.invoke(messages)
+        logger.info(f"Iteration: {state['steps']}")
         agent_data = extract_agent_data(message=message)
         logger.info(colored(f"📝: Evaluate: {agent_data.evaluate}",color='yellow',attrs=['bold']))
         logger.info(colored(f"📒: Memory: {agent_data.memory}",color='light_green',attrs=['bold']))
@@ -122,7 +123,7 @@ class Agent:
         return graph.compile(debug=False)
 
     def invoke(self,query: str)->AgentResult:
-        steps=0
+        steps=1
         max_steps = self.max_steps
         language=self.desktop.get_default_language()
         tools_prompt = self.registry.get_tools_prompt()
@@ -144,7 +145,7 @@ class Agent:
         }
         try:
             with self.watch_cursor:
-                response=self.graph.invoke(state)            
+                response=self.graph.invoke(state,config={'recursion_limit':max_steps+10})            
         except Exception as error:
             response={
                 'output':None,
