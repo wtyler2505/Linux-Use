@@ -1,5 +1,6 @@
 from langchain_core.messages import BaseMessage,HumanMessage
 from windows_use.agent.views import AgentData
+import json
 import ast
 import re
 
@@ -37,7 +38,7 @@ def extract_agent_data(message: BaseMessage) -> AgentData:
             action['params'] = ast.literal_eval(action_input_str)
         except (ValueError, SyntaxError):
             # If there's an issue with conversion, store it as raw string
-            action['params'] = action_input_str
+            action['params'] = json.loads(action_input_str)
     result['action'] = action
     return  AgentData.model_validate(result)
 
@@ -49,6 +50,8 @@ def image_message(prompt,image)->HumanMessage:
         },
         {
             "type": "image_url", 
-            "image_url": {"url": image}
+            "image_url": {
+                "url": image
+            }
         },
     ])

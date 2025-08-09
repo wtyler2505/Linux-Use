@@ -73,6 +73,12 @@ class Desktop:
         process=Process(node.ProcessId)
         return process.name() in BROWSER_NAMES
     
+    def get_default_language(self)->str:
+        command="Get-Culture | Select-Object Name,DisplayName | ConvertTo-Csv -NoTypeInformation"
+        response,_=self.execute_command(command)
+        reader=csv.DictReader(io.StringIO(response))
+        return "".join([row.get('DisplayName') for row in reader])
+    
     def resize_app(self,name:str,size:tuple[int,int]=None,loc:tuple[int,int]=None)->tuple[str,int]:
         apps=self.get_apps()
         matched_app:tuple[App,int]|None=process.extractOne(name,apps)

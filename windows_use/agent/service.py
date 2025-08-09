@@ -1,12 +1,14 @@
 from windows_use.agent.tools.service import click_tool, type_tool, launch_tool, shell_tool, clipboard_tool, done_tool, shortcut_tool, scroll_tool, drag_tool, move_tool, key_tool, wait_tool, scrape_tool, switch_tool, resize_tool
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
-from windows_use.agent.views import AgentState, AgentStep, AgentResult
 from windows_use.agent.utils import extract_agent_data, image_message
 from langchain_core.language_models.chat_models import BaseChatModel
 from windows_use.agent.registry.views import ToolResult
 from windows_use.agent.registry.service import Registry
 from windows_use.agent.prompt.service import Prompt
 from live_inspect.watch_cursor import WatchCursor
+from langgraph.graph import START,END,StateGraph
+from windows_use.agent.views import AgentResult
+from windows_use.agent.state import AgentState
 from langchain_core.tools import BaseTool
 from windows_use.desktop import Desktop
 from rich.markdown import Markdown
@@ -51,90 +53,105 @@ class Agent:
         ] + additional_tools)
         self.instructions=instructions
         self.browser=browser
+        self.max_steps=max_steps
         self.consecutive_failures=consecutive_failures
         self.desktop = Desktop()
-        self.agent_state = AgentState()
         self.watch_cursor = WatchCursor()
-        self.agent_step = AgentStep(max_steps=max_steps)
+        self.console=Console()
         self.use_vision=use_vision
         self.llm = llm
+        self.graph=self.create_graph()
 
-    def reason(self):
-        message=self.llm.invoke(self.agent_state.messages)
+    def reason(self,state:AgentState):
+        messages=state['messages']
+        message=self.llm.invoke(messages)
         agent_data = extract_agent_data(message=message)
-        self.agent_state.update_state(agent_data=agent_data, messages=[message])
+        logger.info(colored(f"📝: Evaluate: {agent_data.evaluate}",color='yellow',attrs=['bold']))
+        logger.info(colored(f"📒: Memory: {agent_data.memory}",color='light_green',attrs=['bold']))
         logger.info(colored(f"💭: Thought: {agent_data.thought}",color='light_magenta',attrs=['bold']))
+        return {**state,'agent_data':agent_data,'steps':state['steps']+1}
 
-    def action(self):
-        self.agent_state.messages.pop() # Remove the last message to avoid duplication
-        last_message = self.agent_state.messages[-1]
+    def action(self,state:AgentState):
+        agent_data=state['agent_data']
+        last_message = state['messages'].pop()
+        name = agent_data.action.name
+        params = agent_data.action.params
         if isinstance(last_message, HumanMessage):
-            self.agent_state.messages[-1]=HumanMessage(content=Prompt.previous_observation_prompt(self.agent_state.previous_observation))
-        ai_message = AIMessage(content=Prompt.action_prompt(agent_data=self.agent_state.agent_data))
-        name = self.agent_state.agent_data.action.name
-        params = self.agent_state.agent_data.action.params
+            state['messages'][-1]=HumanMessage(content=Prompt.previous_observation_prompt(state['previous_observation']))
+        ai_message = AIMessage(content=Prompt.action_prompt(agent_data=agent_data))
         logger.info(colored(f"🔧: Action: {name}({', '.join(f'{k}={v}' for k, v in params.items())})",color='blue',attrs=['bold']))
         tool_result = self.registry.execute(tool_name=name, desktop=self.desktop, **params)
         observation=tool_result.content if tool_result.is_success else tool_result.error
         logger.info(colored(f"🔭: Observation: {shorten(observation,500,placeholder='...')}",color='green',attrs=['bold']))
         desktop_state = self.desktop.get_state(use_vision=self.use_vision)
-        prompt=Prompt.observation_prompt(query=self.agent_state.query,agent_step=self.agent_step, tool_result=tool_result, desktop_state=desktop_state)
+        prompt=Prompt.observation_prompt(query=state['input'],steps=state['steps'],max_steps=state['max_steps'], tool_result=tool_result, desktop_state=desktop_state)
         human_message=image_message(prompt=prompt,image=desktop_state.screenshot) if self.use_vision and desktop_state.screenshot else HumanMessage(content=prompt)
-        self.agent_state.update_state(agent_data=None,observation=observation,messages=[ai_message, human_message])
+        return {**state,'agent_data':None,'messages':[ai_message, human_message],'previous_observation':observation}
 
-    def answer(self):
-        self.agent_state.messages.pop()  # Remove the last message to avoid duplication
-        last_message = self.agent_state.messages[-1]
+    def answer(self,state:AgentState):
+        agent_data=state['agent_data']
+        last_message = state['messages'].pop()
+        name = agent_data.action.name
+        params = agent_data.action.params
         if isinstance(last_message, HumanMessage):
-            self.agent_state.messages[-1]=HumanMessage(content=Prompt.previous_observation_prompt(self.agent_state.previous_observation))
-        name = self.agent_state.agent_data.action.name
-        params = self.agent_state.agent_data.action.params
+            state['messages'][-1]=HumanMessage(content=Prompt.previous_observation_prompt(state['previous_observation']))
         tool_result = self.registry.execute(tool_name=name, desktop=None, **params)
-        ai_message = AIMessage(content=Prompt.answer_prompt(agent_data=self.agent_state.agent_data, tool_result=tool_result))
+        ai_message = AIMessage(content=Prompt.answer_prompt(agent_data=agent_data, tool_result=tool_result))
         logger.info(colored(f"📜: Final Answer: {tool_result.content}",color='cyan',attrs=['bold']))
-        self.agent_state.update_state(agent_data=None,observation=None,result=tool_result.content,messages=[ai_message])
+        return {**state,'agent_data':None,'messages':[ai_message],'previous_observation':None,'output':tool_result.content}
 
-    def invoke(self,query: str):
-        max_steps = self.agent_step.max_steps
+    def main_controller(self,state:AgentState):
+        if state['steps']<state['max_steps']:
+            agent_data=state['agent_data']
+            action_name=agent_data.action.name
+            if action_name!='Done Tool':
+                return 'action'
+        return 'answer'    
+
+    def create_graph(self):
+        graph=StateGraph(AgentState)
+        graph.add_node('reason',self.reason)
+        graph.add_node('action',self.action)
+        graph.add_node('answer',self.answer)
+
+        graph.add_edge(START,'reason')
+        graph.add_conditional_edges('reason',self.main_controller)
+        graph.add_edge('action','reason')
+        graph.add_edge('answer',END)
+
+        return graph.compile(debug=False)
+
+    def invoke(self,query: str)->AgentResult:
+        steps=0
+        max_steps = self.max_steps
+        language=self.desktop.get_default_language()
         tools_prompt = self.registry.get_tools_prompt()
         desktop_state = self.desktop.get_state(use_vision=self.use_vision)
-        prompt=Prompt.observation_prompt(query=query,agent_step=self.agent_step, tool_result=ToolResult(is_success=True, content="No Action"), desktop_state=desktop_state)
-        system_message=SystemMessage(content=Prompt.system_prompt(browser=self.browser,instructions=self.instructions,tools_prompt=tools_prompt,max_steps=max_steps))
+        prompt=Prompt.observation_prompt(query=query,steps=steps,max_steps=max_steps,tool_result=ToolResult(is_success=True, content="No Action Taken"), desktop_state=desktop_state)
+        system_message=SystemMessage(content=Prompt.system_prompt(browser=self.browser,language=language,instructions=self.instructions,tools_prompt=tools_prompt,max_steps=max_steps))
         human_message=image_message(prompt=prompt,image=desktop_state.screenshot) if self.use_vision and desktop_state.screenshot else HumanMessage(content=prompt)
         messages=[system_message,human_message]
-        self.agent_state.init_state(query=query,messages=messages)
+        state={
+            'input':query,
+            'steps':steps,
+            'max_steps':max_steps,
+            'output':'',
+            'error':'',
+            'consecutive_failures':0,
+            'agent_data':None,
+            'messages':messages,
+            'previous_observation':None
+        }
         try:
-            self.watch_cursor.start()
-            while True:
-                if self.agent_step.is_last_step():
-                    self.watch_cursor.stop()
-                    logger.info("Reached maximum number of steps, stopping execution.")
-                    return AgentResult(is_done=False, content=None, error="Maximum steps reached.")
-                elif self.agent_state.consecutive_failures==self.consecutive_failures:
-                    self.watch_cursor.stop()
-                    logger.info("Consecutive failures exceeded limit, stopping execution.")
-                    return AgentResult(is_done=False, content=None, error=self.agent_state.error)
-                try:
-                    self.reason()
-                except Exception as err:
-                    self.agent_state.consecutive_failures += 1
-                    self.agent_state.error = str(err)
-                    logger.error(f"Error: {self.agent_state.error}")
-                    continue
-                if self.agent_state.is_done():
-                    self.answer()
-                    self.watch_cursor.stop()
-                    return AgentResult(is_done=True, content=self.agent_state.result, error=None)
-                else:
-                    self.action()
-                    self.agent_state.consecutive_failures = 0
-                    self.agent_step.increment_step()
+            with self.watch_cursor:
+                response=self.graph.invoke(state)            
         except Exception as error:
-            return AgentResult(is_done=False, content=None, error=str(error))
-        finally:
-            self.watch_cursor.stop()
+            response={
+                'output':None,
+                'error':f"Error: {error}"
+            }
+        return AgentResult(content=response['output'], error=response['error'])
 
     def print_response(self,query: str):
-        console=Console()
         response=self.invoke(query)
-        console.print(Markdown(response.content or response.error))   
+        self.console.print(Markdown(response.content or response.error))   
