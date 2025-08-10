@@ -63,47 +63,50 @@ class Agent:
         self.graph=self.create_graph()
 
     def reason(self,state:AgentState):
-        messages=state['messages']
+        steps=state.get('steps')
+        max_steps=state.get('max_steps')
+        language=self.desktop.get_default_language()
+        tools_prompt = self.registry.get_tools_prompt()
+        messages=[SystemMessage(content=Prompt.system_prompt(browser=self.browser,language=language,instructions=self.instructions,tools_prompt=tools_prompt,max_steps=max_steps))]+state.get('messages')
         message=self.llm.invoke(messages)
-        logger.info(f"Iteration: {state['steps']}")
+        logger.info(f"Iteration: {steps}")
         agent_data = extract_agent_data(message=message)
         logger.info(colored(f"📝: Evaluate: {agent_data.evaluate}",color='yellow',attrs=['bold']))
         logger.info(colored(f"📒: Memory: {agent_data.memory}",color='light_green',attrs=['bold']))
         logger.info(colored(f"💭: Thought: {agent_data.thought}",color='light_magenta',attrs=['bold']))
-        return {**state,'agent_data':agent_data,'steps':state['steps']+1}
+        last_message = state.get('messages').pop()
+        if isinstance(last_message, HumanMessage):
+            message=HumanMessage(content=Prompt.previous_observation_prompt(steps=steps,max_steps=max_steps,observation=state.get('previous_observation')))
+            return {**state,'agent_data':agent_data,'messages':[message],'steps':steps+1}
 
     def action(self,state:AgentState):
-        agent_data=state['agent_data']
-        last_message = state['messages'].pop()
+        steps=state.get('steps')
+        max_steps=state.get('max_steps')
+        agent_data=state.get('agent_data')
         name = agent_data.action.name
         params = agent_data.action.params
-        if isinstance(last_message, HumanMessage):
-            state['messages'][-1]=HumanMessage(content=Prompt.previous_observation_prompt(state['previous_observation']))
         ai_message = AIMessage(content=Prompt.action_prompt(agent_data=agent_data))
         logger.info(colored(f"🔧: Action: {name}({', '.join(f'{k}={v}' for k, v in params.items())})",color='blue',attrs=['bold']))
         tool_result = self.registry.execute(tool_name=name, desktop=self.desktop, **params)
         observation=tool_result.content if tool_result.is_success else tool_result.error
         logger.info(colored(f"🔭: Observation: {shorten(observation,500,placeholder='...')}",color='green',attrs=['bold']))
         desktop_state = self.desktop.get_state(use_vision=self.use_vision)
-        prompt=Prompt.observation_prompt(query=state['input'],steps=state['steps'],max_steps=state['max_steps'], tool_result=tool_result, desktop_state=desktop_state)
+        prompt=Prompt.observation_prompt(query=state.get('input'),steps=steps,max_steps=max_steps, tool_result=tool_result, desktop_state=desktop_state)
         human_message=image_message(prompt=prompt,image=desktop_state.screenshot) if self.use_vision and desktop_state.screenshot else HumanMessage(content=prompt)
         return {**state,'agent_data':None,'messages':[ai_message, human_message],'previous_observation':observation}
 
     def answer(self,state:AgentState):
-        agent_data=state['agent_data']
-        last_message = state['messages'].pop()
+        agent_data=state.get('agent_data')
         name = agent_data.action.name
         params = agent_data.action.params
-        if isinstance(last_message, HumanMessage):
-            state['messages'][-1]=HumanMessage(content=Prompt.previous_observation_prompt(state['previous_observation']))
         tool_result = self.registry.execute(tool_name=name, desktop=None, **params)
         ai_message = AIMessage(content=Prompt.answer_prompt(agent_data=agent_data, tool_result=tool_result))
         logger.info(colored(f"📜: Final Answer: {tool_result.content}",color='cyan',attrs=['bold']))
         return {**state,'agent_data':None,'messages':[ai_message],'previous_observation':None,'output':tool_result.content}
 
     def main_controller(self,state:AgentState):
-        if state['steps']<state['max_steps']:
-            agent_data=state['agent_data']
+        if state.get('steps')<state.get('max_steps'):
+            agent_data=state.get('agent_data')
             action_name=agent_data.action.name
             if action_name!='Done Tool':
                 return 'action'
@@ -125,13 +128,10 @@ class Agent:
     def invoke(self,query: str)->AgentResult:
         steps=1
         max_steps = self.max_steps
-        language=self.desktop.get_default_language()
-        tools_prompt = self.registry.get_tools_prompt()
         desktop_state = self.desktop.get_state(use_vision=self.use_vision)
         prompt=Prompt.observation_prompt(query=query,steps=steps,max_steps=max_steps,tool_result=ToolResult(is_success=True, content="No Action Taken"), desktop_state=desktop_state)
-        system_message=SystemMessage(content=Prompt.system_prompt(browser=self.browser,language=language,instructions=self.instructions,tools_prompt=tools_prompt,max_steps=max_steps))
         human_message=image_message(prompt=prompt,image=desktop_state.screenshot) if self.use_vision and desktop_state.screenshot else HumanMessage(content=prompt)
-        messages=[system_message,human_message]
+        messages=[human_message]
         state={
             'input':query,
             'steps':steps,

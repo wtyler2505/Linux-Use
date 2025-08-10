@@ -41,13 +41,25 @@ class Prompt:
         })
     
     @staticmethod
-    def previous_observation_prompt(observation: str)-> str:
+    def previous_observation_prompt(steps:int,max_steps:int,observation: str)-> str:
         template=PromptTemplate.from_template(dedent('''
         ```xml
-        <output>{observation}</output>
+        <input>
+            <agent_state>
+                Current step: {steps}
+
+                Max. Steps: {max_steps}
+                                                     
+                Action Response: {observation}
+            </agent_state>
+        </input>
         ```
         '''))
-        return template.format(**{'observation': observation})
+        return template.format(**{
+            'steps': steps,
+            'max_steps': max_steps,
+            'observation': observation
+        })
          
     @staticmethod
     def observation_prompt(query:str,steps:int,max_steps:int, tool_result:ToolResult,desktop_state: DesktopState) -> str:
