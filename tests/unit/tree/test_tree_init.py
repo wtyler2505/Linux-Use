@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch, call, ANY
 from PIL import Image, ImageFont, ImageDraw
 from concurrent.futures import ThreadPoolExecutor
 
-from windows_use.tree import Tree
+from windows_use.tree.service import Tree
 from windows_use.tree.views import TreeElementNode, TextElementNode, ScrollElementNode, Center, BoundingBox, TreeState
 
 class TestTree:

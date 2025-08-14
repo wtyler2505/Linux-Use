@@ -12,7 +12,7 @@ import io
 from fuzzywuzzy import process
 from time import sleep
 
-from windows_use.desktop import Desktop
+from windows_use.desktop.service import Desktop
 from windows_use.desktop.views import DesktopState, App, Size
 from windows_use.desktop.config import EXCLUDED_APPS, AVOIDED_APPS
 # No need to import Tree here, as we will patch its source

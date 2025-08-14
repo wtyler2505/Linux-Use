@@ -9,7 +9,7 @@ from textwrap import shorten
 from windows_use.agent.service import Agent, logger
 from windows_use.agent.views import AgentState, AgentStep, AgentResult
 from windows_use.agent.registry.views import ToolResult
-from windows_use.desktop import Desktop
+from windows_use.desktop.service import Desktop
 from windows_use.agent.registry.service import Registry
 from windows_use.agent.prompt.service import Prompt
 from windows_use.agent.utils import extract_agent_data, image_message

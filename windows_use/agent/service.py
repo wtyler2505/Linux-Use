@@ -10,7 +10,7 @@ from langgraph.graph import START,END,StateGraph
 from windows_use.agent.views import AgentResult
 from windows_use.agent.state import AgentState
 from langchain_core.tools import BaseTool
-from windows_use.desktop import Desktop
+from windows_use.desktop.service import Desktop
 from rich.markdown import Markdown
 from rich.console import Console
 from termcolor import colored

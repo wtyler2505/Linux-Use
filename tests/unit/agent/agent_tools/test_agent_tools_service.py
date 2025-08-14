@@ -22,7 +22,7 @@ from windows_use.agent.tools.service import (
     wait_tool,
     scrape_tool,
 )
-from windows_use.desktop import Desktop
+from windows_use.desktop.service import Desktop
 from windows_use.agent.tools.views import (
     Click,
     Type,

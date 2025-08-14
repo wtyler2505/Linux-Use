@@ -5,7 +5,7 @@ from textwrap import dedent
 # --- Import classes to be tested and mocked ---
 from windows_use.agent.registry.service import Registry
 from windows_use.agent.registry.views import Tool as ToolData, ToolResult
-from windows_use.desktop import Desktop
+from windows_use.desktop.service import Desktop
 from langchain.tools import Tool as LangchainTool
 
 
