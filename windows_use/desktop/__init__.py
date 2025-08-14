@@ -10,6 +10,7 @@ from io import BytesIO
 from PIL import Image
 import subprocess
 import pyautogui
+import ctypes
 import base64
 import csv
 import io
@@ -164,6 +165,12 @@ class Desktop:
             print(f"Error: {ex}")
             apps = []
         return apps
+    
+    def get_dpi_scaling():
+        user32 = ctypes.windll.user32
+        user32.SetProcessDPIAware()
+        dpi = user32.GetDpiForSystem()
+        return dpi / 96.0
     
     def screenshot_in_bytes(self,screenshot:PILImage)->bytes:
         buffer=BytesIO()
