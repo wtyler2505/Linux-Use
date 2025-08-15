@@ -35,6 +35,7 @@ class Prompt:
         return template.format(**{
             'evaluate': agent_data.evaluate,
             'memory':  agent_data.memory,
+            'plan': agent_data.plan,
             'thought': agent_data.thought,
             'action_name': agent_data.action.name,
             'action_input': agent_data.action.params

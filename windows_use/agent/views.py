@@ -12,5 +12,6 @@ class Action(BaseModel):
 class AgentData(BaseModel):
     evaluate: Optional[str]=None
     memory: Optional[str]=None
+    plan:Optional[str]=None
     thought: Optional[str]=None
     action: Optional[Action]=None

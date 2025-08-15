@@ -73,6 +73,7 @@ class Agent:
         agent_data = extract_agent_data(message=message)
         logger.info(colored(f"📝: Evaluate: {agent_data.evaluate}",color='yellow',attrs=['bold']))
         logger.info(colored(f"📒: Memory: {agent_data.memory}",color='light_green',attrs=['bold']))
+        logger.info(colored(f"📚: Plan: {agent_data.plan}",color='light_blue',attrs=['bold']))
         logger.info(colored(f"💭: Thought: {agent_data.thought}",color='light_magenta',attrs=['bold']))
         last_message = state.get('messages').pop()
         if isinstance(last_message, HumanMessage):
