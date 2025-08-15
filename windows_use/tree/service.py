@@ -129,7 +129,7 @@ class Tree:
         def is_element_interactive(node:Control):
             try:
                 if node.ControlTypeName in INTERACTIVE_CONTROL_TYPE_NAMES:
-                    if is_element_visible(node) and is_element_enabled(node) and not is_element_image(node) or is_keyboard_focusable(node):
+                    if is_element_visible(node) and is_element_enabled(node) and (not is_element_image(node) or is_keyboard_focusable(node)):
                         return True
                 elif node.ControlTypeName=='GroupControl' and is_browser:
                     if is_element_visible(node) and is_element_enabled(node) and (is_default_action(node) or is_keyboard_focusable(node)):
