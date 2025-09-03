@@ -186,7 +186,7 @@ class Tree:
             
         def tree_traversal(node: Control):
             # Checks to skip the nodes that are not interactive
-            if node.IsOffscreen and node.ControlTypeName!= 'EditControl' and node.ClassName not in set(["Popup","Windows.UI.Core.CoreComponentInputSource"]):
+            if node.IsOffscreen and (node.ControlTypeName not in set(["EditControl","TitleBarControl"])) and node.ClassName not in set(["Popup","Windows.UI.Core.CoreComponentInputSource"]):
                 return None
             
             if is_element_interactive(node):
