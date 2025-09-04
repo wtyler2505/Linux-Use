@@ -62,6 +62,10 @@ class Desktop:
         reader=csv.DictReader(io.StringIO(apps_info))
         return {row.get('Name').lower():row.get('AppID') for row in reader}
     
+    def is_app_running(self,name:str)->bool:
+        apps=self.get_apps()
+        return process.extractOne(name,apps,score_cutoff=60) is not None
+    
     def execute_command(self,command:str)->tuple[str,int]:
         try:
             result = subprocess.run(['powershell', '-Command']+command.split(), 
@@ -108,12 +112,12 @@ class Desktop:
         app_name,_=matched_app
         appid=apps_map.get(app_name)
         if appid is None:
-            return (f'Application {name.title()} not found in start menu.',1)
+            return (name,f'Application {name.title()} not found in start menu.',1)
         if name.endswith('.exe'):
             response,status=self.execute_command(f'Start-Process "{appid}"')
         else:
             response,status=self.execute_command(f'Start-Process "shell:AppsFolder\\{appid}"')
-        return response,status
+        return app_name,response,status
     
     def switch_app(self,name:str):
         apps={app.name:app for app in self.desktop_state.apps}

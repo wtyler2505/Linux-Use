@@ -21,12 +21,17 @@ def done_tool(answer:str,desktop:Desktop=None):
 @tool('Launch Tool',args_schema=Launch)
 def launch_tool(name: str,desktop:Desktop=None) -> str:
     'Launch an application present in start menu (e.g., "notepad", "calculator", "chrome")'
-    _,status=desktop.launch_app(name)
-    pg.sleep(1.25)
+    _,_,status=desktop.launch_app(name)
     if status!=0:
         return f'Failed to launch {name.title()}.'
     else:
-        return f'Launched {name.title()}.'
+        consecutive_waits=3
+        for _ in range(consecutive_waits):
+            if not desktop.is_app_running(name):
+                pg.sleep(1.25)
+            else:
+                return f'{name.title()} launched.'
+        return f'Launching {name.title()} wait for it to come load.'
 
 @tool('Shell Tool',args_schema=Shell)
 def shell_tool(command: str,desktop:Desktop=None) -> str:
