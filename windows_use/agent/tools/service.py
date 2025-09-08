@@ -57,7 +57,7 @@ def clipboard_tool(mode: Literal['copy', 'paste'], text: str = None,desktop:Desk
 @tool('Switch Tool',args_schema=Switch)
 def switch_tool(name: str,desktop:Desktop=None) -> str:
     'Switch to a specific application window (e.g., "notepad", "calculator", "chrome", etc.) and bring to foreground.'
-    response,status=desktop.switch_app(name)
+    _,status=desktop.switch_app(name)
     if status!=0:
         return f'Failed to switch to {name.title()} window.'
     else:

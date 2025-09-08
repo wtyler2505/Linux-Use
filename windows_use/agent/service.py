@@ -8,9 +8,9 @@ from windows_use.agent.prompt.service import Prompt
 from live_inspect.watch_cursor import WatchCursor
 from langgraph.graph import START,END,StateGraph
 from windows_use.agent.views import AgentResult
+from windows_use.desktop.service import Desktop
 from windows_use.agent.state import AgentState
 from langchain_core.tools import BaseTool
-from windows_use.desktop.service import Desktop
 from rich.markdown import Markdown
 from rich.console import Console
 from termcolor import colored
@@ -55,11 +55,11 @@ class Agent:
         self.browser=browser
         self.max_steps=max_steps
         self.consecutive_failures=consecutive_failures
-        self.desktop = Desktop()
-        self.watch_cursor = WatchCursor()
-        self.console=Console()
         self.use_vision=use_vision
         self.llm = llm
+        self.watch_cursor = WatchCursor()
+        self.desktop = Desktop()
+        self.console=Console()
         self.graph=self.create_graph()
 
     def reason(self,state:AgentState):
@@ -146,7 +146,7 @@ class Agent:
             'previous_observation':None
         }
         try:
-            with self.watch_cursor:
+            with self.desktop.auto_minimize(),self.watch_cursor:
                 response=self.graph.invoke(state,config={'recursion_limit':self.max_steps*10})         
         except Exception as error:
             response={

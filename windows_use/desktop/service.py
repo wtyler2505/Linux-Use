@@ -1,8 +1,9 @@
 from uiautomation import Control, GetRootControl, IsIconic, IsZoomed, IsWindowVisible, ControlType, ControlFromCursor, SetWindowTopmost, IsTopLevelWindow, ShowWindow, ControlFromHandle
 from windows_use.desktop.config import EXCLUDED_APPS, BROWSER_NAMES
 from windows_use.desktop.views import DesktopState,App,Size
-from PIL.Image import Image as PILImage
 from windows_use.tree.service import Tree
+from PIL.Image import Image as PILImage
+from contextlib import contextmanager
 from fuzzywuzzy import process
 from psutil import Process
 from time import sleep
@@ -188,3 +189,15 @@ class Desktop:
         size=(screenshot.width*scale, screenshot.height*scale)
         screenshot.thumbnail(size=size, resample=Image.Resampling.LANCZOS)
         return screenshot
+    
+    @contextmanager
+    def auto_minimize(self):
+        SW_MINIMIZE=6
+        SW_RESTORE = 9
+        try:
+            user32 = ctypes.windll.user32
+            hWnd = user32.GetForegroundWindow()
+            user32.ShowWindow(hWnd, SW_MINIMIZE)
+            yield
+        finally:
+            user32.ShowWindow(hWnd, SW_RESTORE)
