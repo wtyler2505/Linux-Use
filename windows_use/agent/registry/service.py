@@ -14,8 +14,8 @@ class Registry:
             return f"Tool '{tool_name}' not found."
         return dedent(f"""
         Tool Name: {tool.name}
-        Description: {tool.description}
-        Parameters: {tool.params}
+        Tool Description: {tool.description}
+        Tool Parameters: {tool.params}
         """)
 
     def registry(self):

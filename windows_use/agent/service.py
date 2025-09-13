@@ -11,6 +11,7 @@ from windows_use.agent.views import AgentResult
 from windows_use.desktop.service import Desktop
 from windows_use.agent.state import AgentState
 from langchain_core.tools import BaseTool
+from contextlib import nullcontext
 from rich.markdown import Markdown
 from rich.console import Console
 from termcolor import colored
@@ -39,11 +40,12 @@ class Agent:
         consecutive_failures (int, optional): Maximum number of consecutive failures for the agent. Defaults to 3.
         max_steps (int, optional): Maximum number of steps for the agent. Defaults to 100.
         use_vision (bool, optional): Whether to use vision for the agent. Defaults to False.
-    
+        auto_minimize (bool, optional): Whether to automatically minimize the IDE while agent is working. Defaults to False.
+
     Returns:
         Agent
     '''
-    def __init__(self,instructions:list[str]=[],additional_tools:list[BaseTool]=[],browser:Literal['edge','chrome','firefox']='edge', llm: BaseChatModel=None,consecutive_failures:int=3,max_steps:int=20,use_vision:bool=False):
+    def __init__(self,instructions:list[str]=[],additional_tools:list[BaseTool]=[],browser:Literal['edge','chrome','firefox']='edge', llm: BaseChatModel=None,consecutive_failures:int=3,max_steps:int=20,use_vision:bool=False,auto_minimize:bool=False):
         self.name='Windows Use'
         self.description='An agent that can interact with GUI elements on Windows' 
         self.registry = Registry([
@@ -55,6 +57,7 @@ class Agent:
         self.browser=browser
         self.max_steps=max_steps
         self.consecutive_failures=consecutive_failures
+        self.auto_minimize=auto_minimize
         self.use_vision=use_vision
         self.llm = llm
         self.watch_cursor = WatchCursor()
@@ -73,6 +76,7 @@ class Agent:
         logger.info(colored(f"📒: Memory: {agent_data.memory}",color='light_green',attrs=['bold']))
         logger.info(colored(f"📚: Plan: {agent_data.plan}",color='light_blue',attrs=['bold']))
         logger.info(colored(f"💭: Thought: {agent_data.thought}",color='light_magenta',attrs=['bold']))
+
         last_message = state.get('messages').pop()
         if isinstance(last_message, HumanMessage):
             message=HumanMessage(content=Prompt.previous_observation_prompt(steps=steps,max_steps=max_steps,observation=state.get('previous_observation')))
@@ -86,6 +90,7 @@ class Agent:
         params = agent_data.action.params
         ai_message = AIMessage(content=Prompt.action_prompt(agent_data=agent_data))
         logger.info(colored(f"🔧: Action: {name}({', '.join(f'{k}={v}' for k, v in params.items())})",color='blue',attrs=['bold']))
+        
         tool_result = self.registry.execute(tool_name=name, desktop=self.desktop, **params)
         observation=tool_result.content if tool_result.is_success else tool_result.error
         logger.info(colored(f"🔭: Observation: {shorten(observation,500,placeholder='...')}",color='green',attrs=['bold']))
@@ -131,7 +136,7 @@ class Agent:
         tools_prompt = self.registry.get_tools_prompt()
         system_prompt=Prompt.system_prompt(browser=self.browser,language=language,instructions=self.instructions,tools_prompt=tools_prompt,max_steps=self.max_steps)
         system_message=SystemMessage(content=system_prompt)
-        human_prompt=Prompt.observation_prompt(query=query,steps=steps,max_steps=self.max_steps,tool_result=ToolResult(is_success=True, content="Desktop ready to operate."), desktop_state=desktop_state)
+        human_prompt=Prompt.observation_prompt(query=query,steps=steps,max_steps=self.max_steps,tool_result=ToolResult(is_success=True, content="The desktop is ready to operate."), desktop_state=desktop_state)
         human_message=image_message(prompt=human_prompt,image=desktop_state.screenshot) if self.use_vision and desktop_state.screenshot else HumanMessage(content=human_prompt)
         messages=[system_message,human_message]
         state={
@@ -146,7 +151,7 @@ class Agent:
             'previous_observation':None
         }
         try:
-            with self.desktop.auto_minimize(),self.watch_cursor:
+            with (self.desktop.auto_minimize() if self.auto_minimize else nullcontext()),self.watch_cursor:
                 response=self.graph.invoke(state,config={'recursion_limit':self.max_steps*10})         
         except Exception as error:
             response={
