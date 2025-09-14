@@ -22,15 +22,14 @@ class Desktop:
         
     def get_state(self,use_vision:bool=False)->DesktopState:
         tree=Tree(self)
-        apps=self.get_apps()
+        active_app,apps=self.get_apps()
         tree_state=tree.get_state()
-        active_app,apps=(apps[0],apps[1:]) if len(apps)>0 else (None,[])
         if use_vision:
             annotated_screenshot=tree.annotated_screenshot(tree_state.interactive_nodes,scale=0.5)
             screenshot=self.screenshot_in_bytes(annotated_screenshot)
         else:
             screenshot=None
-        self.desktop_state=DesktopState(apps=apps,active_app=active_app,screenshot=screenshot,tree_state=tree_state)
+        self.desktop_state=DesktopState(apps= apps,active_app=active_app,screenshot=screenshot,tree_state=tree_state)
         return self.desktop_state
     
     def get_window_element_from_element(self,element:Control)->Control|None:
@@ -38,6 +37,11 @@ class Desktop:
             if IsTopLevelWindow(element.NativeWindowHandle):
                 return element
             element = element.GetParentControl()
+        return None
+    
+    def get_active_app(self,apps:list[App])->App|None:
+        if len(apps)>0 and apps[0].status != "Minimized":
+            return apps[0]
         return None
     
     def get_app_status(self,control:Control)->str:
@@ -153,7 +157,7 @@ class Desktop:
         is_name = "Overlay" in element.Name.strip()
         return no_children or is_name
         
-    def get_apps(self) -> list[App]:
+    def get_apps(self) -> tuple[App|None,list[App]]:
         try:
             sleep(0.5)
             desktop = GetRootControl()  # Get the desktop control
@@ -169,7 +173,10 @@ class Desktop:
         except Exception as ex:
             print(f"Error: {ex}")
             apps = []
-        return apps
+
+        active_app=self.get_active_app(apps)
+        apps=apps[1:] if len(apps)>1 else []
+        return (active_app,apps)
     
     def get_dpi_scaling():
         user32 = ctypes.windll.user32

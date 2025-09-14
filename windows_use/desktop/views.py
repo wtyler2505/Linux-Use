@@ -31,10 +31,10 @@ class DesktopState:
 
     def active_app_to_string(self):
         if self.active_app is None:
-            return 'No active app'
+            return 'No active app found'
         return self.active_app.to_string()
 
     def apps_to_string(self):
         if len(self.apps)==0:
-            return 'No apps opened'
+            return 'No apps running in background'
         return '\n'.join([app.to_string() for app in self.apps])
