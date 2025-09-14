@@ -1,7 +1,7 @@
 from windows_use.tree.views import TreeState
 from typing import Literal,Optional
 from dataclasses import dataclass
-
+from tabulate import tabulate
 
 @dataclass
 class App:
@@ -10,9 +10,9 @@ class App:
     status:Literal['Maximized','Minimized','Normal']
     size:'Size'
     handle: int
-
-    def to_string(self):
-        return f'Name: {self.name}|Depth: {self.depth}|Status: {self.status}|Size: {self.size.to_string()} Handle: {self.handle}'
+    
+    def to_row(self):
+        return [self.name, self.depth, self.status, self.size.width, self.size.height, self.handle]
 
 @dataclass
 class Size:
@@ -32,9 +32,12 @@ class DesktopState:
     def active_app_to_string(self):
         if self.active_app is None:
             return 'No active app found'
-        return self.active_app.to_string()
+        headers = ["Name", "Depth", "Status", "Width", "Height", "Handle"]
+        return tabulate([self.active_app.to_row()], headers=headers, tablefmt="github")
 
     def apps_to_string(self):
-        if len(self.apps)==0:
+        if not self.apps:
             return 'No apps running in background'
-        return '\n'.join([app.to_string() for app in self.apps])
+        headers = ["Name", "Depth", "Status", "Width", "Height", "Handle"]
+        rows = [app.to_row() for app in self.apps]
+        return tabulate(rows, headers=headers, tablefmt="github")

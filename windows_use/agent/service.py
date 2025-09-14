@@ -131,33 +131,34 @@ class Agent:
 
     def invoke(self,query: str)->AgentResult:
         steps=1
-        desktop_state = self.desktop.get_state(use_vision=self.use_vision)
-        language=self.desktop.get_default_language()
-        tools_prompt = self.registry.get_tools_prompt()
-        system_prompt=Prompt.system_prompt(browser=self.browser,language=language,instructions=self.instructions,tools_prompt=tools_prompt,max_steps=self.max_steps)
-        system_message=SystemMessage(content=system_prompt)
-        human_prompt=Prompt.observation_prompt(query=query,steps=steps,max_steps=self.max_steps,tool_result=ToolResult(is_success=True, content="The desktop is ready to operate."), desktop_state=desktop_state)
-        human_message=image_message(prompt=human_prompt,image=desktop_state.screenshot) if self.use_vision and desktop_state.screenshot else HumanMessage(content=human_prompt)
-        messages=[system_message,human_message]
-        state={
-            'input':query,
-            'steps':steps,
-            'max_steps':self.max_steps,
-            'output':'',
-            'error':'',
-            'consecutive_failures':0,
-            'agent_data':None,
-            'messages':messages,
-            'previous_observation':None
-        }
-        try:
-            with (self.desktop.auto_minimize() if self.auto_minimize else nullcontext()),self.watch_cursor:
-                response=self.graph.invoke(state,config={'recursion_limit':self.max_steps*10})         
-        except Exception as error:
-            response={
-                'output':None,
-                'error':f"Error: {error}"
+        with (self.desktop.auto_minimize() if self.auto_minimize else nullcontext()):
+            desktop_state = self.desktop.get_state(use_vision=self.use_vision)
+            language=self.desktop.get_default_language()
+            tools_prompt = self.registry.get_tools_prompt()
+            system_prompt=Prompt.system_prompt(browser=self.browser,language=language,instructions=self.instructions,tools_prompt=tools_prompt,max_steps=self.max_steps)
+            system_message=SystemMessage(content=system_prompt)
+            human_prompt=Prompt.observation_prompt(query=query,steps=steps,max_steps=self.max_steps,tool_result=ToolResult(is_success=True, content="The desktop is ready to operate."), desktop_state=desktop_state)
+            human_message=image_message(prompt=human_prompt,image=desktop_state.screenshot) if self.use_vision and desktop_state.screenshot else HumanMessage(content=human_prompt)
+            messages=[system_message,human_message]
+            state={
+                'input':query,
+                'steps':steps,
+                'max_steps':self.max_steps,
+                'output':'',
+                'error':'',
+                'consecutive_failures':0,
+                'agent_data':None,
+                'messages':messages,
+                'previous_observation':None
             }
+            try:
+                with self.watch_cursor:
+                    response=self.graph.invoke(state,config={'recursion_limit':self.max_steps*10})         
+            except Exception as error:
+                response={
+                    'output':None,
+                    'error':f"Error: {error}"
+                }
         return AgentResult(content=response['output'], error=response['error'])
 
     def print_response(self,query: str):

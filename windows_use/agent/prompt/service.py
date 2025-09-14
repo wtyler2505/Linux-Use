@@ -47,9 +47,7 @@ class Prompt:
         ```xml
         <input>
             <agent_state>
-                Current step: {steps}
-
-                Max. Steps: {max_steps}
+                Steps: {steps}/{max_steps}
                                                      
                 Action Response: {observation}
             </agent_state>

@@ -1,9 +1,7 @@
 ```xml
 <input>
     <agent_state>
-        Current step: {steps}
-
-        Max. Steps: {max_steps}
+        Steps: {steps}/{max_steps}
 
         Action Response: {observation}
     <agent_state>
@@ -15,6 +13,7 @@
         Background Apps:
         {apps}
         [End of App Info]
+        
         [Begin of Screen]
         List of Interactive Elements:
         {interactive_elements}
