@@ -211,7 +211,9 @@ class Tree:
                     bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom,width=box.width(),height=box.height()),
                     center=center,
                     horizontal_scrollable=scroll_pattern.HorizontallyScrollable,
+                    horizontal_scroll_percent=scroll_pattern.HorizontalScrollPercent if scroll_pattern.HorizontallyScrollable else 0,
                     vertical_scrollable=scroll_pattern.VerticallyScrollable,
+                    vertical_scroll_percent=scroll_pattern.VerticalScrollPercent if scroll_pattern.VerticallyScrollable else 0,
                     is_focused=node.HasKeyboardFocus
                 ))
             elif is_element_interactive(node):
