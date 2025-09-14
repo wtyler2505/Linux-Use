@@ -13,3 +13,5 @@ DEFAULT_ACTIONS=set([
 INFORMATIVE_CONTROL_TYPE_NAMES=set([
     'TextControl','ImageControl'
 ])
+
+THREAD_MAX_RETRIES = 3

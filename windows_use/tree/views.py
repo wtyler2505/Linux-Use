@@ -26,7 +26,7 @@ class TreeState:
             return "No scrollable elements"
         headers = [
             "Label", "App Name", "ControlType", "Name", "Coordinates",
-            "Horizontal Scrollable", "Vertical Scrollable"
+            "Horizontal Scrollable", "Vertical Scrollable","IsFocused"
         ]
         base_index = len(self.interactive_nodes)
         rows = [node.to_row(idx, base_index) for idx, node in enumerate(self.scrollable_nodes)]
@@ -92,6 +92,7 @@ class ScrollElementNode:
     center: Center
     horizontal_scrollable: bool
     vertical_scrollable: bool
+    is_focused: bool
 
     def to_row(self, index: int, base_index: int):
         return [
@@ -102,4 +103,5 @@ class ScrollElementNode:
             self.center.to_string(),
             self.horizontal_scrollable,
             self.vertical_scrollable,
+            self.is_focused
         ]

@@ -84,7 +84,7 @@ def click_tool(loc:tuple[int,int],button:Literal['left','right','middle']='left'
         pg.mouseUp()
     pg.sleep(1.0)
     num_clicks={1:'Single',2:'Double',3:'Triple'}
-    return f'{num_clicks.get(clicks)} {button} Clicked on {control.Name} Element with ControlType {control.ControlTypeName} at ({x},{y}).'
+    return f'{num_clicks.get(clicks)} {button} at ({x},{y}).'
 
 @tool('Type Tool',args_schema=Type)
 def type_tool(loc:tuple[int,int],text:str,clear:Literal['true','false']='false',caret_position:Literal['start','idle','end']='idle',press_enter:Literal['true','false']='false',desktop:Desktop=None):
@@ -101,10 +101,10 @@ def type_tool(loc:tuple[int,int],text:str,clear:Literal['true','false']='false',
     if clear=='true':
         pg.hotkey('ctrl','a')
         pg.press('backspace')
-    pg.typewrite(text,interval=0.1)
+    pg.typewrite(text,interval=0.05)
     if press_enter=='true':
         pg.press('enter')
-    return f'Typed {text} on {control.Name} Element with ControlType {control.ControlTypeName} at ({x},{y}).'
+    return f'Typed {text} at ({x},{y}).'
 
 @tool('Scroll Tool',args_schema=Scroll)
 def scroll_tool(loc:tuple[int,int]=None,type:Literal['horizontal','vertical']='vertical',direction:Literal['up','down','left','right']='down',wheel_times:int=1,desktop:Desktop=None)->str:
@@ -147,7 +147,7 @@ def drag_tool(from_loc:tuple[int,int],to_loc:tuple[int,int],desktop:Desktop=None
     x1,y1=from_loc
     x2,y2=to_loc
     cursor.drag_and_drop(from_loc,to_loc)
-    return f'Dragged the {control.Name} element with ControlType {control.ControlTypeName} from ({x1},{y1}) to ({x2},{y2}).'
+    return f'Dragged the element from ({x1},{y1}) to ({x2},{y2}).'
 
 @tool('Move Tool',args_schema=Move)
 def move_tool(to_loc:tuple[int,int],desktop:Desktop=None)->str:

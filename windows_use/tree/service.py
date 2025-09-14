@@ -1,5 +1,5 @@
+from windows_use.tree.config import INTERACTIVE_CONTROL_TYPE_NAMES,INFORMATIVE_CONTROL_TYPE_NAMES, DEFAULT_ACTIONS, THREAD_MAX_RETRIES
 from windows_use.tree.views import TreeElementNode, TextElementNode, ScrollElementNode, Center, BoundingBox, TreeState
-from windows_use.tree.config import INTERACTIVE_CONTROL_TYPE_NAMES,INFORMATIVE_CONTROL_TYPE_NAMES, DEFAULT_ACTIONS
 from uiautomation import GetRootControl,Control,ImageControl,ScrollPattern
 from windows_use.tree.utils import random_point_within_bounding_box
 from windows_use.desktop.config import AVOIDED_APPS, EXCLUDED_APPS
@@ -23,7 +23,7 @@ class Tree:
         interactive_nodes,informative_nodes,scrollable_nodes=self.get_appwise_nodes(node=root)
         return TreeState(interactive_nodes=interactive_nodes,informative_nodes=informative_nodes,scrollable_nodes=scrollable_nodes)
     
-    def get_appwise_nodes(self,node:Control) -> tuple[list[TreeElementNode],list[TextElementNode]]:
+    def get_appwise_nodes(self,node:Control) -> tuple[list[TreeElementNode],list[TextElementNode],list[ScrollElementNode]]:
         apps:list[Control]=[]
         found_foreground_app=False
 
@@ -35,20 +35,29 @@ class Tree:
                     apps.append(app)
                     found_foreground_app=True
 
-        interactive_nodes,informative_nodes,scrollable_nodes=[],[],[]
-        # Parallel traversal (using ThreadPoolExecutor) to get nodes from each app
+        interactive_nodes, informative_nodes, scrollable_nodes = [], [], []
+
         with ThreadPoolExecutor() as executor:
-            future_to_node = {executor.submit(self.get_nodes, app,self.desktop.is_app_browser(app)): app for app in apps}
-            for future in as_completed(future_to_node):
-                try:
-                    result = future.result()
-                    if result:
-                        element_nodes,text_nodes,scroll_nodes=result
-                        interactive_nodes.extend(element_nodes)
-                        informative_nodes.extend(text_nodes)
-                        scrollable_nodes.extend(scroll_nodes)
-                except Exception as e:
-                    print(f"Error processing node {future_to_node[future].Name}: {e}")
+            retry_counts = {app: 0 for app in apps}
+            future_to_app = {executor.submit(self.get_nodes, app, self.desktop.is_app_browser(app)): app for app in apps}
+            while future_to_app:  # keep running until no pending futures
+                for future in as_completed(list(future_to_app)):
+                    app = future_to_app.pop(future)  # remove completed future
+                    try:
+                        result = future.result()
+                        if result:
+                            element_nodes, text_nodes, scroll_nodes = result
+                            interactive_nodes.extend(element_nodes)
+                            informative_nodes.extend(text_nodes)
+                            scrollable_nodes.extend(scroll_nodes)
+                    except Exception as e:
+                        retry_counts[app] += 1
+                        print(f"Error in processing node {app.Name}, retry attempt {retry_counts[app]}\nError: {e}")
+                        if retry_counts[app] < THREAD_MAX_RETRIES:
+                            new_future = executor.submit(self.get_nodes, app, self.desktop.is_app_browser(app))
+                            future_to_app[new_future] = app
+                        else:
+                            print(f"Task failed completely for {app.Name} after {THREAD_MAX_RETRIES} retries")
         return interactive_nodes,informative_nodes,scrollable_nodes
 
     def get_nodes(self, node: Control, is_browser=False) -> tuple[list[TreeElementNode],list[TextElementNode],list[ScrollElementNode]]:
@@ -189,7 +198,23 @@ class Tree:
             if node.IsOffscreen and (node.ControlTypeName not in set(["EditControl","TitleBarControl"])) and node.ClassName not in set(["Popup","Windows.UI.Core.CoreComponentInputSource"]):
                 return None
             
-            if is_element_interactive(node):
+            if is_element_scrollable(node):
+                scroll_pattern:ScrollPattern=node.GetScrollPattern()
+                box = node.BoundingRectangle
+                # Get the center
+                x,y=random_point_within_bounding_box(node=node,scale_factor=0.8)
+                center = Center(x=x,y=y)
+                scrollable_nodes.append(ScrollElementNode(
+                    name=node.Name.strip() or node.LocalizedControlType.capitalize() or "''",
+                    app_name=app_name,
+                    control_type=node.LocalizedControlType.title(),
+                    bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom,width=box.width(),height=box.height()),
+                    center=center,
+                    horizontal_scrollable=scroll_pattern.HorizontallyScrollable,
+                    vertical_scrollable=scroll_pattern.VerticallyScrollable,
+                    is_focused=node.HasKeyboardFocus
+                ))
+            elif is_element_interactive(node):
                 box = node.BoundingRectangle
                 x,y=random_point_within_bounding_box(node=node,scale_factor=0.8)
                 center = Center(x=x,y=y)
@@ -208,21 +233,7 @@ class Tree:
                     name=node.Name.strip() or "''",
                     app_name=app_name
                 ))
-            elif is_element_scrollable(node):
-                scroll_pattern:ScrollPattern=node.GetScrollPattern()
-                box = node.BoundingRectangle
-                # Get the center
-                x,y=random_point_within_bounding_box(node=node,scale_factor=0.8)
-                center = Center(x=x,y=y)
-                scrollable_nodes.append(ScrollElementNode(
-                    name=node.Name.strip() or node.LocalizedControlType.capitalize() or "''",
-                    app_name=app_name,
-                    control_type=node.LocalizedControlType.title(),
-                    bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom,width=box.width(),height=box.height()),
-                    center=center,
-                    horizontal_scrollable=scroll_pattern.HorizontallyScrollable,
-                    vertical_scrollable=scroll_pattern.VerticallyScrollable
-                ))
+            
             # Recursively check all children
             for child in node.GetChildren():
                 tree_traversal(child)
@@ -287,8 +298,8 @@ class Tree:
             executor.map(draw_annotation, range(len(nodes)), nodes)
         return padded_screenshot
     
-    def get_annotated_image_data(self)->tuple[Image.Image,list[TreeElementNode]]:
+    def get_annotated_image_data(self)->tuple[Image.Image,list[TreeElementNode],list[ScrollElementNode]]:
         node=GetRootControl()
-        nodes,_,_=self.get_appwise_nodes(node=node)
+        nodes,_,scroll_nodes=self.get_appwise_nodes(node=node)
         screenshot=self.annotated_screenshot(nodes=nodes,scale=1.0)
-        return screenshot,nodes
+        return screenshot,nodes,scroll_nodes
