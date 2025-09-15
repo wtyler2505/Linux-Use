@@ -10,7 +10,6 @@ class Action(BaseModel):
 
 class AgentData(BaseModel):
     evaluate: str
-    memory: str
     plan: str
     thought: str
     action: Action

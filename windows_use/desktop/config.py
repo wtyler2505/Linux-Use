@@ -3,7 +3,7 @@ from typing import Set
 BROWSER_NAMES=set(['msedge.exe','chrome.exe','firefox.exe'])
 
 AVOIDED_APPS:Set[str]=set([
-    'Recording toolbar'
+    'Recording toolbar','meet.google.com is sharing your screen.'
 ])
 
 EXCLUDED_APPS:Set[str]=set([

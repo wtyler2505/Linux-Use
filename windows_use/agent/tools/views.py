@@ -1,5 +1,5 @@
 from pydantic import BaseModel,Field
-from typing import Literal
+from typing import Literal,Optional
 
 class SharedBaseModel(BaseModel):
     class Config:
@@ -7,6 +7,11 @@ class SharedBaseModel(BaseModel):
 
 class Done(SharedBaseModel):
     answer:str = Field(...,description="the detailed final answer to the user query in proper markdown format",examples=["The task is completed successfully."])
+
+class Memory(SharedBaseModel):
+    mode:Literal['read','write','update','delete'] = Field(...,description="the mode of the memory",examples=['read'])
+    content:Optional[str] = Field(description="to write/update content to/in memory",examples=["hello world"])
+    id:Optional[int] = Field(description="the id of the memory to read/update/delete (zero-indexed)",examples=[0])
 
 class Clipboard(SharedBaseModel):
     mode:Literal['copy','paste'] = Field(...,description="the mode of the clipboard",examples=['copy'])

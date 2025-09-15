@@ -33,7 +33,6 @@ class Prompt:
         template = PromptTemplate.from_file(files('windows_use.agent.prompt').joinpath('action.md'))
         return template.format(**{
             'evaluate': agent_data.evaluate,
-            'memory':  agent_data.memory,
             'plan': agent_data.plan,
             'thought': agent_data.thought,
             'action_name': agent_data.action.name,
@@ -72,7 +71,6 @@ class Prompt:
         template = PromptTemplate.from_file(files('windows_use.agent.prompt').joinpath('answer.md'))
         return template.format(**{
             'evaluate': agent_data.evaluate,
-            'memory':  agent_data.memory,
             'thought': agent_data.thought,
             'final_answer': tool_result.content
         })

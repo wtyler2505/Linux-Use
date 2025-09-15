@@ -1,16 +1,18 @@
-from windows_use.agent.tools.service import click_tool, type_tool, launch_tool, shell_tool, clipboard_tool, done_tool, shortcut_tool, scroll_tool, drag_tool, move_tool, key_tool, wait_tool, scrape_tool, switch_tool, resize_tool
+from windows_use.agent.tools.service import (click_tool, type_tool, launch_tool, shell_tool, 
+clipboard_tool, done_tool, shortcut_tool, scroll_tool, drag_tool, move_tool, key_tool, 
+wait_tool, scrape_tool, switch_tool, resize_tool, memory_tool)
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from windows_use.agent.utils import extract_agent_data, image_message
 from langchain_core.language_models.chat_models import BaseChatModel
-from windows_use.agent.registry.views import ToolResult
 from windows_use.agent.registry.service import Registry
+from windows_use.agent.registry.views import ToolResult
 from windows_use.agent.prompt.service import Prompt
 from live_inspect.watch_cursor import WatchCursor
 from langgraph.graph import START,END,StateGraph
 from windows_use.agent.views import AgentResult
 from windows_use.desktop.service import Desktop
-from windows_use.desktop.views import Browser
 from windows_use.agent.state import AgentState
+from windows_use.desktop.views import Browser
 from langchain_core.tools import BaseTool
 from contextlib import nullcontext
 from rich.markdown import Markdown
@@ -51,7 +53,8 @@ class Agent:
         self.registry = Registry([
             click_tool,type_tool, launch_tool, shell_tool, clipboard_tool,
             done_tool, shortcut_tool, scroll_tool, drag_tool, move_tool,
-            key_tool, wait_tool, scrape_tool, switch_tool, resize_tool
+            key_tool, wait_tool, scrape_tool, switch_tool, resize_tool,
+            memory_tool
         ] + additional_tools)
         self.instructions=instructions
         self.browser=browser
@@ -87,7 +90,6 @@ class Agent:
 
         logger.info(f"Iteration: {steps}")
         logger.info(colored(f"📝: Evaluate: {agent_data.evaluate}",color='yellow',attrs=['bold']))
-        logger.info(colored(f"📒: Memory: {agent_data.memory}",color='light_green',attrs=['bold']))
         logger.info(colored(f"📚: Plan: {agent_data.plan}",color='light_blue',attrs=['bold']))
         logger.info(colored(f"💭: Thought: {agent_data.thought}",color='light_magenta',attrs=['bold']))
 

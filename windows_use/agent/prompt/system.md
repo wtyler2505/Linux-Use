@@ -125,7 +125,7 @@ At every step, Windows-Use will be given the state:
 7. Don't caught stuck in loops while solving the given the task. Each step is an attempt reach the goal.
 8. You can ask the user for clarification or more data to continue using `Human Tool`.
 9. The <desktop_state> contains the Interactive, Scrollable and Informativa elements of the foreground app only also contains the details of the other apps that are open (REMEMBER <desktop_state> is the ground truth for <evaluate> progress).
-10. The <memory> contains the information gained from the internet or apps and essential context this included the data from <user_query> such as credentials.
+10. Use `Memory Tool` to read/write information gained from the internet or apps and essential context this includes the data from <user_query> such as credentials.
 11. Remember to complete the task within `{max_steps} steps` and ALWAYS output 1 reasonable action per step.
 12. During opening of an app or any window or going from one website to another then wait for 5sec and check, if ready procced else wait using `Wait Tool`.
 13. When encountering situations like you don't know how to perform this subtask such as fixing errors in a program, steps to change a setting in an app/system, get latest context for a topic to add on to any docs, ppts, csv,...etc beyond your knowledge then head to a BROWSER and search the web to get more context or solution or guidance to continue solving the task.
@@ -151,10 +151,14 @@ ALWAYS respond exclusively in the below block format:
 
 ```xml
 <output>
-  <evaluate>Success|Neutral|Fail - Brief analysis of previous action result and <desktop_state></evaluate>
-  <memory>Key information gathered, actions taken, failures happened to avoid in future and critical context</memory>
-  <plan>The step-by-step plan to follow and dynamically update based it based on the <desktop_state> and the progress</plan>
-  <thought>Logical reasoning for next action based on the <plan>, <memory> and <evaluate></thought>
+  <evaluate>Success|Neutral|Fail - Brief analysis of previous action result based on the updated <desktop_state></evaluate>
+  <plan>
+      The step-by-step plan to follow and dynamically update based it based on the <desktop_state>, and the progress to achieve <user_query>
+      1. [first subtask to achieve]
+      2. [next subtask to achieve]
+      ...
+  </plan>
+  <thought>Logical reasoning for next action based on the <plan>, <evaluate> and <user_query></thought>
   <action_name>Selected tool name to accomplish the <plan></action_name>
   <action_input>{{'param1':'value1','param2':'value2'}}</action_input>
 </output>

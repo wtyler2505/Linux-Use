@@ -12,10 +12,6 @@ def extract_agent_data(message: BaseMessage) -> AgentData:
     text = message.content
     # Dictionary to store extracted values
     result = {}
-    # Extract Memory
-    memory_match = re.search(r"<memory>(.*?)<\/memory>", text, re.DOTALL)
-    if memory_match:
-        result['memory'] = memory_match.group(1).strip()
     # Extract Evaluate
     evaluate_match = re.search(r"<evaluate>(.*?)<\/evaluate>", text, re.DOTALL)
     if evaluate_match:
