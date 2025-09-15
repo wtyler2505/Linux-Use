@@ -1,4 +1,4 @@
-from uiautomation import Control, GetRootControl, IsIconic, IsZoomed, IsWindowVisible, ControlType, ControlFromCursor, SetWindowTopmost, IsTopLevelWindow, ShowWindow, ControlFromHandle
+from uiautomation import Control, GetRootControl, IsIconic, IsZoomed, IsWindowVisible, ControlType, ControlFromCursor, IsTopLevelWindow, ShowWindow, ControlFromHandle
 from windows_use.desktop.config import EXCLUDED_APPS, BROWSER_NAMES
 from windows_use.desktop.views import DesktopState,App,Size
 from windows_use.tree.service import Tree
@@ -6,6 +6,7 @@ from PIL.Image import Image as PILImage
 from contextlib import contextmanager
 from fuzzywuzzy import process
 from psutil import Process
+import pyautogui as pg
 from time import sleep
 from io import BytesIO
 from PIL import Image
@@ -89,13 +90,11 @@ class Desktop:
         reader=csv.DictReader(io.StringIO(response))
         return "".join([row.get('DisplayName') for row in reader])
     
-    def resize_app(self,name:str,size:tuple[int,int]=None,loc:tuple[int,int]=None)->tuple[str,int]:
-        apps=self.get_apps()
-        matched_app:tuple[App,int]|None=process.extractOne(name,apps)
-        if matched_app is None:
-            return (f'Application {name.title()} not found.',1)
-        app,_=matched_app
-        app_control=ControlFromHandle(app.handle)
+    def resize_app(self,size:tuple[int,int]=None,loc:tuple[int,int]=None)->tuple[str,int]:
+        active_app=self.desktop_state.active_app
+        if active_app is None:
+            return "No active app found to resize",1
+        app_control=ControlFromHandle(active_app.handle)
         if loc is None:
             x=app_control.BoundingRectangle.left
             y=app_control.BoundingRectangle.top
@@ -107,7 +106,7 @@ class Desktop:
         x,y=loc
         width,height=size
         app_control.MoveWindow(x,y,width,height)
-        return (f'Application {name.title()} resized to {width}x{height} at {x},{y}.',0)
+        return (f'{active_app.name} resized to {width}x{height} at {x},{y}.',0)
         
     def launch_app(self,name:str):
         apps_map=self.get_apps_from_start_menu()
@@ -125,7 +124,7 @@ class Desktop:
         return app_name,response,status
     
     def switch_app(self,name:str):
-        apps={app.name:app for app in self.desktop_state.apps}
+        apps={app.name:app for app in [self.desktop_state.active_app]+self.desktop_state.apps if app is not None}
         matched_app:tuple[str,float]=process.extractOne(name,list(apps.keys()))
         if matched_app is None:
             return (f'Application {name.title()} not found.',1)
@@ -134,10 +133,14 @@ class Desktop:
         if IsIconic(app.handle):
             ShowWindow(app.handle, cmdShow=9)
             return (f'{app_name.title()} restored from minimized state.',0)
-        elif SetWindowTopmost(app.handle,isTopmost=True):
-            return (f'{app_name.title()} switched to foreground.',0)
         else:
-            return (f'Failed to switch to {app_name.title()}.',1)
+            shortcut=['alt','tab']
+            for app in apps.values():
+                if app.name==app_name:
+                    break
+                pg.hotkey(*shortcut)
+                pg.sleep(0.1)
+            return (f'Switched to {app_name.title()} window.',0)
     
     def get_app_size(self,control:Control):
         window=control.BoundingRectangle

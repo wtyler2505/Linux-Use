@@ -21,7 +21,6 @@ class Shell(SharedBaseModel):
     command:str=Field(...,description="The PowerShell command to execute.",examples=['Get-Process'])
 
 class Resize(SharedBaseModel):
-    name:str=Field(...,description="The name of the application window to resize.",examples=['Google Chrome'])
     loc:tuple[int,int]=Field(...,description="The cordinates to move the window to.",examples=[(0,0)])
     size:tuple[int,int]=Field(...,description="The size to resize the window to.",examples=[(100,100)])
 
@@ -52,7 +51,7 @@ class Shortcut(SharedBaseModel):
     shortcut:list[str]=Field(...,description="The shortcut to execute by pressing the keys.",examples=[['ctrl','a'],['alt','f4']])
 
 class Switch(SharedBaseModel):
-    name:str=Field(...,description="The name of the application to switch to foreground.",examples=['Google Chrome'])
+    name:str=Field(...,description="The extact name of the application from the background apps to switch too.",examples=['New tab - Personal - Microsoft Edge'])
 
 class Key(SharedBaseModel):
     key:str=Field(...,description="The key to press.",examples=['enter'])

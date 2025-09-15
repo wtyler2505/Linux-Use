@@ -225,11 +225,11 @@ wheels = [
 
 [[package]]
 name = "comtypes"
-version = "1.4.11"
+version = "1.4.12"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/3c/b9/4431119a640f568190499fd76fac4b4ccb5695659c4b3aac570329c150ea/comtypes-1.4.11.zip", hash = "sha256:0a4259370ec48b685fe4483b0944ba1df0aa45163922073fe9b7df1d187db09e", size = 272448, upload-time = "2025-05-14T23:32:11.608Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b6/b8/3af03195b9de515448292169c6d6d7a630de02bedf891a47b809638c186f/comtypes-1.4.12.zip", hash = "sha256:3ff06c442c2de8a2b25785407f244eb5b6f809d21cf068a855071ba80a76876f", size = 280541, upload-time = "2025-08-27T23:47:33.155Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f1/f4/7b7fdbb613992013c4518a0bf8fee2915f79ec07bcfa6180569bca7fa8ef/comtypes-1.4.11-py3-none-any.whl", hash = "sha256:1760d5059ca7ca1d61b574c998378d879c271a86c41f88926619ea97497592bb", size = 246365, upload-time = "2025-05-14T23:32:10.427Z" },
+    { url = "https://files.pythonhosted.org/packages/2d/01/89285549c5138009db68f26c80f2174d0ec82a858547df0cc40a8b0a47d6/comtypes-1.4.12-py3-none-any.whl", hash = "sha256:e0fa9cc19c489fa7feea4c1710f4575c717e2673edef5b99bf99efd507908e44", size = 253704, upload-time = "2025-08-27T23:47:31.58Z" },
 ]
 
 [[package]]
@@ -2304,14 +2304,14 @@ wheels = [
 
 [[package]]
 name = "uiautomation"
-version = "2.0.28"
+version = "2.0.29"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "comtypes" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/2c/78/c7a631189809fac1552ccad35c31e58b5600d2c8a152a9bd2da3550f2d76/uiautomation-2.0.28.tar.gz", hash = "sha256:472b8f4297e7b0d77acdcef6cdb499aee68b4e6179331593f98afb5e3fce36f9", size = 203963, upload-time = "2025-05-09T06:24:06.965Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/bc/23/8238b5cb73e54c3618ce4d443c1830a2749264a0d61a9b61637096b8dc7a/uiautomation-2.0.29.tar.gz", hash = "sha256:3c169112043ce21065aead1d79c3baebdafc9cf03bd24ded02b2db11d423d88d", size = 203970, upload-time = "2025-08-05T05:14:41.194Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/df/cf/d38d1c79aec7bc89a8d4bd694d1917b5f251400fec2f7e31278430be993b/uiautomation-2.0.28-py3-none-any.whl", hash = "sha256:89db27f7d472dc247077906b4805cc375b7d6c28caae91ded858c8beae3973a2", size = 198955, upload-time = "2025-05-09T06:24:05.401Z" },
+    { url = "https://files.pythonhosted.org/packages/b0/27/b9c4b33b4129805fa2c437fa13da06c71e74213ae46da098d194d89834fe/uiautomation-2.0.29-py3-none-any.whl", hash = "sha256:5dd51c9e77e70470142a13d903be67f256c445e7cf20b47ada0ece2bdaff9f32", size = 198985, upload-time = "2025-08-05T05:14:39.552Z" },
 ]
 
 [[package]]
@@ -2406,7 +2406,7 @@ requires-dist = [
     { name = "tabulate", specifier = ">=0.9.0" },
     { name = "termcolor", specifier = ">=3.1.0" },
     { name = "twine", specifier = ">=6.1.0" },
-    { name = "uiautomation", specifier = ">=2.0.28" },
+    { name = "uiautomation", specifier = ">=2.0.29" },
 ]
 provides-extras = ["dev"]
 

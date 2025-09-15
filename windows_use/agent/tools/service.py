@@ -56,7 +56,7 @@ def clipboard_tool(mode: Literal['copy', 'paste'], text: str = None,desktop:Desk
     
 @tool('Switch Tool',args_schema=Switch)
 def switch_tool(name: str,desktop:Desktop=None) -> str:
-    'Switch to a specific application window (e.g., "notepad", "calculator", "chrome", etc.) and bring to foreground.'
+    'To switch to an app present in the background apps thus making it as foreground/active app (e.g., "notepad", "calculator", "chrome", etc.).'
     _,status=desktop.switch_app(name)
     if status!=0:
         return f'Failed to switch to {name.title()} window.'
@@ -64,9 +64,9 @@ def switch_tool(name: str,desktop:Desktop=None) -> str:
         return f'Switched to {name.title()} window.'
     
 @tool("Resize Tool",args_schema=Resize)
-def resize_tool(name: str,loc:tuple[int,int]=None,size:tuple[int,int]=None,desktop:Desktop=None) -> str:
-    'Resize a specific application window (e.g., "notepad", "calculator", "chrome", etc.) to a specific size and location.'
-    response,_=desktop.resize_app(name,loc,size)
+def resize_tool(loc:tuple[int,int]=None,size:tuple[int,int]=None,desktop:Desktop=None) -> str:
+    'Resize current active app window to a specific size or location, if the active app is in "Normal" state not "Maximized" or "Minimized".'
+    response,_=desktop.resize_app(loc,size)
     return response
 
 @tool('Click Tool',args_schema=Click)
