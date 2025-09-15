@@ -1,6 +1,6 @@
 from windows_use.agent.registry.views import ToolResult
+from windows_use.desktop.service import Desktop, DesktopState
 from windows_use.agent.views import AgentData
-from windows_use.desktop.views import DesktopState
 from langchain.prompts import PromptTemplate
 from importlib.resources import files
 from datetime import datetime
@@ -8,11 +8,10 @@ from getpass import getuser
 from textwrap import dedent
 from pathlib import Path
 import pyautogui as pg
-import platform
 
 class Prompt:
     @staticmethod
-    def system_prompt(browser: str,language: str,tools_prompt:str,max_steps:int,instructions: list[str]=[]) -> str:
+    def system_prompt(desktop:Desktop,browser: str,language: str,tools_prompt:str,max_steps:int,instructions: list[str]=[]) -> str:
         width, height = pg.size()
         template =PromptTemplate.from_file(files('windows_use.agent.prompt').joinpath('system.md'))
         return template.format(**{
@@ -20,12 +19,12 @@ class Prompt:
             'instructions': '\n'.join(instructions),
             'tools_prompt': tools_prompt,
             'download_directory': Path.home().joinpath('Downloads').as_posix(),
-            'os':platform.system(),
+            'os':desktop.get_windows_version(),
             'language':language,
-            'browser':browser,
+            'browser':browser.title(),
             'home_dir':Path.home().as_posix(),
-            'user':getuser(),
-            'resolution':f'{width}x{height}',
+            'user':f"{getuser()} ({desktop.get_user_account_type()})",
+            'resolution':f'Primary Monitor ({width}x{height}) with DPI Scale: {desktop.get_dpi_scaling()}',
             'max_steps': max_steps
         })
     

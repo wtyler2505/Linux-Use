@@ -1,18 +1,26 @@
 from windows_use.tree.views import TreeState
-from typing import Literal,Optional
+from typing import Optional
 from dataclasses import dataclass
 from tabulate import tabulate
+from enum import Enum
+
+class Status(Enum):
+    MAXIMIZED='Maximized'
+    MINIMIZED='Minimized'
+    NORMAL='Normal'
+    HIDDEN='Hidden'
+
 
 @dataclass
 class App:
     name:str
     depth:int
-    status:Literal['Maximized','Minimized','Normal']
+    status:Status
     size:'Size'
     handle: int
     
     def to_row(self):
-        return [self.name, self.depth, self.status, self.size.width, self.size.height, self.handle]
+        return [self.name, self.depth, self.status.value, self.size.width, self.size.height, self.handle]
 
 @dataclass
 class Size:

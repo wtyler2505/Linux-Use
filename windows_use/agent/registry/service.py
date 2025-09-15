@@ -2,6 +2,7 @@ from windows_use.agent.registry.views import Tool as ToolData, ToolResult
 from windows_use.desktop.service import Desktop
 from langchain.tools import Tool
 from textwrap import dedent
+import json
 
 class Registry:
     def __init__(self,tools:list[Tool]):
@@ -15,7 +16,7 @@ class Registry:
         return dedent(f"""
         Tool Name: {tool.name}
         Tool Description: {tool.description}
-        Tool Parameters: {tool.params}
+        Tool Parameters: {json.dumps(tool.params,indent=4)}
         """)
 
     def registry(self):

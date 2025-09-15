@@ -1,6 +1,6 @@
 from uiautomation import Control, GetRootControl, IsIconic, IsZoomed, IsWindowVisible, ControlType, ControlFromCursor, IsTopLevelWindow, ShowWindow, ControlFromHandle
+from windows_use.desktop.views import DesktopState, App, Size, Status
 from windows_use.desktop.config import EXCLUDED_APPS, BROWSER_NAMES
-from windows_use.desktop.views import DesktopState,App,Size
 from windows_use.tree.service import Tree
 from PIL.Image import Image as PILImage
 from contextlib import contextmanager
@@ -15,6 +15,7 @@ import pyautogui
 import ctypes
 import base64
 import csv
+import os
 import io
 
 class Desktop:
@@ -41,19 +42,19 @@ class Desktop:
         return None
     
     def get_active_app(self,apps:list[App])->App|None:
-        if len(apps)>0 and apps[0].status != "Minimized":
+        if len(apps)>0 and apps[0].status != Status.MINIMIZED:
             return apps[0]
         return None
     
-    def get_app_status(self,control:Control)->str:
+    def get_app_status(self,control:Control)->Status:
         if IsIconic(control.NativeWindowHandle):
-            return 'Minimized'
+            return Status.MINIMIZED
         elif IsZoomed(control.NativeWindowHandle):
-            return 'Maximized'
+            return Status.MAXIMIZED
         elif IsWindowVisible(control.NativeWindowHandle):
-            return 'Normal'
+            return Status.NORMAL
         else:
-            return 'Hidden'
+            return Status.HIDDEN
     
     def get_cursor_location(self)->tuple[int,int]:
         position=pyautogui.position()
@@ -75,7 +76,7 @@ class Desktop:
     def execute_command(self,command:str)->tuple[str,int]:
         try:
             result = subprocess.run(['powershell', '-Command']+command.split(), 
-            capture_output=True, check=True)
+            capture_output=True, check=True,cwd=os.path.expanduser(path='~\\Desktop'))
             return (result.stdout.decode('latin1'),result.returncode)
         except subprocess.CalledProcessError as e:
             return (e.stdout.decode('latin1'),e.returncode)
@@ -149,7 +150,7 @@ class Desktop:
         return Size(width=window.width(),height=window.height())
     
     def is_app_visible(self,app)->bool:
-        is_minimized=self.get_app_status(app)!='Minimized'
+        is_minimized=self.get_app_status(app)!=Status.MINIMIZED
         size=self.get_app_size(app)
         area=size.width*size.height
         is_overlay=self.is_overlay_app(app)
@@ -181,9 +182,19 @@ class Desktop:
         apps=apps[1:] if len(apps)>1 else []
         return (active_app,apps)
     
-    def get_dpi_scaling():
+    def get_windows_version(self)->str:
+        response,status=self.execute_command("(Get-CimInstance Win32_OperatingSystem).Caption")
+        if status==0:
+            return response.strip()
+        return "Windows"
+    
+    def get_user_account_type(self)->str:
+        response,status=self.execute_command("(Get-LocalUser -Name $env:USERNAME).PrincipalSource")
+        return "Local Account" if response.strip()=='Local' else "Microsoft Account" if status==0 else "Local Account"
+    
+    def get_dpi_scaling(self):
         user32 = ctypes.windll.user32
-        user32.SetProcessDPIAware()
+        # user32.SetProcessDPIAware()
         dpi = user32.GetDpiForSystem()
         return dpi / 96.0
     

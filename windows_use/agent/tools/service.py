@@ -35,9 +35,9 @@ def launch_tool(name: str,desktop:Desktop=None) -> str:
 
 @tool('Shell Tool',args_schema=Shell)
 def shell_tool(command: str,desktop:Desktop=None) -> str:
-    'Execute PowerShell commands and return the output with status code'
+    'Execute PowerShell commands and return the output and status code. The cwd is set to the HOME directory.'
     response,status=desktop.execute_command(command)
-    return f'Status Code: {status}\nResponse: {response}'
+    return f'Response: {response}\nStatus Code: {status}'
 
 @tool('Clipboard Tool',args_schema=Clipboard)
 def clipboard_tool(mode: Literal['copy', 'paste'], text: str = None,desktop:Desktop=None)->str:
