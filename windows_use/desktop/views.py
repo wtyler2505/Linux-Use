@@ -4,6 +4,11 @@ from dataclasses import dataclass
 from tabulate import tabulate
 from enum import Enum
 
+class Browser(Enum):
+    CHROME='Chrome'
+    EDGE='Edge'
+    FIREFOX='Firefox'
+
 class Status(Enum):
     MAXIMIZED='Maximized'
     MINIMIZED='Minimized'

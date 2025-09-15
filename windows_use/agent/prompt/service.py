@@ -1,17 +1,17 @@
+from windows_use.desktop.views import DesktopState, Browser
 from windows_use.agent.registry.views import ToolResult
-from windows_use.desktop.service import Desktop, DesktopState
+from windows_use.desktop.service import Desktop
 from windows_use.agent.views import AgentData
 from langchain.prompts import PromptTemplate
 from importlib.resources import files
 from datetime import datetime
 from getpass import getuser
-from textwrap import dedent
 from pathlib import Path
 import pyautogui as pg
 
 class Prompt:
     @staticmethod
-    def system_prompt(desktop:Desktop,browser: str,language: str,tools_prompt:str,max_steps:int,instructions: list[str]=[]) -> str:
+    def system_prompt(desktop:Desktop,browser: Browser,language: str,tools_prompt:str,max_steps:int,instructions: list[str]=[]) -> str:
         width, height = pg.size()
         template =PromptTemplate.from_file(files('windows_use.agent.prompt').joinpath('system.md'))
         return template.format(**{
@@ -21,7 +21,7 @@ class Prompt:
             'download_directory': Path.home().joinpath('Downloads').as_posix(),
             'os':desktop.get_windows_version(),
             'language':language,
-            'browser':browser.title(),
+            'browser':browser.value,
             'home_dir':Path.home().as_posix(),
             'user':f"{getuser()} ({desktop.get_user_account_type()})",
             'resolution':f'Primary Monitor ({width}x{height}) with DPI Scale: {desktop.get_dpi_scaling()}',
@@ -42,17 +42,7 @@ class Prompt:
     
     @staticmethod
     def previous_observation_prompt(steps:int,max_steps:int,observation: str)-> str:
-        template=PromptTemplate.from_template(dedent('''
-        ```xml
-        <input>
-            <agent_state>
-                Steps: {steps}/{max_steps}
-                                                     
-                Action Response: {observation}
-            </agent_state>
-        </input>
-        ```
-        '''))
+        template=PromptTemplate.from_file(files('windows_use.agent.prompt').joinpath('previous_observation.md'))
         return template.format(**{
             'steps': steps,
             'max_steps': max_steps,

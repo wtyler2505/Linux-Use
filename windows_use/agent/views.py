@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel,Field
 from typing import Optional
     
 class AgentResult(BaseModel):
@@ -7,11 +7,11 @@ class AgentResult(BaseModel):
 
 class Action(BaseModel):
     name:str
-    params: dict
+    params: dict=Field(default_factory=dict)
 
 class AgentData(BaseModel):
-    evaluate: Optional[str]=None
-    memory: Optional[str]=None
-    plan:Optional[str]=None
-    thought: Optional[str]=None
-    action: Optional[Action]=None
+    evaluate: str
+    memory: str
+    plan: str
+    thought: str
+    action: Action

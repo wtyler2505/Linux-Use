@@ -11,5 +11,6 @@ class AgentState(TypedDict):
     error:str
     agent_data:AgentData|None
     consecutive_failures: int
+    max_consecutive_failures: int
     messages:Annotated[list[BaseMessage],add]
     previous_observation: str|None

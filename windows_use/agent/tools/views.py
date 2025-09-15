@@ -9,7 +9,7 @@ class Done(SharedBaseModel):
     answer:str = Field(...,description="the detailed final answer to the user query in proper markdown format",examples=["The task is completed successfully."])
 
 class Clipboard(SharedBaseModel):
-    mode:Literal['copy','paste'] = Field(...,description="the mode of the clipboard",examples=['Copy'])
+    mode:Literal['copy','paste'] = Field(...,description="the mode of the clipboard",examples=['copy'])
     text:str = Field(...,description="the text to copy to clipboard",examples=["hello world"])
 
 class Click(SharedBaseModel):
@@ -54,10 +54,10 @@ class Switch(SharedBaseModel):
     name:str=Field(...,description="The extact name of the application from the background apps to switch too.",examples=['New tab - Personal - Microsoft Edge'])
 
 class Key(SharedBaseModel):
-    key:str=Field(...,description="The key to press.",examples=['enter'])
+    key:str=Field(...,description="The key to press.",examples=['enter','escape','tab','up','down','left','right'])
 
 class Wait(SharedBaseModel):
     duration:int=Field(...,description="The duration to wait in seconds.",examples=[5])
 
 class Scrape(SharedBaseModel):
-    url:str=Field(...,description="The url of the webpage to scrape.",examples=['https://google.com'])
+    url:str=Field(...,description="The url of the webpage in the browser to scrape.",examples=['https://google.com'])
