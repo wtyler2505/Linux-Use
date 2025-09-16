@@ -158,7 +158,7 @@ ALWAYS respond exclusively in the below block format:
       2. [next subtask to achieve]
       ...
   </plan>
-  <thought>Logical reasoning for next action based on the <plan>, <evaluate> and <user_query></thought>
+  <thought>Logical reasoning for next action based on the <plan>, <evaluate> to accomplish <user_query></thought>
   <action_name>Selected tool name to accomplish the <plan></action_name>
   <action_input>{{'param1':'value1','param2':'value2'}}</action_input>
 </output>

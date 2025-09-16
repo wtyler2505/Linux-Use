@@ -1,4 +1,4 @@
-from windows_use.agent.tools.views import Click, Type, Launch, Scroll, Drag, Move, Shortcut, Key, Wait, Scrape,Done, Clipboard, Shell, Switch, Resize
+from windows_use.agent.tools.views import Click, Type, Launch, Scroll, Drag, Move, Shortcut, Key, Wait, Scrape,Done, Clipboard, Shell, Switch, Resize, Memory
 from windows_use.desktop.service import Desktop
 from humancursor import SystemCursor
 from markdownify import markdownify
@@ -19,7 +19,7 @@ def done_tool(answer:str,**kwargs):
     '''To indicate that the task is completed'''
     return answer
 
-@tool('Memory Tool')
+@tool('Memory Tool',args_schema=Memory)
 def memory_tool(mode:Literal['read','write','delete','update'],content:str=None,id:int=None,**kwargs)->str:
     '''For temporarily storing/accessing key information gathered from user/internet/app context during the execution of a task. The memory is a LIST'''
     match mode:

@@ -10,8 +10,8 @@ class Done(SharedBaseModel):
 
 class Memory(SharedBaseModel):
     mode:Literal['read','write','update','delete'] = Field(...,description="the mode of the memory",examples=['read'])
-    content:Optional[str] = Field(description="to write/update content to/in memory",examples=["hello world"])
-    id:Optional[int] = Field(description="the id of the memory to read/update/delete (zero-indexed)",examples=[0])
+    content:Optional[str] = Field(description="to write/update explain the content in detail and concisely to/in memory",default=None,examples=["The name of the person is X","The price of item X is Y"])
+    id:Optional[int] = Field(description="the id of the memory to read/update/delete (zero-indexed)",default=None,examples=[0])
 
 class Clipboard(SharedBaseModel):
     mode:Literal['copy','paste'] = Field(...,description="the mode of the clipboard",examples=['copy'])
