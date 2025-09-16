@@ -29,6 +29,6 @@
         {query}
     </user_query>
 
-Note: Use the `Done Tool` if the task is completely over else continue solving.
+Note: Use the `Done Tool` if the task is completely over else continue solving with full potential.
 </input>
 ```
