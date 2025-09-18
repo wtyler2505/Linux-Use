@@ -11,5 +11,5 @@ wheels/
 # Virtual environments
 .venv
 .env
-notebook.ipynb
+*.ipynb
 __pycache__

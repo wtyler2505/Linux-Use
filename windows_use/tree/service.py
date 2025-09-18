@@ -11,7 +11,7 @@ import random
 
 if TYPE_CHECKING:
     from windows_use.desktop.service import Desktop
-
+    
 class Tree:
     def __init__(self,desktop:'Desktop'):
         self.desktop=desktop
@@ -22,7 +22,7 @@ class Tree:
         root=GetRootControl()
         interactive_nodes,informative_nodes,scrollable_nodes=self.get_appwise_nodes(node=root)
         return TreeState(interactive_nodes=interactive_nodes,informative_nodes=informative_nodes,scrollable_nodes=scrollable_nodes)
-    
+
     def get_appwise_nodes(self,node:Control) -> tuple[list[TreeElementNode],list[TextElementNode],list[ScrollElementNode]]:
         apps:list[Control]=[]
         found_foreground_app=False

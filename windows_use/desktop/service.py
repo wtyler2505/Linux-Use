@@ -69,10 +69,6 @@ class Desktop:
         reader=csv.DictReader(io.StringIO(apps_info))
         return {row.get('Name').lower():row.get('AppID') for row in reader}
     
-    def is_app_running(self,name:str)->bool:
-        apps=self.get_apps()
-        return process.extractOne(name,apps,score_cutoff=60) is not None
-    
     def execute_command(self,command:str)->tuple[str,int]:
         try:
             result = subprocess.run(['powershell', '-Command']+command.split(), 
@@ -94,7 +90,7 @@ class Desktop:
     def resize_app(self,size:tuple[int,int]=None,loc:tuple[int,int]=None)->tuple[str,int]:
         active_app=self.desktop_state.active_app
         if active_app is None:
-            return "No active app found to resize",1
+            return "No active app found",1
         app_control=ControlFromHandle(active_app.handle)
         if loc is None:
             x=app_control.BoundingRectangle.left
