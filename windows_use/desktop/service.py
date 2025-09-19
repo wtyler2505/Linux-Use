@@ -1,6 +1,6 @@
 from uiautomation import Control, GetRootControl, IsIconic, IsZoomed, IsWindowVisible, ControlType, ControlFromCursor, IsTopLevelWindow, ShowWindow, ControlFromHandle
+from windows_use.desktop.config import EXCLUDED_APPS, BROWSER_NAMES, PROCESS_PER_MONITOR_DPI_AWARE
 from windows_use.desktop.views import DesktopState, App, Size, Status
-from windows_use.desktop.config import EXCLUDED_APPS, BROWSER_NAMES
 from windows_use.tree.service import Tree
 from PIL.Image import Image as PILImage
 from contextlib import contextmanager
@@ -20,6 +20,7 @@ import io
 
 class Desktop:
     def __init__(self):
+        ctypes.windll.shcore.SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE)
         self.desktop_state=None
         
     def get_state(self,use_vision:bool=False)->DesktopState:
@@ -190,9 +191,14 @@ class Desktop:
     
     def get_dpi_scaling(self):
         user32 = ctypes.windll.user32
-        # user32.SetProcessDPIAware()
         dpi = user32.GetDpiForSystem()
         return dpi / 96.0
+    
+    def get_screen_resolution(self)->Size:
+        user32 = ctypes.windll.user32
+        width = user32.GetSystemMetrics(0)
+        height = user32.GetSystemMetrics(1)
+        return Size(width=width,height=height)
     
     def screenshot_in_bytes(self,screenshot:PILImage)->bytes:
         buffer=BytesIO()

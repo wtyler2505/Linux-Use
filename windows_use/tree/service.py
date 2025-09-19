@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 class Tree:
     def __init__(self,desktop:'Desktop'):
         self.desktop=desktop
+        self.screen_resolution=self.desktop.get_screen_resolution()
 
     def get_state(self)->TreeState:
         sleep(0.5)
@@ -61,9 +62,6 @@ class Tree:
         return interactive_nodes,informative_nodes,scrollable_nodes
 
     def get_nodes(self, node: Control, is_browser=False) -> tuple[list[TreeElementNode],list[TextElementNode],list[ScrollElementNode]]:
-        interactive_nodes, informative_nodes, scrollable_nodes = [], [], []
-        app_name=node.Name.strip()
-        app_name='Desktop' if node.ClassName=='Progman' else app_name
         
         def is_element_visible(node:Control,threshold:int=0):
             is_control=node.IsControlElement
@@ -137,10 +135,12 @@ class Tree:
             
         def is_element_interactive(node:Control):
             try:
-                if node.ControlTypeName in INTERACTIVE_CONTROL_TYPE_NAMES:
+                if is_browser and node.ControlTypeName in set(['DataItemControl','ListItemControl']) and not is_keyboard_focusable(node):
+                    return False
+                elif node.ControlTypeName in INTERACTIVE_CONTROL_TYPE_NAMES:
                     if is_element_visible(node) and is_element_enabled(node) and (not is_element_image(node) or is_keyboard_focusable(node)):
                         return True
-                elif node.ControlTypeName=='GroupControl' and is_browser:
+                elif is_browser and node.ControlTypeName=='GroupControl':
                     if is_element_visible(node) and is_element_enabled(node) and (is_default_action(node) or is_keyboard_focusable(node)):
                         return True
                 # elif node.ControlTypeName=='GroupControl' and not is_browser:
@@ -154,25 +154,26 @@ class Tree:
             if element_has_child_element(node,'list item','link') or element_has_child_element(node,'item','link'):
                 interactive_nodes.pop()
                 return None
-            elif group_has_no_name(node):
+            elif node.ControlTypeName=='GroupControl':
                 interactive_nodes.pop()
                 if is_keyboard_focusable(node):
                     child=node
                     try:
                         while child.GetFirstChildControl() is not None:
+                            if child.ControlTypeName in INTERACTIVE_CONTROL_TYPE_NAMES:
+                                return None
                             child=child.GetFirstChildControl()
                     except Exception:
                         return None
                     if child.ControlTypeName!='TextControl':
                         return None
-                    control_type='Edit'
                     box = node.BoundingRectangle
                     x,y=box.xcenter(),box.ycenter()
                     center = Center(x=x,y=y)
                     interactive_nodes.append(TreeElementNode(
-                        name=child.Name.strip() or "''",
-                        control_type=control_type,
-                        shortcut=node.AcceleratorKey or "''",
+                        name=child.Name.strip(),
+                        control_type=node.LocalizedControlType,
+                        shortcut=node.AcceleratorKey,
                         bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom,width=box.width(),height=box.height()),
                         center=center,
                         app_name=app_name
@@ -185,9 +186,9 @@ class Tree:
                 x,y=box.xcenter(),box.ycenter()
                 center = Center(x=x,y=y)
                 interactive_nodes.append(TreeElementNode(
-                    name=node.Name.strip() or "''",
+                    name=node.Name.strip(),
                     control_type=control_type,
-                    shortcut=node.AcceleratorKey or "''",
+                    shortcut=node.AcceleratorKey,
                     bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom,width=box.width(),height=box.height()),
                     center=center,
                     app_name=app_name
@@ -221,15 +222,18 @@ class Tree:
                 x,y=random_point_within_bounding_box(node=node,scale_factor=0.8)
                 center = Center(x=x,y=y)
                 interactive_nodes.append(TreeElementNode(
-                    name=node.Name.strip() or "''",
+                    name=node.Name.strip(),
                     control_type=node.LocalizedControlType.title(),
-                    shortcut=node.AcceleratorKey or "''",
+                    shortcut=node.AcceleratorKey,
                     bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom,width=box.width(),height=box.height()),
                     center=center,
                     app_name=app_name
                 ))
                 if is_browser:
-                    dom_correction(node)
+                    if box.width()>0.5*self.screen_resolution.width or box.height()>0.5*self.screen_resolution.height:
+                        interactive_nodes.pop()
+                    else:
+                        dom_correction(node)
             elif is_element_text(node):
                 informative_nodes.append(TextElementNode(
                     name=node.Name.strip() or "''",
@@ -239,6 +243,10 @@ class Tree:
             # Recursively check all children
             for child in node.GetChildren():
                 tree_traversal(child)
+
+        interactive_nodes, informative_nodes, scrollable_nodes = [], [], []
+        app_name=node.Name.strip()
+        app_name='Desktop' if node.ClassName=='Progman' else app_name
 
         tree_traversal(node)
         return (interactive_nodes,informative_nodes,scrollable_nodes)

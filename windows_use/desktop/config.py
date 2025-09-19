@@ -11,3 +11,5 @@ EXCLUDED_APPS:Set[str]=set([
     'Microsoft.UI.Content.PopupWindowSiteBridge',
     'Windows.UI.Core.CoreWindow',
 ]).union(AVOIDED_APPS)
+
+PROCESS_PER_MONITOR_DPI_AWARE = 2
