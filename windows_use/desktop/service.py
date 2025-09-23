@@ -6,6 +6,7 @@ from PIL.Image import Image as PILImage
 from locale import getpreferredencoding
 from contextlib import contextmanager
 from fuzzywuzzy import process
+from typing import Optional
 from psutil import Process
 import pyautogui as pg
 from time import sleep
@@ -111,6 +112,10 @@ class Desktop:
         width,height=size
         app_control.MoveWindow(x,y,width,height)
         return (f'{active_app.name} resized to {width}x{height} at {x},{y}.',0)
+    
+    def is_app_running(self,name:str)->bool:
+        apps={app.name:app for app in [self.desktop_state.active_app]+self.desktop_state.apps if app is not None}
+        return process.extractOne(name,list(apps.keys()),score_cutoff=60) is not None
         
     def launch_app(self,name:str):
         apps_map=self.get_apps_from_start_menu()
@@ -129,7 +134,7 @@ class Desktop:
     
     def switch_app(self,name:str):
         apps={app.name:app for app in [self.desktop_state.active_app]+self.desktop_state.apps if app is not None}
-        matched_app:tuple[str,float]=process.extractOne(name,list(apps.keys()))
+        matched_app:Optional[tuple[str,float]]=process.extractOne(name,list(apps.keys()))
         if matched_app is None:
             return (f'Application {name.title()} not found.',1)
         app_name,_=matched_app
