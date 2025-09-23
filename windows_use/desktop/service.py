@@ -3,6 +3,7 @@ from windows_use.desktop.config import EXCLUDED_APPS, BROWSER_NAMES, PROCESS_PER
 from windows_use.desktop.views import DesktopState, App, Size, Status
 from windows_use.tree.service import Tree
 from PIL.Image import Image as PILImage
+from locale import getpreferredencoding
 from contextlib import contextmanager
 from fuzzywuzzy import process
 from psutil import Process
@@ -21,6 +22,7 @@ import io
 class Desktop:
     def __init__(self):
         ctypes.windll.shcore.SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE)
+        self.encoding=getpreferredencoding()
         self.desktop_state=None
         
     def get_state(self,use_vision:bool=False)->DesktopState:
@@ -72,11 +74,15 @@ class Desktop:
     
     def execute_command(self,command:str)->tuple[str,int]:
         try:
-            result = subprocess.run(['powershell', '-Command']+command.split(), 
-            capture_output=True, check=True,cwd=os.path.expanduser(path='~\\Desktop'))
-            return (result.stdout.decode('latin1'),result.returncode)
-        except subprocess.CalledProcessError as e:
-            return (e.stdout.decode('latin1'),e.returncode)
+            result = subprocess.run(['powershell', '-NoProfile', '-Command']+command.split(), 
+            capture_output=True, timeout=25,cwd=os.path.expanduser(path='~\\Desktop'))
+            stdout=result.stdout.decode(self.encoding)
+            stderr=result.stderr.decode(self.encoding)
+            return (stdout or stderr,result.returncode)
+        except subprocess.TimeoutExpired:
+            return ('Command execution timed out', 1)
+        except Exception as e:
+            return ('Command execution failed', 1)
         
     def is_app_browser(self,node:Control):
         process=Process(node.ProcessId)
