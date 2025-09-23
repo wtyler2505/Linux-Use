@@ -6,7 +6,7 @@ load_dotenv()
 
 def main():
     llm=ChatGoogleGenerativeAI(model='gemini-2.5-flash-lite',temperature=0.2)
-    agent = Agent(llm=llm,browser=Browser.CHROME,use_vision=False,auto_minimize=False)
+    agent = Agent(llm=llm,browser=Browser.EDGE,use_vision=False,auto_minimize=False)
     query=input("Enter your query: ")
     agent.print_response(query)
 

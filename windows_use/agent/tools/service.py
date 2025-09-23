@@ -52,9 +52,9 @@ def memory_tool(mode:Literal['read','write','delete','update'],content:str=None,
 def launch_tool(name: str,**kwargs) -> str:
     'Launch an application present in start menu (e.g., "notepad", "calculator", "chrome")'
     desktop:Desktop=kwargs['desktop']
-    _,_,status=desktop.launch_app(name)
+    response,status=desktop.launch_app(name)
     if status!=0:
-        return f'Failed to launch {name.title()}.'
+        return response
     else:
         consecutive_waits=3
         for _ in range(consecutive_waits):

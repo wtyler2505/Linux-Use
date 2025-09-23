@@ -119,13 +119,13 @@ class Desktop:
         
     def launch_app(self,name:str):
         apps_map=self.get_apps_from_start_menu()
-        matched_app=process.extractOne(name,apps_map.keys())
+        matched_app=process.extractOne(name,apps_map.keys(),score_cutoff=70)
         if matched_app is None:
-            return (f'Application {name.title()} not found in start menu.',1)
+            return (f'{name.title()} not found in start menu.',1)
         app_name,_=matched_app
         appid=apps_map.get(app_name)
         if appid is None:
-            return (name,f'Application {name.title()} not found in start menu.',1)
+            return (name,f'{name.title()} not found in start menu.',1)
         if name.endswith('.exe'):
             response,status=self.execute_command(f'Start-Process "{appid}"')
         else:
@@ -134,7 +134,7 @@ class Desktop:
     
     def switch_app(self,name:str):
         apps={app.name:app for app in [self.desktop_state.active_app]+self.desktop_state.apps if app is not None}
-        matched_app:Optional[tuple[str,float]]=process.extractOne(name,list(apps.keys()))
+        matched_app:Optional[tuple[str,float]]=process.extractOne(name,list(apps.keys()),score_cutoff=70)
         if matched_app is None:
             return (f'Application {name.title()} not found.',1)
         app_name,_=matched_app
