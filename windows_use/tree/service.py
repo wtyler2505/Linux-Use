@@ -230,10 +230,7 @@ class Tree:
                     app_name=app_name
                 ))
                 if is_browser:
-                    if box.width()>0.5*self.screen_resolution.width or box.height()>0.5*self.screen_resolution.height:
-                        interactive_nodes.pop()
-                    else:
-                        dom_correction(node)
+                    dom_correction(node)
             elif is_element_text(node):
                 informative_nodes.append(TextElementNode(
                     name=node.Name.strip() or "''",
