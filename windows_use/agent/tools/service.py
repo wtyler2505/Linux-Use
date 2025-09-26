@@ -104,7 +104,7 @@ def resize_tool(loc:tuple[int,int]=None,size:tuple[int,int]=None,**kwargs) -> st
 
 @tool('Click Tool',args_schema=Click)
 def click_tool(loc:tuple[int,int],button:Literal['left','right','middle']='left',clicks:int=1,**kwargs)->str:
-    'Click on UI elements at specific coordinates. Supports left/right/middle mouse buttons and single/double/triple clicks.'
+    'Perform Clicking on UI elements or specific location. NOTE: Single Left click to select UI element, Double Left click to open an app,folder,file, Single Right click to open context menu..'
     x,y=loc
     cursor.move_to(loc)
     desktop:Desktop=kwargs['desktop']

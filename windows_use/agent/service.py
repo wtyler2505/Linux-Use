@@ -13,19 +13,13 @@ from live_inspect.watch_cursor import WatchCursor
 from langgraph.graph import START,END,StateGraph
 from windows_use.agent.views import AgentResult
 from windows_use.agent.state import AgentState
-from windows_use.ui.service import AgentUI
 from langchain_core.tools import BaseTool
-from PyQt6.QtWidgets import QApplication
-from importlib.resources import files
 from contextlib import nullcontext
 from rich.markdown import Markdown
 from rich.console import Console
-from PyQt6.QtGui import QIcon
 from termcolor import colored
 from textwrap import shorten
 import logging
-import ctypes
-import sys
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
