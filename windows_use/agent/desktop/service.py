@@ -1,7 +1,7 @@
 from uiautomation import Control, GetRootControl, IsIconic, IsZoomed, IsWindowVisible, ControlType, ControlFromCursor, IsTopLevelWindow, ShowWindow, ControlFromHandle
-from windows_use.desktop.config import EXCLUDED_APPS, BROWSER_NAMES, PROCESS_PER_MONITOR_DPI_AWARE
-from windows_use.desktop.views import DesktopState, App, Size, Status
-from windows_use.tree.service import Tree
+from windows_use.agent.desktop.config import EXCLUDED_APPS, AVOIDED_APPS, BROWSER_NAMES, PROCESS_PER_MONITOR_DPI_AWARE
+from windows_use.agent.desktop.views import DesktopState, App, Size, Status
+from windows_use.agent.tree.service import Tree
 from PIL.Image import Image as PILImage
 from locale import getpreferredencoding
 from contextlib import contextmanager
@@ -117,7 +117,7 @@ class Desktop:
         apps={app.name:app for app in [self.desktop_state.active_app]+self.desktop_state.apps if app is not None}
         return process.extractOne(name,list(apps.keys()),score_cutoff=60) is not None
         
-    def launch_app(self,name:str):
+    def launch_app(self,name:str)->tuple[str,int]:
         apps_map=self.get_apps_from_start_menu()
         matched_app=process.extractOne(name,apps_map.keys(),score_cutoff=70)
         if matched_app is None:
@@ -130,7 +130,7 @@ class Desktop:
             response,status=self.execute_command(f'Start-Process "{appid}"')
         else:
             response,status=self.execute_command(f'Start-Process "shell:AppsFolder\\{appid}"')
-        return app_name,response,status
+        return response,status
     
     def switch_app(self,name:str):
         apps={app.name:app for app in [self.desktop_state.active_app]+self.desktop_state.apps if app is not None}
@@ -176,7 +176,7 @@ class Desktop:
             elements = desktop.GetChildren()
             apps = []
             for depth, element in enumerate(elements):
-                if element.ClassName in EXCLUDED_APPS or self.is_overlay_app(element):
+                if element.ClassName in EXCLUDED_APPS or element.ClassName in AVOIDED_APPS or self.is_overlay_app(element):
                     continue
                 if element.ControlType in [ControlType.WindowControl, ControlType.PaneControl]:
                     status = self.get_app_status(element)

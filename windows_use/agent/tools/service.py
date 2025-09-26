@@ -1,5 +1,5 @@
 from windows_use.agent.tools.views import Click, Type, Launch, Scroll, Drag, Move, Shortcut, Key, Wait, Scrape,Done, Clipboard, Shell, Switch, Resize, Memory
-from windows_use.desktop.service import Desktop
+from windows_use.agent.desktop.service import Desktop
 from humancursor import SystemCursor
 from markdownify import markdownify
 from langchain.tools import tool
@@ -55,14 +55,13 @@ def launch_tool(name: str,**kwargs) -> str:
     response,status=desktop.launch_app(name)
     if status!=0:
         return response
-    else:
-        consecutive_waits=3
-        for _ in range(consecutive_waits):
-            if not desktop.is_app_running(name):
-                pg.sleep(1.25)
-            else:
-                return f'{name.title()} launched.'
-        return f'Launching {name.title()} wait for it to come load.'
+    consecutive_waits=3
+    for _ in range(consecutive_waits):
+        if not desktop.is_app_running(name):
+            pg.sleep(1.25)
+        else:
+            return f'{name.title()} launched.'
+    return f'Launching {name.title()} wait for it to come load.'
 
 @tool('Shell Tool',args_schema=Shell)
 def shell_tool(command: str,**kwargs) -> str:
