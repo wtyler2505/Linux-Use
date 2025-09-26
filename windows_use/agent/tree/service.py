@@ -18,7 +18,7 @@ class Tree:
         self.screen_resolution=self.desktop.get_screen_resolution()
 
     def get_state(self)->TreeState:
-        sleep(0.5)
+        sleep(0.1)
         # Get the root control of the desktop
         root=GetRootControl()
         interactive_nodes,informative_nodes,scrollable_nodes=self.get_appwise_nodes(node=root)
@@ -218,11 +218,18 @@ class Tree:
                     is_focused=node.HasKeyboardFocus
                 ))
             elif is_element_interactive(node):
+                name=node.Name.strip() 
                 box = node.BoundingRectangle
-                x,y=random_point_within_bounding_box(node=node,scale_factor=0.8)
+                if box.width()<50 or box.height()<50:
+                    x,y=box.xcenter(),box.ycenter()
+                else:
+                    x,y=random_point_within_bounding_box(node=node,scale_factor=0.8)
                 center = Center(x=x,y=y)
+                if not name:
+                    legacy_pattern=node.GetLegacyIAccessiblePattern()
+                    name=legacy_pattern.Value.strip() or legacy_pattern.Name.strip()
                 interactive_nodes.append(TreeElementNode(
-                    name=node.Name.strip(),
+                    name=name,
                     control_type=node.LocalizedControlType.title(),
                     shortcut=node.AcceleratorKey,
                     bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom,width=box.width(),height=box.height()),
@@ -253,7 +260,7 @@ class Tree:
 
     def annotated_screenshot(self, nodes: list[TreeElementNode],scale:float=0.7) -> Image.Image:
         screenshot = self.desktop.get_screenshot(scale=scale)
-        sleep(0.25)
+        sleep(0.10)
         # Add padding
         padding = 20
         width = screenshot.width + (2 * padding)
