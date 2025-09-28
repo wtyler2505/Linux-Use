@@ -1,6 +1,5 @@
 from windows_use.agent.tools.views import Click, Type, Launch, Scroll, Drag, Move, Shortcut, Key, Wait, Scrape,Done, Clipboard, Shell, Switch, Resize, Memory
 from windows_use.agent.desktop.service import Desktop
-from humancursor import SystemCursor
 from markdownify import markdownify
 from langchain.tools import tool
 from typing import Literal
@@ -9,7 +8,6 @@ import pyperclip as pc
 import pyautogui as pg
 import requests
 
-cursor=SystemCursor()
 pg.FAILSAFE=False
 pg.PAUSE=1.0
 memory=[]
@@ -106,7 +104,8 @@ def resize_tool(loc:tuple[int,int]=None,size:tuple[int,int]=None,**kwargs) -> st
 def click_tool(loc:tuple[int,int],button:Literal['left','right','middle']='left',clicks:int=1,**kwargs)->str:
     'Perform Clicking on UI elements or specific location. NOTE: Single Left click to select UI element, Double Left click to open an app,folder,file, Single Right click to open context menu..'
     x,y=loc
-    cursor.move_to(loc)
+    pg.moveTo(x,y)
+    pg.sleep(0.05)
     desktop:Desktop=kwargs['desktop']
     control=desktop.get_element_under_cursor()
     parent=control.GetParentControl()
@@ -114,9 +113,11 @@ def click_tool(loc:tuple[int,int],button:Literal['left','right','middle']='left'
         pg.click(x=x,y=y,button=button,clicks=clicks)
     else:
         pg.mouseDown()
+        if clicks==2 and button=='left':
+            pg.click(clicks=1)
         pg.click(button=button,clicks=clicks)
         pg.mouseUp()
-    pg.sleep(1.0)
+    pg.sleep(0.1)
     num_clicks={1:'Single',2:'Double',3:'Triple'}
     return f'{num_clicks.get(clicks)} {button} at ({x},{y}).'
 
@@ -124,7 +125,7 @@ def click_tool(loc:tuple[int,int],button:Literal['left','right','middle']='left'
 def type_tool(loc:tuple[int,int],text:str,clear:Literal['true','false']='false',caret_position:Literal['start','idle','end']='idle',press_enter:Literal['true','false']='false',**kwargs):
     'Type text into input fields, text areas, or focused elements. Set clear=True to replace existing text, False to append. Click on target element coordinates first and start typing.'
     x,y=loc
-    cursor.click_on(loc)
+    pg.leftClick(x,y)
     if caret_position == 'start':
         pg.press('home')
     elif caret_position == 'end':
@@ -134,7 +135,8 @@ def type_tool(loc:tuple[int,int],text:str,clear:Literal['true','false']='false',
     if clear=='true':
         pg.hotkey('ctrl','a')
         pg.press('backspace')
-    pg.typewrite(text,interval=0.05)
+    pg.typewrite(text,interval=0.02)
+    pg.sleep(0.05)
     if press_enter=='true':
         pg.press('enter')
     return f'Typed {text} at ({x},{y}).'
@@ -143,7 +145,8 @@ def type_tool(loc:tuple[int,int],text:str,clear:Literal['true','false']='false',
 def scroll_tool(loc:tuple[int,int]=None,type:Literal['horizontal','vertical']='vertical',direction:Literal['up','down','left','right']='down',wheel_times:int=1,**kwargs)->str:
     'Move cursor to a specific location or current location, start scrolling in the specified direction. Use wheel_times to control scroll amount (1 wheel = ~3-5 lines). Essential for navigating lists, web pages, and long content.'
     if loc:
-        cursor.move_to(loc)
+        x,y=loc
+        pg.moveTo(x,y)
     match type:
         case 'vertical':
             match direction:
@@ -178,14 +181,17 @@ def drag_tool(from_loc:tuple[int,int],to_loc:tuple[int,int],**kwargs)->str:
     'Drag and drop operation from source coordinates to destination coordinates. Useful for moving files, resizing windows, or drag-and-drop interactions.'
     x1,y1=from_loc
     x2,y2=to_loc
-    cursor.drag_and_drop(from_loc,to_loc)
+    pg.moveTo(x1,y1)
+    pg.sleep(0.01)
+    pg.dragTo(x2,y2)
     return f'Dragged the element from ({x1},{y1}) to ({x2},{y2}).'
 
 @tool('Move Tool',args_schema=Move)
 def move_tool(to_loc:tuple[int,int],**kwargs)->str:
     'Move mouse cursor to specific coordinates without clicking. Useful for hovering over elements or positioning cursor before other actions.'
     x,y=to_loc
-    cursor.move_to(to_loc)
+    pg.moveTo(x,y)
+    pg.sleep(0.01)
     return f'Moved the mouse pointer to ({x},{y}).'
 
 @tool('Shortcut Tool',args_schema=Shortcut)
@@ -202,7 +208,7 @@ def key_tool(key:str='',**kwargs)->str:
 
 @tool('Wait Tool',args_schema=Wait)
 def wait_tool(duration:int,**kwargs)->str:
-    'Pause execution for specified duration in seconds. Useful for waiting for applications to load, animations to complete, or adding delays between actions.'
+    'Pause and wait for specific duration in seconds. Useful for waiting for applications to launch, animations to complete, or webpages to load.'
     pg.sleep(duration)
     return f'Waited for {duration} seconds.'
 
