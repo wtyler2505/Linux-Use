@@ -26,6 +26,7 @@ dependencies = [
     "humancursor>=1.1.5",
     "ipykernel>=6.29.5",
     "langchain>=0.3.25",
+    "langchain-anthropic>=0.3.20",
     "langchain-community>=0.3.25",
     "langchain-google-genai>=2.1.5",
     "langchain-groq>=0.3.4",

@@ -54,7 +54,6 @@ class Agent:
             click_tool,type_tool, launch_tool, shell_tool, clipboard_tool,
             done_tool, shortcut_tool, scroll_tool, drag_tool, move_tool,
             key_tool, wait_tool, scrape_tool, switch_tool, resize_tool,
-            memory_tool
         ] + additional_tools)
         self.instructions=instructions
         self.browser=browser
@@ -77,12 +76,13 @@ class Agent:
         error=''
         
         while consecutive_failures<=max_consecutive_failures:
+            message=self.llm.invoke(messages)
             try:
-                message=self.llm.invoke(messages)
                 agent_data = extract_agent_data(message=message)
                 break
             except Exception as e:
                 error=e
+                print(message.content)
                 logger.error(f"[Retry {consecutive_failures}] Failed to extract agent data\nError:{e}")
                 consecutive_failures+=1
         if consecutive_failures>max_consecutive_failures:

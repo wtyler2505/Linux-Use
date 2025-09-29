@@ -99,19 +99,24 @@ class Desktop:
         active_app=self.desktop_state.active_app
         if active_app is None:
             return "No active app found",1
-        app_control=ControlFromHandle(active_app.handle)
-        if loc is None:
-            x=app_control.BoundingRectangle.left
-            y=app_control.BoundingRectangle.top
-            loc=(x,y)
-        if size is None:
-            width=app_control.BoundingRectangle.width()
-            height=app_control.BoundingRectangle.height()
-            size=(width,height)
-        x,y=loc
-        width,height=size
-        app_control.MoveWindow(x,y,width,height)
-        return (f'{active_app.name} resized to {width}x{height} at {x},{y}.',0)
+        if active_app.status==Status.MINIMIZED:
+            return f"{active_app.name} is minimized",1
+        elif active_app.status==Status.MAXIMIZED:
+            return f"{active_app.name} is maximized",1
+        else:
+            app_control=ControlFromHandle(active_app.handle)
+            if loc is None:
+                x=app_control.BoundingRectangle.left
+                y=app_control.BoundingRectangle.top
+                loc=(x,y)
+            if size is None:
+                width=app_control.BoundingRectangle.width()
+                height=app_control.BoundingRectangle.height()
+                size=(width,height)
+            x,y=loc
+            width,height=size
+            app_control.MoveWindow(x,y,width,height)
+            return (f'{active_app.name} resized to {width}x{height} at {x},{y}.',0)
     
     def is_app_running(self,name:str)->bool:
         apps={app.name:app for app in [self.desktop_state.active_app]+self.desktop_state.apps if app is not None}
@@ -127,9 +132,9 @@ class Desktop:
         if appid is None:
             return (name,f'{name.title()} not found in start menu.',1)
         if name.endswith('.exe'):
-            response,status=self.execute_command(f'Start-Process "{appid}"')
+            response,status=self.execute_command(f'Start-Process {appid}')
         else:
-            response,status=self.execute_command(f'Start-Process "shell:AppsFolder\\{appid}"')
+            response,status=self.execute_command(f'Start-Process shell:AppsFolder\\{appid}')
         return response,status
     
     def switch_app(self,name:str):

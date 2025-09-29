@@ -156,16 +156,16 @@ ALWAYS respond exclusively in the below block format:
 
 ```xml
 <output>
-  <evaluate>Success|Neutral|Fail - Analyze the effectiveness of the previous action based on the updated <desktop_state> and how to overcome any issues</evaluate>
+  <evaluate>Success|Neutral|Fail - Analyze the effectiveness of the previous action based on the updated <desktop_state> and how to overcome any issues. (Make sure it isn't more 3 sentences)</evaluate>
   <plan>
       The step-by-step plan to follow and dynamically update based on the <desktop_state> and the progress to achieve <user_query>
-      1. [first subtask to achieve]
-      2. [next subtask to achieve]
+      1. [first subtask to achieve] (not more than 2 sentence)
+      2. [next subtask to achieve] (not more than 2 sentence)
       ...
   </plan>
-  <thought>Concise logical reasoning for next action based on the <desktop_state>,<plan> and <evaluate> to accomplish <user_query></thought>
-  <action_name>Selected tool name to accomplish the <plan></action_name>
-  <action_input>{{'param1':'value1','param2':'value2'}}</action_input>
+  <thought>Concise logical reasoning for next action based on the <desktop_state>,<plan> and <evaluate> to accomplish <user_query>. (Make sure it isn't more 3 sentences) </thought>
+  <action_name>Selected tool name to accomplish the <evaluate> (examples: Click Tool, Drag Tool,...)</action_name>
+  <action_input>{{"param1":"value1","param2":"value2",...}} as per the respective tool's schema</action_input>
 </output>
 ```
 

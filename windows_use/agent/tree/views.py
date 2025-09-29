@@ -10,7 +10,7 @@ class TreeState:
     def interactive_elements_to_string(self) -> str:
         if not self.interactive_nodes:
             return "No interactive elements"
-        headers = ["Label", "App Name", "ControlType", "Name", "Shortcut", "Coordinates"]
+        headers = ["Label", "App Name", "ControlType", "Name", "Value", "Shortcut", "Coordinates"]
         rows = [node.to_row(idx) for idx, node in enumerate(self.interactive_nodes)]
         return tabulate(rows, headers=headers, tablefmt="github")
 
@@ -65,13 +65,14 @@ class Center:
 class TreeElementNode:
     name: str
     control_type: str
+    value:str
     shortcut: str
     bounding_box: BoundingBox
     center: Center
     app_name: str
 
     def to_row(self, index: int):
-        return [index, self.app_name, self.control_type, self.name, self.shortcut, self.center.to_string()]
+        return [index, self.app_name, self.control_type, self.name, self.value, self.shortcut, self.center.to_string()]
 
 
 @dataclass

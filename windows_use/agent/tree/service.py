@@ -168,11 +168,14 @@ class Tree:
                     if child.ControlTypeName!='TextControl':
                         return None
                     box = node.BoundingRectangle
+                    legacy_pattern=node.GetLegacyIAccessiblePattern()
+                    value=legacy_pattern.Value
                     x,y=box.xcenter(),box.ycenter()
                     center = Center(x=x,y=y)
                     interactive_nodes.append(TreeElementNode(
                         name=child.Name.strip(),
                         control_type=node.LocalizedControlType,
+                        value=value,
                         shortcut=node.AcceleratorKey,
                         bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom,width=box.width(),height=box.height()),
                         center=center,
@@ -183,11 +186,14 @@ class Tree:
                 node=node.GetFirstChildControl()
                 control_type='link'
                 box = node.BoundingRectangle
+                legacy_pattern=node.GetLegacyIAccessiblePattern()
+                value=legacy_pattern.Value
                 x,y=box.xcenter(),box.ycenter()
                 center = Center(x=x,y=y)
                 interactive_nodes.append(TreeElementNode(
                     name=node.Name.strip(),
                     control_type=control_type,
+                    value=node.Name.strip(),
                     shortcut=node.AcceleratorKey,
                     bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom,width=box.width(),height=box.height()),
                     center=center,
@@ -218,19 +224,16 @@ class Tree:
                     is_focused=node.HasKeyboardFocus
                 ))
             elif is_element_interactive(node):
-                name=node.Name.strip() 
+                legacy_pattern=node.GetLegacyIAccessiblePattern()
+                value=legacy_pattern.Value.strip() if legacy_pattern.Value is not None else ""
+                name=node.Name.strip()
                 box = node.BoundingRectangle
-                if box.width()<50 or box.height()<50:
-                    x,y=box.xcenter(),box.ycenter()
-                else:
-                    x,y=random_point_within_bounding_box(node=node,scale_factor=0.8)
+                x,y=box.xcenter(),box.ycenter()
                 center = Center(x=x,y=y)
-                if not name:
-                    legacy_pattern=node.GetLegacyIAccessiblePattern()
-                    name=legacy_pattern.Value.strip() or legacy_pattern.Name.strip()
                 interactive_nodes.append(TreeElementNode(
                     name=name,
                     control_type=node.LocalizedControlType.title(),
+                    value=value,
                     shortcut=node.AcceleratorKey,
                     bounding_box=BoundingBox(left=box.left,top=box.top,right=box.right,bottom=box.bottom,width=box.width(),height=box.height()),
                     center=center,
