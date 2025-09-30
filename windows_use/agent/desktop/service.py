@@ -5,6 +5,7 @@ from windows_use.agent.tree.service import Tree
 from PIL.Image import Image as PILImage
 from locale import getpreferredencoding
 from contextlib import contextmanager
+from pywinauto import Application
 from fuzzywuzzy import process
 from typing import Optional
 from psutil import Process
@@ -146,14 +147,10 @@ class Desktop:
         app=apps.get(app_name)
         if IsIconic(app.handle):
             ShowWindow(app.handle, cmdShow=9)
-            return (f'{app_name.title()} restored from minimized state.',0)
+            return (f'{app_name.title()} restored from Minimized state.',0)
         else:
-            shortcut=['alt','tab']
-            for app in apps.values():
-                if app.name==app_name:
-                    break
-                pg.hotkey(*shortcut)
-                pg.sleep(0.1)
+            app=Application().connect(handle=app.handle)
+            app.window().set_focus()
             return (f'Switched to {app_name.title()} window.',0)
     
     def get_app_size(self,control:Control):

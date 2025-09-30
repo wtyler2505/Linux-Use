@@ -1,9 +1,16 @@
+from token import OP
 from pydantic import BaseModel,Field
 from typing import Literal,Optional
 
 class SharedBaseModel(BaseModel):
     class Config:
         extra='allow'
+
+class App(SharedBaseModel):
+    mode:Literal['launch','resize','switch'] = Field(...,description="the mode of operation to perform on the app. Launch: Launches the app present in start menu. Resize: Resizes the active app. Switch: Switches to a specific app",examples=['launch'])
+    name:Optional[str] = Field(description="the exact name of the app. (required for launch, switch mode)",examples=['notepad','chrome','New tab - Personal - Microsoft Edge'],default=None)
+    loc:Optional[tuple[int,int]]=Field(description="The cordinates to move the app window to. (required for resize mode)",examples=[(0,0)],default=None)
+    size:Optional[tuple[int,int]]=Field(description="The size to resize the app window to. (required for resize mode)",examples=[(100,100)],default=None)
 
 class Done(SharedBaseModel):
     answer:str = Field(...,description="the detailed final answer to the user query in proper markdown format",examples=["The task is completed successfully."])
@@ -13,10 +20,6 @@ class Memory(SharedBaseModel):
     content:Optional[str] = Field(description="to write/update explain the content in detail and concisely to/in memory",default=None,examples=["The name of the person is X","The price of item X is Y"])
     id:Optional[int] = Field(description="the id of the memory to read/update/delete (zero-indexed)",default=None,examples=[0])
 
-class Clipboard(SharedBaseModel):
-    mode:Literal['copy','paste'] = Field(...,description="the mode of the clipboard",examples=['copy'])
-    text:str = Field(...,description="the text to copy to clipboard",examples=["hello world"])
-
 class Click(SharedBaseModel):
     loc:tuple[int,int]=Field(...,description="The coordinate within the bounding box of the element to click on.",examples=[(0,0)])
     button:Literal['left','right','middle']=Field(description='The button to click on the element.',default='left',examples=['left'])
@@ -25,19 +28,12 @@ class Click(SharedBaseModel):
 class Shell(SharedBaseModel):
     command:str=Field(...,description="The PowerShell command to execute.",examples=['Get-Process'])
 
-class Resize(SharedBaseModel):
-    loc:tuple[int,int]=Field(...,description="The cordinates to move the window to.",examples=[(0,0)])
-    size:tuple[int,int]=Field(...,description="The size to resize the window to.",examples=[(100,100)])
-
 class Type(SharedBaseModel):
     loc:tuple[int,int]=Field(...,description="The coordinate within the bounding box of the element to type on.",examples=[(0,0)])
     text:str=Field(...,description="The text to type on the element.",examples=['hello world'])
     clear:Literal['true','false']=Field(description="To clear the text field before typing.",default='false',examples=['true'])
     caret_position:Literal['start','idle','end']=Field(description="The position of the caret.",default='idle',examples=['start','idle','end'])
     press_enter:Literal['true','false']=Field(description="To press enter after typing.",default='false',examples=['true'])
-
-class Launch(SharedBaseModel):
-    name:str=Field(...,description="The name of the application to launch.",examples=['Google Chrome'])
 
 class Scroll(SharedBaseModel):
     loc:tuple[int,int]|None=Field(description="The coordinate within the bounding box of the element to scroll on. If None, the screen will be scrolled.",default=None,examples=[(0,0)])
@@ -53,13 +49,7 @@ class Move(SharedBaseModel):
     to_loc:tuple[int,int]=Field(...,description="The coordinates to move to.",examples=[(100,100)])
 
 class Shortcut(SharedBaseModel):
-    shortcut:list[str]=Field(...,description="The shortcut to execute by pressing the keys.",examples=[['ctrl','a'],['alt','f4']])
-
-class Switch(SharedBaseModel):
-    name:str=Field(...,description="The extact name of the application from the background apps to switch too.",examples=['New tab - Personal - Microsoft Edge'])
-
-class Key(SharedBaseModel):
-    key:str=Field(...,description="The key to press.",examples=['enter','escape','tab','up','down','left','right'])
+    shortcut:str=Field(...,description="The shortcut to execute by pressing the keys.",examples=['win','enter','ctrl+c','alt+tab'])
 
 class Wait(SharedBaseModel):
     duration:int=Field(...,description="The duration to wait in seconds.",examples=[5])

@@ -1,10 +1,9 @@
-from windows_use.agent.tools.views import Click, Type, Launch, Scroll, Drag, Move, Shortcut, Key, Wait, Scrape,Done, Clipboard, Shell, Switch, Resize, Memory
+from windows_use.agent.tools.views import Click, Type, Scroll, Drag, Move, Shortcut, Wait, Scrape, Done, Shell, Memory, App
 from windows_use.agent.desktop.service import Desktop
 from markdownify import markdownify
+from typing import Literal,Optional
 from langchain.tools import tool
-from typing import Literal
 import uiautomation as uia
-import pyperclip as pc
 import pyautogui as pg
 import requests
 
@@ -16,6 +15,35 @@ memory=[]
 def done_tool(answer:str,**kwargs):
     '''To indicate that the task is completed'''
     return answer
+
+@tool('App Tool',args_schema=App)
+def app_tool(mode:Literal['launch','resize','switch'],name:Optional[str]=None,loc:Optional[tuple[int,int]]=None,size:Optional[tuple[int,int]]=None,**kwargs)->str:
+    '''To handle the app related tasks. Launch: Launches an app present in start menu. Resize: Resizes the active app. Switch: Switches to a specific app'''
+    desktop:Desktop=kwargs['desktop']
+    match mode:
+        case 'launch':
+            response,status=desktop.launch_app(name)
+            if status!=0:
+                return response
+            consecutive_waits=3
+            for _ in range(consecutive_waits):
+                if not desktop.is_app_running(name):
+                    pg.sleep(1.25)
+                else:
+                    return f'{name.title()} launched.'
+            return f'Launching {name.title()} wait for it to come load.'
+        case 'resize':
+            _,status=desktop.resize_app(size=size,loc=loc)
+            if status!=0:
+                return f'Failed to switch to {name.title()} window.'
+            else:
+                return f'Switched to {name.title()} window.'
+        case 'switch':
+            _,status=desktop.switch_app(name)
+            if status!=0:
+                return f'Failed to switch to {name.title()} window.'
+            else:
+                return f'Switched to {name.title()} window.'
 
 @tool('Memory Tool',args_schema=Memory)
 def memory_tool(mode:Literal['read','write','delete','update'],content:str=None,id:int=None,**kwargs)->str:
@@ -46,59 +74,12 @@ def memory_tool(mode:Literal['read','write','delete','update'],content:str=None,
             memory.pop(id)
             return f"Deleted content at id={id}"
 
-@tool('Launch Tool',args_schema=Launch)
-def launch_tool(name: str,**kwargs) -> str:
-    'Launch an application present in start menu (e.g., "notepad", "calculator", "chrome")'
-    desktop:Desktop=kwargs['desktop']
-    response,status=desktop.launch_app(name)
-    if status!=0:
-        return response
-    consecutive_waits=3
-    for _ in range(consecutive_waits):
-        if not desktop.is_app_running(name):
-            pg.sleep(1.25)
-        else:
-            return f'{name.title()} launched.'
-    return f'Launching {name.title()} wait for it to come load.'
-
 @tool('Shell Tool',args_schema=Shell)
 def shell_tool(command: str,**kwargs) -> str:
     'Execute PowerShell commands and return the output and status code. The cwd is set to the HOME directory.'
     desktop:Desktop=kwargs['desktop']
     response,status=desktop.execute_command(command)
     return f'Response: {response}\nStatus Code: {status}'
-
-@tool('Clipboard Tool',args_schema=Clipboard)
-def clipboard_tool(mode: Literal['copy', 'paste'], text: str = None,**kwargs)->str:
-    'Copy text to clipboard or retrieve current clipboard content. Use "copy" mode with text parameter to copy, "paste" mode to retrieve.'
-    if mode == 'copy':
-        if text:
-            pc.copy(text)  # Copy text to system clipboard
-            return f'Copied "{text}" to clipboard'
-        else:
-            raise ValueError("No text provided to copy")
-    elif mode == 'paste':
-        clipboard_content = pc.paste()  # Get text from system clipboard
-        return f'Clipboard Content: "{clipboard_content}"'
-    else:
-        raise ValueError('Invalid mode. Use "copy" or "paste".')
-    
-@tool('Switch Tool',args_schema=Switch)
-def switch_tool(name: str,**kwargs) -> str:
-    'To switch to an app present in the background apps thus making it as foreground/active app (e.g., "notepad", "calculator", "chrome", etc.).'
-    desktop:Desktop=kwargs['desktop']
-    _,status=desktop.switch_app(name)
-    if status!=0:
-        return f'Failed to switch to {name.title()} window.'
-    else:
-        return f'Switched to {name.title()} window.'
-    
-@tool("Resize Tool",args_schema=Resize)
-def resize_tool(loc:tuple[int,int]=None,size:tuple[int,int]=None,**kwargs) -> str:
-    'Resize current active app window to a specific size or location, if the active app is in "Normal" state not "Maximized" or "Minimized".'
-    desktop:Desktop=kwargs['desktop']
-    response,_=desktop.resize_app(loc,size)
-    return response
 
 @tool('Click Tool',args_schema=Click)
 def click_tool(loc:tuple[int,int],button:Literal['left','right','middle']='left',clicks:int=1,**kwargs)->str:
@@ -195,16 +176,14 @@ def move_tool(to_loc:tuple[int,int],**kwargs)->str:
     return f'Moved the mouse pointer to ({x},{y}).'
 
 @tool('Shortcut Tool',args_schema=Shortcut)
-def shortcut_tool(shortcut:list[str],**kwargs)->str:
-    'Execute keyboard shortcuts using key combinations. Pass keys as list (e.g., ["ctrl", "c"] for copy, ["alt", "tab"] for app switching, ["win", "r"] for Run dialog).'
-    pg.hotkey(*shortcut)
+def shortcut_tool(shortcut:str,**kwargs)->str:
+    'Execute keyboard shortcuts that can be single key combinations or multiple key combinations separated by "+".'
+    shortcut=shortcut.split('+')
+    if len(shortcut)>1:
+        pg.hotkey(*shortcut)
+    else:
+        pg.press(''.join(shortcut))
     return f'Pressed {'+'.join(shortcut)}.'
-
-@tool('Key Tool',args_schema=Key)
-def key_tool(key:str='',**kwargs)->str:
-    'Press individual keyboard keys. Supports special keys like "enter", "escape", "tab", "space", "backspace", "delete", arrow keys ("up", "down", "left", "right"), function keys ("f1"-"f12").'
-    pg.press(key)
-    return f'Pressed the key {key}.'
 
 @tool('Wait Tool',args_schema=Wait)
 def wait_tool(duration:int,**kwargs)->str:
