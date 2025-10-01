@@ -1,5 +1,5 @@
 from windows_use.agent.tools.service import (click_tool, type_tool, shell_tool, done_tool,
-shortcut_tool, scroll_tool, drag_tool, move_tool, wait_tool, app_tool, scrape_tool )
+shortcut_tool, scroll_tool, drag_tool, move_tool, wait_tool, app_tool, scrape_tool, memory_tool )
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from windows_use.agent.utils import extract_agent_data, image_message
 from langchain_core.language_models.chat_models import BaseChatModel
@@ -18,6 +18,7 @@ from rich.markdown import Markdown
 from rich.console import Console
 from termcolor import colored
 from textwrap import shorten
+from pathlib import Path
 import logging
 
 logger = logging.getLogger(__name__)
@@ -52,7 +53,7 @@ class Agent:
         self.registry = Registry([
             click_tool,type_tool, app_tool, shell_tool, done_tool, 
             shortcut_tool, scroll_tool, drag_tool, move_tool,
-            wait_tool, scrape_tool
+            wait_tool, scrape_tool, memory_tool
         ] + additional_tools)
         self.instructions=instructions
         self.browser=browser
@@ -65,6 +66,8 @@ class Agent:
         self.desktop = Desktop()
         self.console=Console()
         self.graph=self.create_graph()
+        memory_path=Path.cwd()/'.memories'
+        memory_path.mkdir(exist_ok=True)
 
     def reason(self,state:AgentState):
         steps=state.get('steps')
@@ -89,7 +92,6 @@ class Agent:
 
         logger.info(f"Iteration: {steps}")
         logger.info(colored(f"📝: Evaluate: {agent_data.evaluate}",color='yellow',attrs=['bold']))
-        logger.info(colored(f"📚: Plan: {agent_data.plan}",color='light_blue',attrs=['bold']))
         logger.info(colored(f"💭: Thought: {agent_data.thought}",color='light_magenta',attrs=['bold']))
 
         last_message = state.get('messages').pop()

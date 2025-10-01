@@ -1,7 +1,6 @@
 ```xml
 <output>
     <evaluate>{evaluate}</evaluate>
-    <plan>{plan}</plan>
     <thought>{thought}</thought>
     <action_name>{action_name}</action_name>
     <action_input>{action_input}</action_input>

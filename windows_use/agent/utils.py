@@ -16,10 +16,6 @@ def extract_agent_data(message: BaseMessage) -> AgentData:
     evaluate_match = re.search(r"<evaluate>(.*?)<\/evaluate>", text, re.DOTALL)
     if evaluate_match:
         result['evaluate'] = evaluate_match.group(1).strip()
-    # Extract Plan
-    plan_match = re.search(r"<plan>(.*?)<\/plan>", text, re.DOTALL)
-    if plan_match:
-        result['plan'] = plan_match.group(1).strip()
     # Extract Thought
     thought_match = re.search(r"<thought>(.*?)<\/thought>", text, re.DOTALL)
     if thought_match:

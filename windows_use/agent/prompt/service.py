@@ -33,7 +33,6 @@ class Prompt:
         template = PromptTemplate.from_file(files('windows_use.agent.prompt').joinpath('action.md'))
         return template.format(**{
             'evaluate': agent_data.evaluate,
-            'plan': agent_data.plan,
             'thought': agent_data.thought,
             'action_name': agent_data.action.name,
             'action_input': agent_data.action.params

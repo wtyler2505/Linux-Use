@@ -5,11 +5,9 @@ from windows_use.agent.tree.service import Tree
 from PIL.Image import Image as PILImage
 from locale import getpreferredencoding
 from contextlib import contextmanager
-from pywinauto import Application
 from fuzzywuzzy import process
 from typing import Optional
 from psutil import Process
-import pyautogui as pg
 from time import sleep
 from io import BytesIO
 from PIL import Image
@@ -149,6 +147,7 @@ class Desktop:
             ShowWindow(app.handle, cmdShow=9)
             return (f'{app_name.title()} restored from Minimized state.',0)
         else:
+            from pywinauto import Application
             app=Application().connect(handle=app.handle)
             app.window().set_focus()
             return (f'Switched to {app_name.title()} window.',0)
