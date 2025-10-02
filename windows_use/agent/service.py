@@ -18,7 +18,6 @@ from rich.markdown import Markdown
 from rich.console import Console
 from termcolor import colored
 from textwrap import shorten
-from pathlib import Path
 import logging
 
 logger = logging.getLogger(__name__)
@@ -53,7 +52,7 @@ class Agent:
         self.registry = Registry([
             click_tool,type_tool, app_tool, shell_tool, done_tool, 
             shortcut_tool, scroll_tool, drag_tool, move_tool,
-            wait_tool, scrape_tool, memory_tool
+            wait_tool, scrape_tool
         ] + additional_tools)
         self.instructions=instructions
         self.browser=browser
@@ -66,8 +65,6 @@ class Agent:
         self.desktop = Desktop()
         self.console=Console()
         self.graph=self.create_graph()
-        memory_path=Path.cwd()/'.memories'
-        memory_path.mkdir(exist_ok=True)
 
     def reason(self,state:AgentState):
         steps=state.get('steps')

@@ -189,7 +189,7 @@ ALWAYS respond exclusively in the below block format:
   <evaluate>Success|Neutral|Fail - Analyze the effectiveness of the previous action based on the updated <desktop_state> and how to overcome any issues</evaluate>
   <thought>Brief logical reasoning for next action based on the <desktop_state> and <evaluate> to accomplish <user_query></thought>
   <action_name>Select the tool name (examples: Click Tool, Type Tool, ...) as per <evaluate></action_name>
-  <action_input>{"param1":"value1","param2":"value2",...} as per the respective tool's schema</action_input>
+  <action_input>{{"param1":"value1","param2":"value2",...}} as per the respective tool's schema</action_input>
 </output>
 ```
 
