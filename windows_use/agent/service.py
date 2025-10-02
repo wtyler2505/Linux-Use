@@ -98,7 +98,7 @@ class Agent:
         if isinstance(last_message, HumanMessage):
             message=HumanMessage(content=Prompt.previous_observation_prompt(steps=steps,max_steps=max_steps,observation=state.get('previous_observation')))
             return {**state,'agent_data':agent_data,'messages':[message],'steps':steps+1}
-
+        
     def action(self,state:AgentState):
         steps=state.get('steps')
         max_steps=state.get('max_steps')
@@ -114,7 +114,14 @@ class Agent:
         desktop_state = self.desktop.get_state(use_vision=self.use_vision)
         prompt=Prompt.observation_prompt(query=state.get('input'),steps=steps,max_steps=max_steps, tool_result=tool_result, desktop_state=desktop_state)
         human_message=image_message(prompt=prompt,image=desktop_state.screenshot) if self.use_vision and desktop_state.screenshot else HumanMessage(content=prompt)
-        return {**state,'agent_data':None,'messages':[ai_message, human_message],'previous_observation':observation}
+        
+        match name:
+            case 'Scrape Tool':
+                previous_observation=f"Scraped {params.get('url')}"
+            case _:
+                previous_observation=observation
+
+        return {**state,'agent_data':None,'messages':[ai_message, human_message],'previous_observation':previous_observation}
 
     def answer(self,state:AgentState):
         steps=state.get('steps')
