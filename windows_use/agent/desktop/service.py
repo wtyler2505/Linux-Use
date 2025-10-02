@@ -74,10 +74,15 @@ class Desktop:
     
     def execute_command(self,command:str)->tuple[str,int]:
         try:
-            result = subprocess.run(['powershell', '-NoProfile', '-Command']+command.split(), 
-            capture_output=True, timeout=25,cwd=os.path.expanduser(path='~\\Desktop'))
-            stdout=result.stdout.decode(self.encoding)
-            stderr=result.stderr.decode(self.encoding)
+            result = subprocess.run(
+                ['powershell', '-NoProfile', '-Command', command], 
+                capture_output=True, 
+                errors='ignore',
+                timeout=25,
+                cwd=os.path.expanduser(path='~')
+            )
+            stdout=result.stdout
+            stderr=result.stderr
             return (stdout or stderr,result.returncode)
         except subprocess.TimeoutExpired:
             return ('Command execution timed out', 1)
