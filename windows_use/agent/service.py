@@ -110,17 +110,11 @@ class Agent:
         tool_result = self.registry.execute(tool_name=name, desktop=self.desktop, **params)
 
         observation=tool_result.content if tool_result.is_success else tool_result.error
+        previous_observation=observation
         logger.info(colored(f"🔭: Observation: {shorten(observation,500,placeholder='...')}",color='green',attrs=['bold']))
         desktop_state = self.desktop.get_state(use_vision=self.use_vision)
         prompt=Prompt.observation_prompt(query=state.get('input'),steps=steps,max_steps=max_steps, tool_result=tool_result, desktop_state=desktop_state)
         human_message=image_message(prompt=prompt,image=desktop_state.screenshot) if self.use_vision and desktop_state.screenshot else HumanMessage(content=prompt)
-        
-        match name:
-            case 'Scrape Tool':
-                previous_observation=f"Scraped {params.get('url')}"
-            case _:
-                previous_observation=observation
-
         return {**state,'agent_data':None,'messages':[ai_message, human_message],'previous_observation':previous_observation}
 
     def answer(self,state:AgentState):
