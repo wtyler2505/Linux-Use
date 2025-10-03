@@ -27,7 +27,7 @@ class Tree:
     def get_appwise_nodes(self,node:Control) -> tuple[list[TreeElementNode],list[TextElementNode],list[ScrollElementNode]]:
         apps:list[Control]=[]
         found_foreground_app=False
-
+        # EXCLUDED_APPS.discard('Progman')
         for app in node.GetChildren():
             if app.ClassName in EXCLUDED_APPS:
                 apps.append(app)
@@ -137,6 +137,8 @@ class Tree:
             try:
                 if is_browser and node.ControlTypeName in set(['DataItemControl','ListItemControl']) and not is_keyboard_focusable(node):
                     return False
+                elif not is_browser and node.ControlTypeName=="ImageControl" and is_keyboard_focusable(node):
+                    return True
                 elif node.ControlTypeName in INTERACTIVE_CONTROL_TYPE_NAMES:
                     if is_element_visible(node) and is_element_enabled(node) and (not is_element_image(node) or is_keyboard_focusable(node)):
                         return True
