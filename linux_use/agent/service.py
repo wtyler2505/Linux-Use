@@ -8,7 +8,6 @@ from linux_use.agent.registry.views import ToolResult
 from linux_use.agent.desktop.service import Desktop
 from linux_use.agent.desktop.views import Browser
 from linux_use.agent.prompt.service import Prompt
-from live_inspect.watch_cursor import WatchCursor
 from langgraph.graph import START,END,StateGraph
 from linux_use.agent.views import AgentResult
 from linux_use.agent.state import AgentState
