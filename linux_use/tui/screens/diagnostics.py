@@ -94,9 +94,9 @@ class DiagnosticsScreen(Screen):
     def on_button_pressed(self, event: Button.Pressed) -> None:
         \"\"\"Handle button presses\"\"\"
         if event.button.id == \"btn-run-diag\":
-            self.run_diagnostics()
+            self.run_worker(self.run_diagnostics())
         elif event.button.id == \"btn-autofix\":
-            self.run_autofix()
+            self.run_worker(self.run_autofix())
         elif event.button.id == \"btn-back\":
             self.app.pop_screen()
     
