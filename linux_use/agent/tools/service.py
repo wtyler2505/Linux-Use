@@ -339,7 +339,8 @@ def shortcut_tool(shortcut:str,**kwargs)->str:
         pg.hotkey(*shortcut)
     else:
         pg.press(''.join(shortcut))
-    return f'Pressed {'+'.join(shortcut)}.'
+    shortcut_str = '+'.join(shortcut)
+    return f'Pressed {shortcut_str}.'
 
 @tool('Wait Tool',args_schema=Wait)
 def wait_tool(duration:int,**kwargs)->str:
