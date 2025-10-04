@@ -100,7 +100,6 @@ class DiagnosticsScreen(Screen):
         elif event.button.id == \"btn-back\":
             self.app.pop_screen()
     
-    @work(exclusive=True)
     async def run_diagnostics(self) -> None:
         \"\"\"Run all diagnostic checks\"\"\"
         log = self.query_one(\"#diag-log\", LogViewer)
