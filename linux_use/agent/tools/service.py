@@ -174,13 +174,13 @@ def memory_tool(mode: Literal['view','read','write','delete','update'],path: Opt
 @tool('Shell Tool',args_schema=Shell)
 def shell_tool(command: str,**kwargs) -> str:
     '''
-    Executes PowerShell commands and returns output with status codes.
+    Executes bash shell commands and returns output with status codes.
     
     Use this tool to:
-        - Run Windows system commands and scripts
+        - Run Linux system commands and scripts
         - Query system information and configurations
         - Automate file operations and system tasks
-        - Access Windows management utilities
+        - Access Linux management utilities (apt, systemctl, etc.)
     
     The working directory is set to the user's HOME directory by default. 
     Returns both command output and exit status code for error handling.
