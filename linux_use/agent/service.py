@@ -29,13 +29,13 @@ logger.addHandler(handler)
 
 class Agent:
     '''
-    Windows Use
+    Linux Use
 
-    An agent that can interact with GUI elements on Windows
+    An agent that can interact with GUI elements on Linux desktop environments
 
     Args:
         instructions (list[str], optional): Instructions for the agent. Defaults to [].
-        browser (Browser, optional): Browser the agent should use (Make sure this browser is installed). Defaults to 'Edge'.
+        browser (Browser, optional): Browser the agent should use (Make sure this browser is installed). Defaults to 'Firefox'.
         additional_tools (list[BaseTool], optional): Additional tools for the agent. Defaults to [].
         llm (BaseChatModel): Language model for the agent. Defaults to None.
         consecutive_failures (int, optional): Maximum number of consecutive failures for the agent. Defaults to 3.
@@ -46,9 +46,9 @@ class Agent:
     Returns:
         Agent
     '''
-    def __init__(self,instructions:list[str]=[],additional_tools:list[BaseTool]=[],browser:Browser=Browser.EDGE, llm: BaseChatModel=None,max_consecutive_failures:int=3,max_steps:int=25,use_vision:bool=False,auto_minimize:bool=False):
-        self.name='Windows Use'
-        self.description='An agent that can interact with GUI elements on Windows' 
+    def __init__(self,instructions:list[str]=[],additional_tools:list[BaseTool]=[],browser:Browser=Browser.FIREFOX, llm: BaseChatModel=None,max_consecutive_failures:int=3,max_steps:int=25,use_vision:bool=False,auto_minimize:bool=False):
+        self.name='Linux Use'
+        self.description='An agent that can interact with GUI elements on Linux desktop environments' 
         self.registry = Registry([
             click_tool,type_tool, app_tool, shell_tool, done_tool, 
             shortcut_tool, scroll_tool, drag_tool, move_tool,
