@@ -1,0 +1,448 @@
+/* Linux-Use TUI - Cyberpunk/Hacker Theme */
+/* Inspired by spy agency terminals and matrix aesthetics */
+
+Screen {
+    background: $surface;
+}
+
+/* Color Palette - Cyberpunk Hacker */
+$surface: #0a0e14;
+$surface-lighten-1: #131720;
+$surface-lighten-2: #1a1f2e;
+$primary: #00ff41;
+$primary-darken-1: #00cc33;
+$secondary: #00d9ff;
+$warning: #ff6b00;
+$error: #ff0051;
+$success: #00ff41;
+$accent: #8a2be2;
+$boost: #ff00ff;
+
+/* Main Container Styling */
+.main-container {
+    background: $surface;
+    border: heavy $primary;
+}
+
+/* Header */
+Header {
+    background: $surface-lighten-1;
+    color: $primary;
+    text-style: bold;
+    border: heavy $primary;
+    height: 3;
+}
+
+/* Footer */
+Footer {
+    background: $surface-lighten-1;
+    color: $secondary;
+    text-style: bold;
+    border: heavy $primary;
+    height: 3;
+}
+
+/* Buttons */
+Button {
+    background: $surface-lighten-2;
+    color: $primary;
+    border: heavy $primary;
+    text-style: bold;
+}
+
+Button:hover {
+    background: $primary-darken-1;
+    color: $surface;
+    border: heavy $secondary;
+}
+
+Button:focus {
+    background: $secondary;
+    color: $surface;
+    text-style: bold;
+    border: heavy $boost;
+}
+
+Button.-warning {
+    background: $warning;
+    color: $surface;
+}
+
+Button.-error {
+    background: $error;
+    color: $surface;
+}
+
+Button.-success {
+    background: $success;
+    color: $surface;
+}
+
+/* Input Fields */
+Input {
+    background: $surface-lighten-1;
+    color: $primary;
+    border: heavy $primary;
+}
+
+Input:focus {
+    border: heavy $secondary;
+    background: $surface-lighten-2;
+}
+
+/* Data Tables */
+DataTable {
+    background: $surface;
+    color: $primary;
+    border: heavy $primary;
+}
+
+DataTable > .datatable--header {
+    background: $surface-lighten-1;
+    color: $secondary;
+    text-style: bold;
+}
+
+DataTable > .datatable--cursor {
+    background: $primary-darken-1;
+    color: $surface;
+}
+
+/* Log Display */
+RichLog {
+    background: $surface;
+    color: $primary;
+    border: heavy $primary;
+    scrollbar-color: $secondary;
+    scrollbar-color-hover: $boost;
+}
+
+/* Static Text */
+Static {
+    color: $primary;
+}
+
+Static.-secondary {
+    color: $secondary;
+}
+
+Static.-warning {
+    color: $warning;
+}
+
+Static.-error {
+    color: $error;
+}
+
+Static.-accent {
+    color: $accent;
+}
+
+/* Labels */
+Label {
+    color: $primary;
+    text-style: bold;
+}
+
+Label.-secondary {
+    color: $secondary;
+}
+
+/* Containers */
+Container {
+    background: $surface;
+    border: heavy $primary;
+    padding: 1;
+}
+
+Container.-bordered {
+    border: heavy $secondary;
+}
+
+/* Horizontal and Vertical layouts */
+Horizontal {
+    height: auto;
+}
+
+Vertical {
+    width: auto;
+}
+
+/* Progress Bar */
+ProgressBar {
+    color: $primary;
+    background: $surface-lighten-1;
+    bar-color: $primary;
+}
+
+ProgressBar.-complete {
+    bar-color: $success;
+}
+
+ProgressBar.-error {
+    bar-color: $error;
+}
+
+/* Loading Indicator */
+LoadingIndicator {
+    color: $secondary;
+    background: $surface;
+}
+
+/* Tabs */
+Tabs {
+    background: $surface-lighten-1;
+}
+
+Tab {
+    background: $surface-lighten-1;
+    color: $primary;
+    border: heavy transparent;
+}
+
+Tab:hover {
+    background: $surface-lighten-2;
+    color: $secondary;
+}
+
+Tab.-active {
+    background: $primary;
+    color: $surface;
+    text-style: bold;
+    border: heavy $secondary;
+}
+
+/* Sidebar */
+.sidebar {
+    background: $surface-lighten-1;
+    border: heavy $primary;
+    width: 30;
+}
+
+/* Main Content */
+.main-content {
+    background: $surface;
+    border: heavy $primary;
+}
+
+/* Status Indicators */
+.status-active {
+    color: $success;
+    text-style: bold;
+}
+
+.status-idle {
+    color: $secondary;
+}
+
+.status-error {
+    color: $error;
+    text-style: bold;
+}
+
+.status-warning {
+    color: $warning;
+    text-style: bold;
+}
+
+/* Metrics Display */
+.metric-label {
+    color: $secondary;
+    text-style: bold;
+}
+
+.metric-value {
+    color: $primary;
+    text-style: bold;
+}
+
+.metric-high {
+    color: $error;
+    text-style: bold;
+}
+
+.metric-medium {
+    color: $warning;
+    text-style: bold;
+}
+
+.metric-low {
+    color: $success;
+    text-style: bold;
+}
+
+/* ASCII Art Boxes */
+.ascii-box {
+    border: heavy $primary;
+    background: $surface-lighten-1;
+    color: $primary;
+}
+
+/* Tree View */
+Tree {
+    background: $surface;
+    color: $primary;
+}
+
+Tree:focus {
+    border: heavy $secondary;
+}
+
+/* Option List */
+OptionList {
+    background: $surface;
+    color: $primary;
+    border: heavy $primary;
+}
+
+OptionList:focus {
+    border: heavy $secondary;
+}
+
+/* Select */
+Select {
+    background: $surface-lighten-1;
+    color: $primary;
+    border: heavy $primary;
+}
+
+/* Scrollbars */
+Scrollbar {
+    background: $surface-lighten-1;
+    color: $primary;
+}
+
+ScrollbarCorner {
+    background: $surface-lighten-1;
+}
+
+/* Placeholder */
+Placeholder {
+    background: $surface-lighten-2;
+    color: $primary;
+    border: heavy $primary;
+}
+
+/* Pretty for code display */
+Pretty {
+    background: $surface;
+    color: $primary;
+}
+
+/* Switch */
+Switch {
+    background: $surface-lighten-1;
+}
+
+Switch:focus {
+    background: $surface-lighten-2;
+}
+
+Switch.-on {
+    color: $success;
+}
+
+/* Checkbox */
+Checkbox {
+    background: $surface-lighten-1;
+    color: $primary;
+}
+
+Checkbox:focus {
+    background: $surface-lighten-2;
+}
+
+Checkbox.-on {
+    color: $success;
+}
+
+/* RadioButton */
+RadioButton {
+    background: $surface-lighten-1;
+    color: $primary;
+}
+
+RadioButton:focus {
+    background: $surface-lighten-2;
+}
+
+/* Special Widget Classes */
+.agent-status-panel {
+    border: heavy $secondary;
+    background: $surface-lighten-1;
+    padding: 1;
+}
+
+.monitoring-panel {
+    border: heavy $primary;
+    background: $surface;
+    padding: 1;
+}
+
+.diagnostic-panel {
+    border: heavy $accent;
+    background: $surface-lighten-1;
+    padding: 1;
+}
+
+.installation-panel {
+    border: heavy $warning;
+    background: $surface-lighten-1;
+    padding: 1;
+}
+
+/* Live Tree Visualization */
+.tree-viz {
+    background: $surface;
+    color: $secondary;
+    border: heavy $primary;
+}
+
+/* Session Recording */
+.recording-active {
+    color: $error;
+    text-style: bold blink;
+}
+
+.recording-paused {
+    color: $warning;
+    text-style: bold;
+}
+
+/* Command Palette */
+CommandPalette {
+    background: $surface-lighten-1;
+    color: $primary;
+    border: heavy $secondary;
+}
+
+/* Notifications */
+.notification {
+    background: $surface-lighten-2;
+    border: heavy $secondary;
+    padding: 1;
+}
+
+.notification.-success {
+    border: heavy $success;
+}
+
+.notification.-error {
+    border: heavy $error;
+}
+
+.notification.-warning {
+    border: heavy $warning;
+}
+
+/* Matrix-style scrolling effect */
+.matrix-scroll {
+    color: $primary;
+    text-style: bold;
+}
+
+/* Glitch effect for errors */
+.glitch {
+    color: $error;
+    text-style: bold blink;
+}
