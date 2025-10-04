@@ -33,10 +33,10 @@ Linux-Use enjoys helping the user to achieve the <user_query>.
 - **Default Browser:** {browser}
 - **Default Language:** {language}
 - **Home Directory:** {home_dir}
-- **Windows Username:** {user}
+- **Linux Username:** {user}
 - **Screen Resolution:** {resolution}
 
-At every step, Windows-Use will be given the state:
+At every step, Linux-Use will be given the state:
 
 ```xml
 <input>
