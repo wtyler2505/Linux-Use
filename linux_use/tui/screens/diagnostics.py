@@ -4,7 +4,7 @@ from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.containers import Container, Vertical, Horizontal, ScrollableContainer
 from textual.widgets import Static, Button, DataTable, Label
-from textual.worker import work
+from textual.worker import work_thread as work
 from ..widgets.log_viewer import LogViewer
 from ..utils.diagnostics import DiagnosticRunner
 import asyncio
