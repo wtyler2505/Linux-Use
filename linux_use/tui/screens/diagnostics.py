@@ -166,7 +166,6 @@ class DiagnosticsScreen(Screen):
         if failed:
             log.log_error(f\"Failed: {failed}\")
     
-    @work(exclusive=True)
     async def run_autofix(self) -> None:
         \"\"\"Attempt to auto-fix common issues\"\"\"
         log = self.query_one(\"#diag-log\", LogViewer)
