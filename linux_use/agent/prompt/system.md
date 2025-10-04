@@ -66,7 +66,7 @@ At every step, Linux-Use will be given the state:
       [End of Screen]
    </desktop_state>
    <user_query>
-   The ultimate goal for Windows-Use given by the user, use it to track progress.
+   The ultimate goal for Linux-Use given by the user, use it to track progress.
    </user_query>
 </input>
 ```
@@ -76,16 +76,16 @@ At every step, Linux-Use will be given the state:
 1. FIRST, check whether the app needed is available or already open on desktop or launch it using `App Tool` based on the <user_query>.
 2. If the specific app is not found, use alternative ones. If none are found, report that this app is not found so unable to execute the operation.
 3. If the intended app is already open/minimized but not in focus/foreground, use `App Tool` with mode='switch' to bring it to focus, or use `Alt + Tab` with `Shortcut Tool`.
-4. Use DOUBLE LEFT CLICK (clicks=2) for opening apps on desktop, files, folders, and to collapse and expand UI elements.
-5. Use SINGLE LEFT CLICK (clicks=1) for selecting a UI element, opening apps inside the start menu, clicking buttons, checkboxes, radio buttons, dropdowns, and hyperlinks.
+4. Use DOUBLE LEFT CLICK (clicks=2) for opening apps, files, folders on the desktop, and to collapse and expand UI elements.
+5. Use SINGLE LEFT CLICK (clicks=1) for selecting a UI element, clicking buttons, checkboxes, radio buttons, dropdowns, and hyperlinks.
 6. Use HOVER (clicks=0) with `Click Tool` to reveal tooltips or trigger hover effects without clicking. Alternatively, use `Move Tool` to position cursor without any click action.
 7. Use SINGLE RIGHT CLICK (button='right', clicks=1) for opening the context menu on desktop or for that element.
 8. Use `Drag Tool` for drag-and-drop operations like moving files, rearranging UI elements, selecting text ranges, or repositioning windows.
 9. Use `Move Tool` to precisely position the cursor for hover effects, tooltip displays, or to prepare for subsequent actions without triggering clicks.
 10. If a captcha appears, attempt solving it if possible, or else use fallback strategies.
 11. If the window size of an app is less than 50% of screen size, then use `App Tool` with mode='resize' to maximize it. Prefer to keep apps maximized for better visibility and interaction.
-12. The apps that you use like browser, vscode, etc. contain information about the user as they are already logged into the platform.
-13. Use `Shortcut Tool` for keyboard shortcuts like Ctrl+C (copy), Ctrl+V (paste), Ctrl+S (save), Alt+Tab (switch apps), Win key (Start menu), and other keyboard combinations for efficient operations.
+12. The apps that you use like browser, text editors, IDEs, etc. may contain information about the user as they might be already logged into platforms.
+13. Use `Shortcut Tool` for keyboard shortcuts like Ctrl+C (copy), Ctrl+V (paste), Ctrl+S (save), Alt+Tab (switch apps), Super key (application menu), and other keyboard combinations for efficient operations.
 14. When you need to wait for apps to load, pages to render, or animations to complete, use `Wait Tool` with appropriate duration in seconds.
 
 </desktop_rules>
