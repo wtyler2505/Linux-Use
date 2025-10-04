@@ -59,9 +59,8 @@ dependencies = [
     "python-dotenv>=1.0.0",
     "requests>=2.31.0",
     
-    # Cursor tracking (if compatible with Linux)
+    # Cursor tracking
     "humancursor>=1.1.5",
-    "live-inspect==0.1.1",
 ]
 
 [project.optional-dependencies]
