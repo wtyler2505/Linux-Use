@@ -1,5 +1,5 @@
-from windows_use.agent.registry.views import Tool as ToolData, ToolResult
-from windows_use.agent.desktop.service import Desktop
+from linux_use.agent.registry.views import Tool as ToolData, ToolResult
+from linux_use.agent.desktop.service import Desktop
 from langchain.tools import Tool
 from textwrap import dedent
 import json

@@ -1,5 +1,5 @@
-from windows_use.agent.tools.views import Click, Type, Scroll, Drag, Move, Shortcut, Wait, Scrape, Done, Shell, Memory, App
-from windows_use.agent.desktop.service import Desktop
+from linux_use.agent.tools.views import Click, Type, Scroll, Drag, Move, Shortcut, Wait, Scrape, Done, Shell, Memory, App
+from linux_use.agent.desktop.service import Desktop
 from markdownify import markdownify
 from typing import Literal,Optional
 from langchain.tools import tool

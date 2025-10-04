@@ -1,7 +1,7 @@
 from uiautomation import Control, GetRootControl, IsIconic, IsZoomed, IsWindowVisible, ControlType, ControlFromCursor, IsTopLevelWindow, ShowWindow, ControlFromHandle
-from windows_use.agent.desktop.config import EXCLUDED_APPS, AVOIDED_APPS, BROWSER_NAMES, PROCESS_PER_MONITOR_DPI_AWARE
-from windows_use.agent.desktop.views import DesktopState, App, Size, Status
-from windows_use.agent.tree.service import Tree
+from linux_use.agent.desktop.config import EXCLUDED_APPS, AVOIDED_APPS, BROWSER_NAMES, PROCESS_PER_MONITOR_DPI_AWARE
+from linux_use.agent.desktop.views import DesktopState, App, Size, Status
+from linux_use.agent.tree.service import Tree
 from PIL.Image import Image as PILImage
 from locale import getpreferredencoding
 from contextlib import contextmanager

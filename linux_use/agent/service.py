@@ -1,17 +1,17 @@
-from windows_use.agent.tools.service import (click_tool, type_tool, shell_tool, done_tool,
+from linux_use.agent.tools.service import (click_tool, type_tool, shell_tool, done_tool,
 shortcut_tool, scroll_tool, drag_tool, move_tool, wait_tool, app_tool, scrape_tool, memory_tool )
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
-from windows_use.agent.utils import extract_agent_data, image_message
+from linux_use.agent.utils import extract_agent_data, image_message
 from langchain_core.language_models.chat_models import BaseChatModel
-from windows_use.agent.registry.service import Registry
-from windows_use.agent.registry.views import ToolResult
-from windows_use.agent.desktop.service import Desktop
-from windows_use.agent.desktop.views import Browser
-from windows_use.agent.prompt.service import Prompt
+from linux_use.agent.registry.service import Registry
+from linux_use.agent.registry.views import ToolResult
+from linux_use.agent.desktop.service import Desktop
+from linux_use.agent.desktop.views import Browser
+from linux_use.agent.prompt.service import Prompt
 from live_inspect.watch_cursor import WatchCursor
 from langgraph.graph import START,END,StateGraph
-from windows_use.agent.views import AgentResult
-from windows_use.agent.state import AgentState
+from linux_use.agent.views import AgentResult
+from linux_use.agent.state import AgentState
 from langchain_core.tools import BaseTool
 from contextlib import nullcontext
 from rich.markdown import Markdown

@@ -1,7 +1,7 @@
-from windows_use.agent.desktop.views import DesktopState, Browser
-from windows_use.agent.registry.views import ToolResult
-from windows_use.agent.desktop.service import Desktop
-from windows_use.agent.views import AgentData
+from linux_use.agent.desktop.views import DesktopState, Browser
+from linux_use.agent.registry.views import ToolResult
+from linux_use.agent.desktop.service import Desktop
+from linux_use.agent.views import AgentData
 from langchain.prompts import PromptTemplate
 from importlib.resources import files
 from datetime import datetime
