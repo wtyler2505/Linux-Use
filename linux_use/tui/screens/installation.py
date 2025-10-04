@@ -115,7 +115,6 @@ class InstallationScreen(Screen):
                 self.is_installing = False
             self.app.pop_screen()
     
-    @work(exclusive=True)
     async def start_installation(self) -> None:
         """Start the installation process"""
         self.is_installing = True
