@@ -275,25 +275,17 @@ def scroll_tool(loc:tuple[int,int]=None,type:Literal['horizontal','vertical']='v
         case 'vertical':
             match direction:
                 case 'up':
-                    uia.WheelUp(wheel_times)
+                    pg.scroll(wheel_times * 100)  # Positive for up
                 case 'down':
-                    uia.WheelDown(wheel_times)
+                    pg.scroll(-wheel_times * 100)  # Negative for down
                 case _:
                     return 'Invalid direction. Use "up" or "down".'
         case 'horizontal':
             match direction:
                 case 'left':
-                    pg.keyDown('Shift')
-                    pg.sleep(0.05)
-                    uia.WheelUp(wheel_times)
-                    pg.sleep(0.05)
-                    pg.keyUp('Shift')
+                    pg.hscroll(-wheel_times * 100)  # Negative for left
                 case 'right':
-                    pg.keyDown('Shift')
-                    pg.sleep(0.05)
-                    uia.WheelDown(wheel_times)
-                    pg.sleep(0.05)
-                    pg.keyUp('Shift')
+                    pg.hscroll(wheel_times * 100)  # Positive for right
                 case _:
                     return 'Invalid direction. Use "left" or "right".'
         case _:
