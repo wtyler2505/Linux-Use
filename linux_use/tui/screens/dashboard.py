@@ -245,3 +245,36 @@ class DashboardScreen(Screen):
     def action_quit(self) -> None:
         """Quit the application"""
         self.app.exit()
+    
+    async def execute_agent_task(self, task: str) -> None:
+        """Execute agent task asynchronously"""
+        log = self.query_one("#main-log", LogViewer)
+        status = self.query_one(StatusPanel)
+        
+        try:
+            log.log_system("=" * 50)
+            log.log_info(f"Task: {task}")
+            log.log_system("=" * 50)
+            
+            # Execute via agent service
+            success = await self.agent_service.execute_task(task)
+            
+            if success:
+                status.update_status("SUCCESS", "green")
+                status.update_agent_state("COMPLETED")
+                log.log_success("Task completed successfully!")
+            else:
+                status.update_status("ERROR", "red")
+                status.update_agent_state("FAILED")
+                log.log_error("Task execution failed")
+        
+        except Exception as e:
+            status.update_status("ERROR", "red")
+            status.update_agent_state("ERROR")
+            log.log_error(f"Exception: {e}")
+        
+        finally:
+            # Reset to standby after a delay
+            await asyncio.sleep(2)
+            status.update_status("STANDBY", "cyan")
+            status.update_agent_state("IDLE")
