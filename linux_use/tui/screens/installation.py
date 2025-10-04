@@ -106,7 +106,7 @@ class InstallationScreen(Screen):
         """Handle button presses"""
         if event.button.id == "btn-start":
             if not self.is_installing:
-                self.start_installation()
+                self.run_worker(self.start_installation())
         elif event.button.id == "btn-back":
             self.app.pop_screen()
         elif event.button.id == "btn-cancel":
