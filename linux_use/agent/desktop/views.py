@@ -5,23 +5,25 @@ from tabulate import tabulate
 from enum import Enum
 
 class Browser(Enum):
-    CHROME='Chrome'
-    EDGE='Edge'
-    FIREFOX='Firefox'
+    FIREFOX = 'firefox'
+    CHROME = 'google-chrome'
+    CHROMIUM = 'chromium'
+    EDGE = 'microsoft-edge'
+    BRAVE = 'brave-browser'
 
 class Status(Enum):
-    MAXIMIZED='Maximized'
-    MINIMIZED='Minimized'
-    NORMAL='Normal'
-    HIDDEN='Hidden'
+    MAXIMIZED = 'Maximized'
+    MINIMIZED = 'Minimized'
+    NORMAL = 'Normal'
+    HIDDEN = 'Hidden'
 
 
 @dataclass
 class App:
-    name:str
-    depth:int
-    status:Status
-    size:'Size'
+    name: str
+    depth: int
+    status: Status
+    size: 'Size'
     handle: int
     
     def to_row(self):
@@ -29,18 +31,18 @@ class App:
 
 @dataclass
 class Size:
-    width:int
-    height:int
+    width: int
+    height: int
 
     def to_string(self):
         return f'({self.width},{self.height})'
 
 @dataclass
 class DesktopState:
-    apps:list[App]
-    active_app:Optional[App]
-    screenshot:bytes|None
-    tree_state:TreeState
+    apps: list[App]
+    active_app: Optional[App]
+    screenshot: bytes | None
+    tree_state: TreeState
 
     def active_app_to_string(self):
         if self.active_app is None:
