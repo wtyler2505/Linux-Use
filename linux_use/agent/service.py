@@ -123,7 +123,7 @@ class Agent:
         else:
             tool_result=ToolResult(is_success=False,content="The agent has reached the maximum number of steps.")
         ai_message = AIMessage(content=Prompt.answer_prompt(agent_data=agent_data, tool_result=tool_result))
-        logger.info(colored(f"📜: Final Answer: {shorten(tool_result.content,500,placeholder="...")}",color='cyan',attrs=['bold']))
+        logger.info(colored(f"📜: Final Answer: {shorten(tool_result.content,500,placeholder='...')}",color='cyan',attrs=['bold']))
         return {**state,'agent_data':None,'messages':[ai_message],'previous_observation':None,'output':tool_result.content}
 
     def main_controller(self,state:AgentState):
