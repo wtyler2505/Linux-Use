@@ -60,7 +60,6 @@ class Agent:
         self.auto_minimize=auto_minimize
         self.use_vision=use_vision
         self.llm = llm
-        self.watch_cursor = WatchCursor()
         self.desktop = Desktop()
         self.console=Console()
         self.graph=self.create_graph()
