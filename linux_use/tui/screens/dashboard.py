@@ -7,7 +7,9 @@ from textual.widgets import Static, Button, Input, Label, TabbedContent, TabPane
 from ..widgets.status_panel import StatusPanel
 from ..widgets.metrics_display import MetricsDisplay
 from ..widgets.log_viewer import LogViewer
+from ..services.agent_service import AgentService
 import time
+import asyncio
 
 class DashboardScreen(Screen):
     """Main control dashboard with live agent monitoring"""
