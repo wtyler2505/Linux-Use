@@ -197,9 +197,17 @@ class DashboardScreen(Screen):
                 log.log_warning("No task entered")
         
         elif event.button.id == "btn-pause":
+            if self.agent_service:
+                self.run_worker(self.agent_service.pause_agent())
+            status = self.query_one(StatusPanel)
+            status.update_status("PAUSED", "yellow")
             log.log_warning("Agent paused")
         
         elif event.button.id == "btn-stop":
+            if self.agent_service:
+                self.run_worker(self.agent_service.stop_agent())
+            status = self.query_one(StatusPanel)
+            status.update_status("STANDBY", "cyan")
             log.log_error("Agent stopped")
         
         elif event.button.id == "btn-quick-diag":
