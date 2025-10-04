@@ -172,8 +172,7 @@ class Agent:
                 'previous_observation':None
             }
             try:
-                with self.watch_cursor:
-                    response=self.graph.invoke(state,config={'recursion_limit':self.max_steps*10})         
+                response=self.graph.invoke(state,config={'recursion_limit':self.max_steps*10})         
             except Exception as error:
                 response={
                     'output':None,
