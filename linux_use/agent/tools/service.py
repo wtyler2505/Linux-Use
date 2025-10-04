@@ -200,26 +200,15 @@ def click_tool(loc:tuple[int,int],button:Literal['left','right','middle']='left'
         - Single right click: Open context menus
         - Middle click: Browser-specific actions
     
-    Automatically detects UI elements under cursor and adjusts click behavior 
-    for reliable interaction. Essential for all point-and-click UI operations.
+    Essential for all point-and-click UI operations on Linux desktop.
     '''
     x,y=loc
     pg.moveTo(x,y)
-    pg.sleep(0.05)
-    desktop:Desktop=kwargs['desktop']
-    control=desktop.get_element_under_cursor()
-    parent=control.GetParentControl()
-    if parent.Name=="Desktop":
-        pg.click(x=x,y=y,button=button,clicks=clicks)
-    else:
-        pg.mouseDown()
-        if clicks==2 and button=='left':
-            pg.click(clicks=1)
-        pg.click(button=button,clicks=clicks)
-        pg.mouseUp()
+    pg.sleep(0.1)
+    pg.click(x=x, y=y, button=button, clicks=clicks)
     pg.sleep(0.1)
     num_clicks={1:'Single',2:'Double',3:'Triple'}
-    return f'{num_clicks.get(clicks)} {button} at ({x},{y}).'
+    return f'{num_clicks.get(clicks)} {button} click at ({x},{y}).'
 
 @tool('Type Tool',args_schema=Type)
 def type_tool(loc:tuple[int,int],text:str,clear:Literal['true','false']='false',caret_position:Literal['start','idle','end']='idle',press_enter:Literal['true','false']='false',**kwargs):
