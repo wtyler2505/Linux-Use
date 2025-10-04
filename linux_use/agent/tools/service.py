@@ -26,10 +26,10 @@ def done_tool(answer:str,**kwargs):
 @tool('App Tool',args_schema=App)
 def app_tool(mode:Literal['launch','resize','switch'],name:Optional[str]=None,loc:Optional[tuple[int,int]]=None,size:Optional[tuple[int,int]]=None,**kwargs)->str:
     '''
-    Manages Windows applications through launch, resize, and window switching operations.
+    Manages Linux applications through launch, resize, and window switching operations.
     
     Modes:
-        - launch: Opens an application from the Windows Start Menu by name
+        - launch: Opens an application by name (e.g., 'firefox', 'gedit')
         - resize: Adjusts the active application window's size and position
         - switch: Brings a specific application window into focus
     
