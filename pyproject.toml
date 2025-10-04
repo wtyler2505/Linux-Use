@@ -35,8 +35,9 @@ dependencies = [
     "langgraph>=0.6.4",
     
     # Linux GUI Automation & Accessibility
+    # Note: pyatspi must be installed via system package manager
+    # Use: sudo apt install python3-pyatspi gir1.2-atspi-2.0
     "python-xlib>=0.33",
-    "pyatspi>=2.38.0",
     "pyautogui>=0.9.54",
     
     # System Interaction
