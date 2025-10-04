@@ -101,13 +101,13 @@ class DiagnosticsScreen(Screen):
             self.app.pop_screen()
     
     async def run_diagnostics(self) -> None:
-        \"\"\"Run all diagnostic checks\"\"\"
-        log = self.query_one(\"#diag-log\", LogViewer)
+        """Run all diagnostic checks"""
+        log = self.query_one("#diag-log", LogViewer)
         table = self.query_one(DataTable)
         
-        log.log_system(\"═\" * 50)
-        log.log_system(\"RUNNING DIAGNOSTIC SUITE\")
-        log.log_system(\"═\" * 50)
+        log.log_system("═" * 50)
+        log.log_system("RUNNING DIAGNOSTIC SUITE")
+        log.log_system("═" * 50)
         
         # Clear table
         table.clear()
@@ -118,18 +118,18 @@ class DiagnosticsScreen(Screen):
         # Populate table
         for result in results:
             # Status icon
-            if result.status == \"pass\":
-                status_icon = \"✓\"
-                style = \"green bold\"
-            elif result.status == \"warning\":
-                status_icon = \"⚠\"
-                style = \"yellow bold\"
+            if result.status == "pass":
+                status_icon = "✓"
+                style = "green bold"
+            elif result.status == "warning":
+                status_icon = "⚠"
+                style = "yellow bold"
             else:
-                status_icon = \"✗\"
-                style = \"red bold\"
+                status_icon = "✗"
+                style = "red bold"
             
             # Fix suggestion
-            fix = result.fix_suggestion if result.fix_suggestion else \"-\"
+            fix = result.fix_suggestion if result.fix_suggestion else "-"
             
             table.add_row(
                 result.name,
@@ -139,46 +139,46 @@ class DiagnosticsScreen(Screen):
             )
             
             # Log result
-            if result.status == \"pass\":
-                log.log_success(f\"{result.name}: {result.message}\")
-            elif result.status == \"warning\":
-                log.log_warning(f\"{result.name}: {result.message}\")
+            if result.status == "pass":
+                log.log_success(f"{result.name}: {result.message}")
+            elif result.status == "warning":
+                log.log_warning(f"{result.name}: {result.message}")
             else:
-                log.log_error(f\"{result.name}: {result.message}\")
+                log.log_error(f"{result.name}: {result.message}")
             
             if result.details:
-                log.log_info(f\"  Details: {result.details}\")
+                log.log_info(f"  Details: {result.details}")
             if result.fix_suggestion:
-                log.log_info(f\"  Fix: {result.fix_suggestion}\")
+                log.log_info(f"  Fix: {result.fix_suggestion}")
         
-        log.log_system(\"═\" * 50)
-        log.log_system(\"DIAGNOSTICS COMPLETE\")
-        log.log_system(\"═\" * 50)
+        log.log_system("═" * 50)
+        log.log_system("DIAGNOSTICS COMPLETE")
+        log.log_system("═" * 50)
         
         # Summary
-        passed = sum(1 for r in results if r.status == \"pass\")
-        warnings = sum(1 for r in results if r.status == \"warning\")
-        failed = sum(1 for r in results if r.status == \"fail\")
+        passed = sum(1 for r in results if r.status == "pass")
+        warnings = sum(1 for r in results if r.status == "warning")
+        failed = sum(1 for r in results if r.status == "fail")
         
-        log.log_success(f\"Passed: {passed}\")
+        log.log_success(f"Passed: {passed}")
         if warnings:
-            log.log_warning(f\"Warnings: {warnings}\")
+            log.log_warning(f"Warnings: {warnings}")
         if failed:
-            log.log_error(f\"Failed: {failed}\")
+            log.log_error(f"Failed: {failed}")
     
     async def run_autofix(self) -> None:
-        \"\"\"Attempt to auto-fix common issues\"\"\"
-        log = self.query_one(\"#diag-log\", LogViewer)
+        """Attempt to auto-fix common issues"""
+        log = self.query_one("#diag-log", LogViewer)
         
-        log.log_system(\"═\" * 50)
-        log.log_system(\"AUTO-FIX INITIATED\")
-        log.log_system(\"═\" * 50)
+        log.log_system("═" * 50)
+        log.log_system("AUTO-FIX INITIATED")
+        log.log_system("═" * 50)
         
         # Get quick fixes
         fixes = DiagnosticRunner.get_quick_fixes()
         
         for issue, fix_cmd in fixes.items():
-            log.log_info(f\"Attempting fix for: {issue}\")
+            log.log_info(f"Attempting fix for: {issue}")
             log.log_command(fix_cmd)
             
             # Try to apply fix
@@ -188,10 +188,10 @@ class DiagnosticsScreen(Screen):
             else:
                 log.log_warning(message)
         
-        log.log_system(\"═\" * 50)
-        log.log_system(\"AUTO-FIX COMPLETE\")
-        log.log_system(\"═\" * 50)
-        log.log_info(\"Re-running diagnostics...\")
+        log.log_system("═" * 50)
+        log.log_system("AUTO-FIX COMPLETE")
+        log.log_system("═" * 50)
+        log.log_info("Re-running diagnostics...")
         
         await asyncio.sleep(1)
         await self.run_diagnostics()
