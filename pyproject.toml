@@ -1,30 +1,30 @@
 [project]
-name = "windows-use"
-version = "0.6.1"
-description = "An AI Agent that interacts with Windows OS at GUI level."
+name = "linux-use"
+version = "0.1.0"
+description = "An AI Agent that interacts with Linux desktop environments at GUI level."
 authors = [
-    { name = "Jeomon George", email = "jeogeoalukka@gmail.com" }
+    { name = "Tyler Wilson", email = "wtyler2505@example.com" },
+    { name = "Jeomon George (Original Windows-Use)", email = "jeogeoalukka@gmail.com" }
 ]
 readme = "README.md"
 license = 'MIT'
 license-files = ["LICENSE"]
-urls = { homepage = "https://github.com/CursorTouch" }
-keywords = ["windows", "agent", "ai", "desktop","ai agent","automation"]
-requires-python = ">=3.13"
+urls = { homepage = "https://github.com/wtyler2505/Linux-Use" }
+keywords = ["linux", "agent", "ai", "desktop", "ai agent", "automation", "cinnamon", "mint"]
+requires-python = ">=3.12"
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "Topic :: Software Development :: User Interfaces",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "License :: OSI Approved :: MIT License",
-    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
 ]
 
 dependencies = [
-    "fuzzywuzzy>=0.18.0",
-    "humancursor>=1.1.5",
-    "ipykernel>=6.29.5",
+    # Core LLM/Agent Framework
     "langchain>=0.3.25",
     "langchain-anthropic>=0.3.20",
     "langchain-community>=0.3.25",
@@ -33,22 +33,34 @@ dependencies = [
     "langchain-ollama>=0.3.3",
     "langchain-openai>=0.3.27",
     "langgraph>=0.6.4",
-    "live-inspect==0.1.1",
-    "lxml>=6.0.1",
-    "markdown>=3.9",
-    "markdownify>=1.1.0",
-    "pillow>=11.2.1",
-    "psutil>=7.0.0",
+    
+    # Linux GUI Automation & Accessibility
+    "python-xlib>=0.33",
+    "pyatspi>=2.38.0",
     "pyautogui>=0.9.54",
-    "pydantic>=2.11.7",
-    "python-levenshtein>=0.27.1",
-    "pywinauto>=0.6.9",
-    "pywinsandbox>=1.4.0",
+    
+    # System Interaction
+    "psutil>=7.0.0",
+    "distro>=1.8.0",
+    "screeninfo>=0.8",
+    
+    # UI/Output
     "rich>=14.0.0",
-    "tabulate>=0.9.0",
     "termcolor>=3.1.0",
-    "twine>=6.1.0",
-    "uiautomation>=2.0.29",
+    "tabulate>=0.9.0",
+    
+    # Utilities
+    "pydantic>=2.11.7",
+    "pillow>=11.2.1",
+    "markdownify>=1.1.0",
+    "fuzzywuzzy>=0.18.0",
+    "python-levenshtein>=0.27.1",
+    "python-dotenv>=1.0.0",
+    "requests>=2.31.0",
+    
+    # Cursor tracking (if compatible with Linux)
+    "humancursor>=1.1.5",
+    "live-inspect==0.1.1",
 ]
 
 [project.optional-dependencies]
@@ -57,9 +69,14 @@ dev = [
     "ruff>=0.12.1",
 ]
 
+wayland = [
+    "pydbus>=0.6.0",
+    "pygobject>=3.42.0",
+]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build]
-packages = ["windows_use"]
+packages = ["linux_use"]
