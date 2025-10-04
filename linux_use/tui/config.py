@@ -1,59 +1,68 @@
 """TUI Configuration"""
 
-from pathlib import Path
-from typing import Optional
-from pydantic import BaseModel
 import os
+from dataclasses import dataclass
+from pathlib import Path
 
-class TUIConfig(BaseModel):
-    """TUI configuration settings"""
+
+@dataclass
+class TUIConfig:
+    """Configuration for Linux-Use TUI"""
     
-    # Paths
-    app_dir: Path = Path("/app")
-    config_dir: Path = Path.home() / ".linux-use"
-    log_dir: Path = Path.home() / ".linux-use" / "logs"
-    cache_dir: Path = Path.home() / ".linux-use" / "cache"
-    
-    # API Settings
-    anthropic_api_key: Optional[str] = None
+    # API Keys
+    anthropic_api_key: str = ""
     use_claude_max: bool = False
     
-    # Agent Settings
+    # Agent settings
     max_steps: int = 25
     max_consecutive_failures: int = 3
     use_vision: bool = False
-    auto_minimize: bool = False
+    auto_minimize: bool = True
     
-    # Monitoring
-    refresh_rate: float = 1.0  # seconds
-    max_log_lines: int = 1000
-    
-    # Advanced
+    # Recording
     enable_recording: bool = True
+    recording_dir: str = "/app/recordings"
+    
+    # Remote monitoring
     enable_remote_monitoring: bool = False
     remote_port: int = 8888
     
-    class Config:
-        env_prefix = "LINUX_USE_"
-        
-    def ensure_dirs(self):
-        """Create necessary directories"""
-        for dir_path in [self.config_dir, self.log_dir, self.cache_dir]:
-            dir_path.mkdir(parents=True, exist_ok=True)
+    # Logging
+    log_level: str = "INFO"
+    log_file: str = "/app/logs/tui.log"
     
     @classmethod
     def load(cls) -> 'TUIConfig':
-        """Load configuration from environment and files"""
+        """Load configuration from environment"""
         config = cls()
         
-        # Load from .env if exists
-        env_file = config.app_dir / ".env"
-        if env_file.exists():
-            from dotenv import load_dotenv
-            load_dotenv(env_file)
-            
-        # Override from environment
-        config.anthropic_api_key = os.getenv('ANTHROPIC_API_KEY')
+        # Load from environment
+        config.anthropic_api_key = os.environ.get('ANTHROPIC_API_KEY', '')
+        config.max_steps = int(os.environ.get('LINUX_USE_MAX_STEPS', '25'))
+        config.max_consecutive_failures = int(os.environ.get('LINUX_USE_MAX_FAILURES', '3'))
         
-        config.ensure_dirs()
         return config
+    
+    def save(self):
+        """Save configuration to .env file"""
+        env_file = Path("/app/.env")
+        
+        # Read existing content
+        env_content = {}
+        if env_file.exists():
+            with open(env_file, 'r') as f:
+                for line in f:
+                    line = line.strip()
+                    if line and '=' in line and not line.startswith('#'):
+                        key, value = line.split('=', 1)
+                        env_content[key] = value
+        
+        # Update with new values
+        env_content['ANTHROPIC_API_KEY'] = self.anthropic_api_key
+        env_content['LINUX_USE_MAX_STEPS'] = str(self.max_steps)
+        env_content['LINUX_USE_MAX_FAILURES'] = str(self.max_consecutive_failures)
+        
+        # Write back
+        with open(env_file, 'w') as f:
+            for key, value in env_content.items():
+                f.write(f"{key}={value}\n")

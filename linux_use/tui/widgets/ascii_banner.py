@@ -1,31 +1,31 @@
-"""ASCII Art Banner Widget"""
+"""ASCII Banner Widget"""
 
 from textual.app import ComposeResult
 from textual.widgets import Static
-from rich.text import Text
+
 
 class ASCIIBanner(Static):
-    """Cyberpunk-style ASCII banner"""
+    """Cyberpunk-themed ASCII banner"""
     
     BANNER = """
-╭────────────────────────────────────────────────────────────────────────╮
-│                                                                        │
-│  ██╗     ██╗███╗   ██╗██╗██╗   ██╗██╗  ██╗██╗  ██╗██████╗        │
-│  ██║     ██║████╗  ██║██║██║   ██║██║  ██║██║ ██╔╝██╔════╝        │
-│  ██║     ██║██╔██╗ ██║██║██║   ██║██║  ██║█████╔╝ █████╗          │
-│  ██║     ██║██║╚██╗██║██║██║   ██║██║  ██║██╔═██╗╚══██║        │
-│  ███████╗██║██║ ╚████║╚██╗╚████╔╝╚████╔╝██║  ██║██████║        │
-│  ╚══════╝╚═╝╚═╝  ╚═══╝ ╚═╝ ╚═══╝  ╚═══╝ ╚═╝  ╚═╝╚═════╝        │
-│                                                                        │
-│  ▶ AI-POWERED DESKTOP AUTOMATION SYSTEM                               │
-│  ▶ LINUX MINT 22.2 CINNAMON OPTIMIZED                                │
-│  ▶ CLASSIFIED: LEVEL 5 CLEARANCE                                      │
-│                                                                        │
-╰────────────────────────────────────────────────────────────────────────╯
-    """
+██╗     ██╗███╗   ██╗██╗   ██╗██╗  ██╗      ██╗   ██╗███████╗███████╗
+██║     ██║████╗  ██║██║   ██║╚██╗██╔╝      ██║   ██║██╔════╝██╔════╝
+██║     ██║██╔██╗ ██║██║   ██║ ╚███╔╝ █████╗██║   ██║███████╗█████╗  
+██║     ██║██║╚██╗██║██║   ██║ ██╔██╗ ╚════╝██║   ██║╚════██║██╔══╝  
+███████╗██║██║ ╚████║╚██████╔╝██╔╝ ██╗      ╚██████╔╝███████║███████╗
+╚══════╝╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝       ╚═════╝ ╚══════╝╚══════╝
+                                                                       
+    ▀█▀ █▀▀ █▀█ █▀▄▀█ █ █▄░█ ▄▀█ █░░   █░█ █▀ █▀▀ █▀█   █ █▄░█ ▀█▀ █▀▀ █▀█ █▀▀ ▄▀█ █▀▀ █▀▀
+    ░█░ ██▄ █▀▄ █░▀░█ █ █░▀█ █▀█ █▄▄   █▄█ ▄█ ██▄ █▀▄   █ █░▀█ ░█░ ██▄ █▀▄ █▀░ █▀█ █▄▄ ██▄
     
-    def __init__(self, **kwargs):
-        super().__init__(self.BANNER, **kwargs)
-        self.styles.color = "#00ff41"
-        self.styles.background = "#0a0e14"
+    ╔═══════════════════════════════════════════════════════════════════╗
+    ║   DESKTOP AUTOMATION FRAMEWORK v2.0 :: LINUX EDITION             ║
+    ║   [POWERED BY ANTHROPIC CLAUDE & AT-SPI2]                        ║
+    ╚═══════════════════════════════════════════════════════════════════╝
+"""
+    
+    def __init__(self):
+        super().__init__(self.BANNER)
+        self.styles.text_align = "center"
+        self.styles.color = "cyan"
         self.styles.text_style = "bold"

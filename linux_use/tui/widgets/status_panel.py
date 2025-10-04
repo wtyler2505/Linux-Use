@@ -2,63 +2,42 @@
 
 from textual.app import ComposeResult
 from textual.widgets import Static
-from textual.containers import Container, Horizontal, Vertical
-from rich.text import Text
-import time
+from textual.containers import Container, Vertical
+
 
 class StatusPanel(Container):
-    """Real-time agent status panel with cyberpunk styling"""
-    
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.agent_status = "IDLE"
-        self.last_action = "System initialized"
-        self.mission_count = 0
-        self.success_rate = 100.0
+    """Real-time status display panel"""
     
     def compose(self) -> ComposeResult:
         """Create child widgets"""
         with Vertical():
-            yield Static("╭── AGENT STATUS MONITOR ──────────────────────╮", classes="metric-label")
-            
-            with Horizontal():
-                yield Static("│ STATUS:", classes="metric-label")
-                yield Static(self.agent_status, id="agent-status", classes="status-active")
-            
-            with Horizontal():
-                yield Static("│ LAST ACTION:", classes="metric-label")
-                yield Static(self.last_action, id="last-action", classes="metric-value")
-            
-            with Horizontal():
-                yield Static("│ MISSIONS:", classes="metric-label")
-                yield Static(f"{self.mission_count}", id="mission-count", classes="metric-value")
-            
-            with Horizontal():
-                yield Static("│ SUCCESS RATE:", classes="metric-label")
-                yield Static(f"{self.success_rate:.1f}%", id="success-rate", classes="metric-high")
-            
-            with Horizontal():
-                yield Static("│ UPTIME:", classes="metric-label")
-                yield Static("00:00:00", id="uptime", classes="metric-value")
-            
-            yield Static("╰───────────────────────────────────────────────╯", classes="metric-label")
+            yield Static("╔═══ SYSTEM STATUS ═══════╗", classes="metric-label")
+            yield Static("", id="status-content")
+            yield Static("", id="agent-state")
+            yield Static("", id="uptime")
+            yield Static("", id="tasks-completed")
     
-    def update_status(self, status: str, action: str = None):
-        """Update agent status"""
-        self.agent_status = status
-        status_widget = self.query_one("#agent-status", Static)
-        status_widget.update(status)
+    def on_mount(self) -> None:
+        """Initialize on mount"""
+        self.update_status("STANDBY", "cyan")
+        self.query_one("#uptime", Static).update("⏱ Uptime: 00:00:00")
+        self.query_one("#tasks-completed", Static).update("✅ Tasks: 0")
+    
+    def update_status(self, status: str, color: str = "white"):
+        """Update status display"""
+        status_widget = self.query_one("#status-content", Static)
         
-        if status == "ACTIVE":
-            status_widget.remove_class("status-idle", "status-error")
-            status_widget.add_class("status-active")
-        elif status == "ERROR":
-            status_widget.remove_class("status-idle", "status-active")
-            status_widget.add_class("status-error")
-        else:
-            status_widget.remove_class("status-active", "status-error")
-            status_widget.add_class("status-idle")
+        status_icons = {
+            "STANDBY": "⏸",
+            "RUNNING": "▶",
+            "PAUSED": "⏸",
+            "ERROR": "✗",
+            "SUCCESS": "✓"
+        }
         
-        if action:
-            self.last_action = action
-            self.query_one("#last-action", Static).update(action)
+        icon = status_icons.get(status, "●")
+        status_widget.update(f"{icon} STATUS: [{color}]{status}[/]")
+    
+    def update_agent_state(self, state: str):
+        """Update agent state"""
+        self.query_one("#agent-state", Static).update(f"🤖 Agent: {state}")
