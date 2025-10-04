@@ -149,6 +149,12 @@ class DashboardScreen(Screen):
         log.log_info("All systems operational")
         log.log_info("Waiting for task input...")
         
+        # Initialize agent service
+        def agent_log_callback(msg: str):
+            log.log_agent(msg)
+        
+        self.agent_service = AgentService(progress_callback=agent_log_callback)
+        
         # Start update timer
         self.set_interval(1.0, self.update_dashboard)
     
