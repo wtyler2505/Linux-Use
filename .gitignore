@@ -15,4 +15,7 @@ sandbox
 *.ipynb
 __pycache__
 .vscode
-.memories
+.memories-e 
+# Environment files
+*.env
+*.env.*
