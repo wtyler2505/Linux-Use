@@ -92,12 +92,12 @@ class DiagnosticsScreen(Screen):
         self.run_diagnostics()
     
     def on_button_pressed(self, event: Button.Pressed) -> None:
-        \"\"\"Handle button presses\"\"\"
-        if event.button.id == \"btn-run-diag\":
+        """Handle button presses"""
+        if event.button.id == "btn-run-diag":
             self.run_worker(self.run_diagnostics())
-        elif event.button.id == \"btn-autofix\":
+        elif event.button.id == "btn-autofix":
             self.run_worker(self.run_autofix())
-        elif event.button.id == \"btn-back\":
+        elif event.button.id == "btn-back":
             self.app.pop_screen()
     
     async def run_diagnostics(self) -> None:
