@@ -172,15 +172,21 @@ Vertical {
 ProgressBar {
     color: $primary;
     background: $surface-lighten-1;
-    bar-color: $primary;
 }
 
-ProgressBar.-complete {
-    bar-color: $success;
+ProgressBar > Bar {
+    color: $primary;
+    background: $primary;
 }
 
-ProgressBar.-error {
-    bar-color: $error;
+ProgressBar.-complete > Bar {
+    color: $success;
+    background: $success;
+}
+
+ProgressBar.-error > Bar {
+    color: $error;
+    background: $error;
 }
 
 /* Loading Indicator */
