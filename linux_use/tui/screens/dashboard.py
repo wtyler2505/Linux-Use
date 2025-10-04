@@ -90,6 +90,7 @@ class DashboardScreen(Screen):
     def __init__(self):
         super().__init__()
         self.start_time = time.time()
+        self.agent_service = None
     
     def compose(self) -> ComposeResult:
         """Create child widgets"""
