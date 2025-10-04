@@ -4,7 +4,7 @@ from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.containers import Container, Vertical, Horizontal, ScrollableContainer
 from textual.widgets import Static, Button, ProgressBar, Label
-from textual.worker import work_thread as work
+# Worker import not needed - using run_worker instead
 from ..widgets.log_viewer import LogViewer
 from ..utils.system_detector import SystemDetector
 from ..utils.installer import PackageInstaller
