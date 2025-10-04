@@ -3,7 +3,6 @@ from linux_use.agent.desktop.service import Desktop
 from markdownify import markdownify
 from typing import Literal,Optional
 from langchain.tools import tool
-import uiautomation as uia
 from pathlib import Path
 import pyautogui as pg
 import requests
