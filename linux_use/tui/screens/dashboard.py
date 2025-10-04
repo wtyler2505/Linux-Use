@@ -184,8 +184,17 @@ class DashboardScreen(Screen):
             task = task_input.value
             if task:
                 log.log_command(f"Executing: {task}")
-                log.log_warning("Agent execution not yet implemented in TUI")
+                
+                # Update status
+                status = self.query_one(StatusPanel)
+                status.update_status("RUNNING", "green")
+                status.update_agent_state("EXECUTING")
+                
+                # Execute task asynchronously
+                self.run_worker(self.execute_agent_task(task))
                 task_input.value = ""
+            else:
+                log.log_warning("No task entered")
         
         elif event.button.id == "btn-pause":
             log.log_warning("Agent paused")
