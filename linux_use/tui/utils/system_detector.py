@@ -139,7 +139,7 @@ class SystemDetector:
             try:
                 __import__(module)
                 dependencies[f"python:{module}"] = True
-            except ImportError:
+            except (ImportError, SystemExit, Exception):
                 dependencies[f"python:{module}"] = False
         
         # Check command-line tools
